@@ -54,7 +54,7 @@ export function TrackList({ track }: { track: string }) {
         return `::view-transition-group(scenario-${e.id}) { z-index: ${10 - away}; animation-delay: ${expanded ? Math.min(i * 12, 48) : 0}ms; }`;
       }).join('\n')}</style>
       <header className="booth-hero">
-        <img className="booth-hero-art" src="/brand/signiture/copilot-signature.png" alt="" aria-hidden="true" />
+        <img className="booth-hero-art" src="brand/signiture/copilot-signature.png" alt="" aria-hidden="true" />
         <div className="booth-hero-inner">
           <button type="button" className="booth-back" onClick={() => go(HASH_HOME)}>
             <ArrowLeftRegular aria-hidden="true" />{COPY.backToHome}
@@ -80,7 +80,7 @@ export function TrackList({ track }: { track: string }) {
                 <article key={p.id} data-agent={p.id}>
                   <header>
                     <h2 className="sc-overview-product-name">
-                      <span className="sc-overview-copilot-logo"><img src="/logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}
+                      <span className="sc-overview-copilot-logo"><img src="logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}
                       <span className="sc-overview-product-suffix">{p.label}</span>
                     </h2>
                   </header>

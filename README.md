@@ -41,9 +41,21 @@ Microsoft **Copilot Chat**과 **Copilot Cowork**가 실제 업무를 어떻게 �
 | | 설비 모니터링 SaaS 기술 문의 답변과 고객 안내 자료 준비 | Cowork |
 | | 차세대 진동 센서·예지보전 출시 보도자료 초안 | Chat |
 
-## 실행
+## 로컬에서 확인하기
 
-Node.js 20 이상이 필요합니다.
+### 방법 1. 더블클릭으로 열기 (Node.js 설치 불필요)
+
+1. 로컬 확인용 압축 파일(`copilot-cowork-demo-local.zip`)을 받아 압축을 풉니다.
+2. `copilot-cowork-demo` 폴더의 `index.html` 을 더블클릭합니다. Edge나 Chrome을 권장하며, 인터넷 연결 없이도 동작합니다.
+3. F11 키로 전체 화면을 쓰면 부스 화면과 같은 비율로 보입니다.
+
+압축 파일은 아래 명령으로 직접 만들 수도 있습니다. 결과는 `dist-local/` 폴더이고, 이 폴더를 통째로 복사해 쓰면 됩니다.
+
+```bash
+npm run build:local
+```
+
+### 방법 2. 개발 서버로 열기 (Node.js 20 이상)
 
 ```bash
 npm install
@@ -53,15 +65,17 @@ npm install
 npm run dev
 ```
 
-브라우저에서 `http://localhost:5173` 을 엽니다. 배포용 빌드는 다음 명령으로 만듭니다(결과는 `dist/`).
+브라우저에서 `http://localhost:5173` 을 엽니다. 코드나 시나리오를 고치면 화면이 바로 바뀝니다.
+
+## 배포
+
+웹 배포용 빌드는 다음 명령으로 만듭니다. 결과는 `dist/` 폴더입니다.
 
 ```bash
 npm run build
 ```
 
-## 배포
-
-`dist/` 폴더를 정적 호스팅에 올리면 됩니다. 주소는 해시(`#/…`) 방식이라 서버 설정이 필요 없습니다.
+`dist/` 폴더를 정적 호스팅에 올리면 됩니다. 주소는 해시(`#/…`) 방식이고 경로가 모두 상대 경로라, 루트가 아닌 하위 경로에 올려도 서버 설정 없이 동작합니다.
 Azure Static Web Apps를 쓸 때는 함께 들어 있는 `staticwebapp.config.json` 이 그대로 적용됩니다(앱 위치 `/`, 출력 위치 `dist`).
 
 ## 고쳐 쓰기

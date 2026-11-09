@@ -81,7 +81,7 @@ const LETTER: Record<string, [string, string]> = {
 
 /** 앱 아이콘 (M365 로고 또는 글자 배지) */
 export function AppIcon({ app }: { app: string }) {
-  if (app === 'chat') return <img className="wb-fico is-logo" src="/logo/copilot/copilot.png" alt="" aria-hidden="true" />;
+  if (app === 'chat') return <img className="wb-fico is-logo" src="logo/copilot/copilot.png" alt="" aria-hidden="true" />;
   if (isApp(app) && app !== 'onenote') return <img className="wb-fico is-logo" src={APP_LOGO[app]} alt="" aria-hidden="true" />;
   const [ch, bg] = LETTER[app] ?? ['•', '#8a8886'];
   return <span className="wb-fico" style={{ background: bg }} aria-hidden="true">{ch}</span>;

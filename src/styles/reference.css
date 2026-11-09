@@ -2252,7 +2252,7 @@ button {
     bottom: 0;
     left: 0;
     z-index: -2;
-    background: url(/brand/gradient/sky-07.jpg) center / cover no-repeat
+    background: url(../assets/gradient/sky-07.jpg) center / cover no-repeat
 }
 
 .booth-home-head {
@@ -4201,7 +4201,7 @@ button {
 }
 
 .sc-stage-sky {
-    background: linear-gradient(180deg, color-mix(in srgb, var(--sc-canvas) 26%, transparent) 0%, color-mix(in srgb, var(--sc-canvas) 58%, transparent) 42%, color-mix(in srgb, var(--sc-canvas) 88%, transparent) 74%, var(--sc-canvas) 96%), url(/brand/gradient/sky-02.jpg) right top / cover no-repeat
+    background: linear-gradient(180deg, color-mix(in srgb, var(--sc-canvas) 26%, transparent) 0%, color-mix(in srgb, var(--sc-canvas) 58%, transparent) 42%, color-mix(in srgb, var(--sc-canvas) 88%, transparent) 74%, var(--sc-canvas) 96%), url(../assets/gradient/sky-02.jpg) right top / cover no-repeat
 }
 
 .sc-stage-head {

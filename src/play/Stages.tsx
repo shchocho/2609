@@ -72,7 +72,7 @@ export function PainStage({ title, caption, onNext }: { title: string; caption: 
 export function ProductName({ agent }: { agent: Scenario['agent'] }) {
   return (
     <span className="sc-overview-product-name">
-      <span className="sc-overview-copilot-logo"><img src="/logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}
+      <span className="sc-overview-copilot-logo"><img src="logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}
       <span className="sc-overview-product-suffix">{agent === 'chat' ? 'Chat' : 'Cowork'}</span>
     </span>
   );
@@ -88,7 +88,7 @@ export function OverviewStage({ agent, steps, hook, onNext }: { agent: Scenario[
       <div className="sc-stage-head">
         <h2>
           <span className="sc-overview-product-name">
-            <span className="sc-overview-copilot-logo"><img src="/logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}
+            <span className="sc-overview-copilot-logo"><img src="logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}
             <span className="sc-overview-product-suffix">{agent === 'chat' ? 'Chat' : 'Cowork'}</span>
             <span className="sc-overview-product-particle">{agent === 'chat' ? '과' : '와'}</span>
           </span>{' '}함께라면?
@@ -124,6 +124,7 @@ function QrButton() {
   const [ok, setOk] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
+    if (!COPY.qr.src) return;
     const img = new Image();
     img.onload = () => setOk(true);
     img.src = COPY.qr.src;
@@ -195,7 +196,7 @@ export function DoneStage({ s, st, vars, completed }: { s: Scenario; st: PlaySta
           <h2>
             {completed
               ? <><ProductName agent={s.agent} /><span>{s.agent === 'chat' ? '과 함께' : '와 함께'}</span></>
-              : <><img src="/logo/copilot/copilot-lockup-horiz.png" alt="Microsoft Copilot" /><span>체험 미완료</span></>}
+              : <><img src="logo/copilot/copilot-lockup-horiz.png" alt="Microsoft Copilot" /><span>체험 미완료</span></>}
           </h2>
           <p>{completed ? s.finish?.sub ?? s.hook ?? s.summary : '체험을 끝까지 진행하지 않았습니다.'}</p>
         </div>

@@ -3,8 +3,8 @@ import { go, HASH_HOME } from '../router';
 import { COPY } from '../copy';
 
 const HERO = {
-  landscape: '/brand/hero/copilot-hero-light-16x9.png',
-  motion: '/brand/hero/copilot-hero-motion-light-16x9.mp4',
+  landscape: 'brand/hero/copilot-hero-light-16x9.png',
+  motion: 'brand/hero/copilot-hero-motion-light-16x9.mp4',
 };
 
 function usePortrait() {
@@ -44,7 +44,7 @@ export function Attract({ limited = false }: { limited?: boolean }) {
       )}
       {limited ? (
         <div className="booth-attract-say">
-          <img className="booth-limited-logo" src="/logo/copilot/copilot-horiz-black.png" alt="Copilot" />
+          <img className="booth-limited-logo" src="logo/copilot/copilot-horiz-black.png" alt="Copilot" />
           <h1>더 큰 화면에서<br />접속해 주세요</h1>
           <p>PC나 태블릿에서 체험해 주세요.<br />창을 작게 열었다면 크기를 늘려 주세요.</p>
         </div>
@@ -52,7 +52,7 @@ export function Attract({ limited = false }: { limited?: boolean }) {
         <div className="booth-attract-say">
           <h1>
             <span className="booth-lockup-hold">
-              <img className="booth-lockup" src="/logo/copilot/copilot-horiz-black.png" alt="Copilot" />
+              <img className="booth-lockup" src="logo/copilot/copilot-horiz-black.png" alt="Copilot" />
               {COPY.particle}
             </span>{' '}
             함께라면, <span>{COPY.tagline}</span>

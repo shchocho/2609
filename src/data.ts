@@ -61,12 +61,12 @@ export const EFFORTS = [
 ];
 
 export const APP_LOGO: Record<AppId, string> = {
-  excel: '/logo/m365/excel.svg',
-  word: '/logo/m365/word.svg',
-  powerpoint: '/logo/m365/powerpoint.svg',
-  outlook: '/logo/m365/outlook.svg',
-  teams: '/logo/m365/teams.svg',
-  onenote: '/brand/m365-icon-gradient/onenote.png',
+  excel: 'logo/m365/excel.svg',
+  word: 'logo/m365/word.svg',
+  powerpoint: 'logo/m365/powerpoint.svg',
+  outlook: 'logo/m365/outlook.svg',
+  teams: 'logo/m365/teams.svg',
+  onenote: 'brand/m365-icon-gradient/onenote.png',
 };
 
 /** 시나리오에 등장하는 앱 목록 (apps 가 없으면 workbench 아티팩트에서 유추) */

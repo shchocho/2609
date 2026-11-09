@@ -12,8 +12,8 @@ export const COPY = {
   /** 푸터 */
   footerLeft: '© Microsoft 2026',
   footerRight: 'Copilot Cowork Experience',
-  /** 결과 화면 QR (파일이 없으면 자동으로 숨김) */
-  qr: { src: '/qr/experience-qr.png', label: 'Copilot 체험 안내' },
+  /** 결과 화면 QR 안내 — public/ 에 이미지를 넣고 경로(예: 'qr/experience-qr.png')를 적으면 버튼이 나타남 */
+  qr: { src: '', label: 'Copilot 체험 안내' },
   /** 체험 데이터는 가상의 회사·인물 기준임을 알리는 문구 */
   disclaimer: '이 체험의 회사·인물·수치는 모두 가상의 예시입니다.',
 };

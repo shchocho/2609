@@ -32,7 +32,7 @@ export function MessageView({ m, active, ids, extra, hold = false, clips, pick, 
   if (m.role === 'tool') {
     return (
       <div className={`sc-act${active ? ' is-now' : ' is-done'}`}>
-        <p className="sc-act-h"><img className="sc-act-ico" src="/logo/copilot/copilot.png" alt="" aria-hidden="true" />{toolCategory(m.tool)}<i aria-hidden="true">›</i></p>
+        <p className="sc-act-h"><img className="sc-act-ico" src="logo/copilot/copilot.png" alt="" aria-hidden="true" />{toolCategory(m.tool)}<i aria-hidden="true">›</i></p>
         <p className="sc-act-d">{m.tool}</p>
       </div>
     );

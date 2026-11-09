@@ -133,4 +133,4 @@ const EXT: Record<string, string> = {
 export const appFromName = (name: string) => EXT[name.split('.').pop()?.toLowerCase() ?? ''] ?? 'word';
 
 /** 공개 폴더 기준 경로 */
-export const asset = (p: string) => '/' + p.replace(/^\//, '');
+export const asset = (p: string) => p.replace(/^\//, '');

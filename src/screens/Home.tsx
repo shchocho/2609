@@ -24,7 +24,7 @@ export function Home() {
             <span className="booth-home-title-line">
               <span className="booth-home-title-product">
                 <span className="booth-home-lockup">
-                  <img src="/logo/copilot/copilot-lockup-horiz.png" alt="Microsoft Copilot" />
+                  <img src="logo/copilot/copilot-lockup-horiz.png" alt="Microsoft Copilot" />
                 </span>
                 <span>{COPY.particle}</span>
               </span>
