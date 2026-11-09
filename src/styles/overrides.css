@@ -1,0 +1,36 @@
+/* 공용 버전 보정 스타일 — Fluent UI 토큰(원본은 FluentProvider가 주입)과 로컬 폰트 대체 */
+:root {
+  --borderRadiusNone: 0;
+  --borderRadiusSmall: 2px;
+  --borderRadiusMedium: 4px;
+  --borderRadiusLarge: 6px;
+  --borderRadiusXLarge: 8px;
+  --borderRadiusCircular: 10000px;
+  --colorNeutralForeground1: #242424;
+  --colorNeutralForeground2: #424242;
+  --colorNeutralForeground3: #616161;
+  --colorNeutralBackground1: #ffffff;
+  --colorNeutralStroke1: #d1d1d1;
+  --colorNeutralStroke2: #e0e0e0;
+  --colorBrandBackground: #0a6bba;
+  --shadow8: 0 0 2px rgba(0, 0, 0, .12), 0 4px 8px rgba(0, 0, 0, .14);
+  /* Segoe 계열은 배포하지 않으므로 Pretendard 우선 */
+  --booth-font: "Segoe UI Variable Display", "Segoe UI", "Pretendard Variable", Pretendard, "Malgun Gothic", system-ui, sans-serif;
+}
+.booth-root {
+  height: 100%;
+  font-family: var(--booth-font);
+  font-size: var(--booth-body);
+  color: var(--copilot-ink);
+}
+/* 체험 데이터 안내 문구 */
+.booth-disclaimer {
+  position: fixed;
+  right: 14px;
+  bottom: 10px;
+  z-index: 5;
+  margin: 0;
+  font-size: 12px;
+  color: var(--copilot-ink-3);
+  pointer-events: none;
+}

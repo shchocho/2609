@@ -1,0 +1,4 @@
+{
+  "navigationFallback": { "rewrite": "/index.html", "exclude": ["/assets/*", "/logo/*", "/brand/*", "/font/*"] },
+  "globalHeaders": { "cache-control": "public, max-age=3600" }
+}
