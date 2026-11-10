@@ -21,7 +21,7 @@ export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const P = {
   search: '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/>',
-  moon: '<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a7 7 0 1 0 10.5 10.5Z"/>',
+  moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>',
   cube: '<path d="m12 3 8 4.5v9L12 21l-8-4.5v-9Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/>',
   ruler: '<path d="m3.5 16.5 13-13 4 4-13 13Z"/><path d="m7 13 1.6 1.6M10 10l1.6 1.6M13 7l1.6 1.6"/>',
   layers: '<path d="m12 3 9 5-9 5-9-5Z"/><path d="m3 12.5 9 5 9-5M3 17l9 5 9-5"/>',
@@ -90,8 +90,29 @@ export function tilt(container, selector, max = 7) {
 // ---------------------------------------------------------------- 저장소 (브라우저에만 남는 개인 설정·진행 기록)
 const KEY = 'miniatyr.v1';
 const DEF = { N: 12, fit: false, theme: 'system', sheetStyle: 'paper', mmpx: 96 / 25.4, items: {} };
-let state = { ...DEF };
-try { const raw = localStorage.getItem(KEY); if (raw) state = { ...DEF, ...JSON.parse(raw) }; } catch { /* 저장소를 쓸 수 없으면 기본값으로 동작 */ }
+/** 저장된 값·가져온 백업은 믿지 않는다: 아는 필드만, 아는 형태로만 받아들인다. */
+function sanitize(raw) {
+  const o = raw && typeof raw === 'object' ? raw : {}, out = { ...DEF, items: {} };
+  if ([6, 12, 18, 24, 48].includes(o.N)) out.N = o.N;
+  out.fit = o.fit === true;
+  if (['system', 'light', 'dark'].includes(o.theme)) out.theme = o.theme;
+  if (['paper', 'blueprint', 'night'].includes(o.sheetStyle)) out.sheetStyle = o.sheetStyle;
+  if (Number.isFinite(o.mmpx) && o.mmpx >= 2.4 && o.mmpx <= 6.5) out.mmpx = o.mmpx;
+  if (o.items && typeof o.items === 'object') {
+    for (const [id, v] of Object.entries(o.items).slice(0, 400)) {
+      if (!/^[a-z0-9-]{1,40}$/.test(id) || !v || typeof v !== 'object') continue;
+      const it = {};
+      if (typeof v.variant === 'string' && /^[a-z0-9]{1,16}$/.test(v.variant)) it.variant = v.variant;
+      if (Number.isInteger(v.fin) && v.fin >= 0 && v.fin < 20) it.fin = v.fin;
+      if (Array.isArray(v.done)) it.done = [...new Set(v.done.filter((n) => Number.isInteger(n) && n > 0 && n < 100))];
+      if (Number.isFinite(v.started)) it.started = v.started;
+      out.items[id] = it;
+    }
+  }
+  return out;
+}
+let state = { ...DEF, items: {} };
+try { const raw = localStorage.getItem(KEY); if (raw) state = sanitize(JSON.parse(raw)); } catch { /* 저장소를 쓸 수 없으면 기본값으로 동작 */ }
 const subs = new Set();
 export const store = {
   get: (k) => state[k],
@@ -100,7 +121,7 @@ export const store = {
   setItem(id, patch) { state.items[id] = { ...(state.items[id] || {}), ...patch }; this.save(); },
   dropItem(id) { delete state.items[id]; this.save(); },
   all: () => state,
-  replace(next) { state = { ...DEF, ...next }; this.save(); },
+  replace(next) { state = sanitize(next); this.save(); },
   save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* 무시 */ } },
   on(f) { subs.add(f); return () => subs.delete(f); },
 };

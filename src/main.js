@@ -37,7 +37,7 @@ let pal = null;
 function openPalette() {
   if (pal) return;
   let sel = 0, results = [];
-  const input = h('input', { type: 'search', id: 'pal-q', placeholder: '가구 이름 · 종류 (예: 포엥, 책상, sofa)', 'aria-label': '가구 찾기', autocomplete: 'off' });
+  const input = h('input', { type: 'search', id: 'pal-q', placeholder: '가구 이름 · 종류 (예: 포엥, 책상, sofa)', 'aria-label': '가구 찾기', autocomplete: 'off', role: 'combobox', 'aria-expanded': 'true', 'aria-controls': 'pal-list', 'aria-autocomplete': 'list' });
   const ul = h('ul', { role: 'listbox', id: 'pal-list' });
   const box = h('div', { class: 'panel pal', role: 'dialog', 'aria-modal': 'true', 'aria-label': '가구 찾기' }, h('label', { class: 'field' }, h('span', { html: icon('search') }), input), ul);
   const scrim = h('div', { class: 'scrim', onclick: (e) => { if (e.target === scrim) close(); } }, box);
@@ -48,11 +48,11 @@ function openPalette() {
     const q = input.value.trim().toLowerCase();
     results = (q ? CATALOG.filter((it) => searchText(it).includes(q)) : CATALOG).slice(0, 40);
     sel = Math.min(sel, Math.max(0, results.length - 1));
-    ul.replaceChildren(...(results.length ? results.map((it, i) => h('li', { role: 'option', 'aria-selected': String(i === sel) },
-      h('button', { type: 'button', tabindex: '-1', 'aria-selected': String(i === sel), onclick: () => go(it) }, h('img', { src: thumb(it.id), alt: '', loading: 'lazy' }), h('span', {}, h('b', {}, it.name), h('span', {}, `${it.ko} ${it.type}`)), h('span', { class: 'mono', style: { fontSize: 'var(--t-xs)', color: 'var(--ink-3)' } }, `No.${no3(it.no)}`))))
-      : [h('li', { style: { padding: '18px', color: 'var(--ink-3)' } }, '찾는 가구가 없습니다. 다른 이름으로 찾아보세요.')]));
-    const cur = ul.querySelector('button[aria-selected="true"]');
-    if (cur) cur.scrollIntoView({ block: 'nearest' });
+    ul.replaceChildren(...(results.length ? results.map((it, i) => h('li', { role: 'option', id: `pal-o-${i}`, 'aria-selected': String(i === sel), onclick: () => go(it) },
+      h('img', { src: thumb(it.id), alt: '', loading: 'lazy' }), h('span', {}, h('b', {}, it.name), h('span', {}, `${it.ko} ${it.type}`)), h('span', { class: 'mono', style: { fontSize: 'var(--t-xs)', color: 'var(--ink-3)' } }, `No.${no3(it.no)}`)))
+      : [h('li', { role: 'presentation', style: { display: 'block', padding: '18px', color: 'var(--ink-3)' } }, '찾는 가구가 없습니다. 다른 이름으로 찾아보세요.')]));
+    const cur = ul.querySelector('[aria-selected="true"]');
+    if (cur) { cur.scrollIntoView({ block: 'nearest' }); input.setAttribute('aria-activedescendant', cur.id); } else input.removeAttribute('aria-activedescendant');
   };
   const key = (e) => {
     if (e.key === 'Escape') { e.preventDefault(); close(); }

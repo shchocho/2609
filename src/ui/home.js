@@ -56,8 +56,8 @@ export function homePage(root, ctx) {
     h('dl', { class: 'hero__facts' },
       h('div', {}, h('dt', {}, '100'), h('dd', {}, '가구')),
       h('div', {}, h('dt', {}, '138'), h('dd', {}, '크기·구성 변형')),
-      h('div', {}, h('dt', {}, '5'), h('dd', {}, '축척')),
-      h('div', {}, h('dt', {}, '5'), h('dd', {}, '도면 종류'))),
+      h('div', {}, h('dt', {}, '1,824'), h('dd', {}, '부품')),
+      h('div', {}, h('dt', {}, '1:6–1:48'), h('dd', {}, '다섯 가지 축척'))),
     h('p', { class: 'scrollcue' }, h('span', { html: icon('down') }), '스크롤하면 만드는 과정이 이어집니다'));
   const chapEls = [hero, ...CHAPTERS.map((c, i) => h('article', { class: 'chapter', dataset: { ch: String(i + 1) } },
     h('span', { class: 'eyebrow' }, `${c.n} — ${c.k}`), h('h2', {}, c.t), h('p', {}, c.d),
@@ -177,6 +177,7 @@ export function homePage(root, ctx) {
     stage = new Stage(host, { maxDpr: ctx.lowPower ? 1.25 : 2, samples: ctx.lowPower ? 40 : 72,
       onFrame: (s) => { const az = (((s.cam.theta * 180) / Math.PI) % 360 + 360) % 360; hud.az.textContent = `AZ ${String(Math.round(az)).padStart(3, '0')}°  EL ${String(Math.round(90 - (s.cam.phi * 180) / Math.PI)).padStart(2, '0')}°`; } });
     stage.fitScale = 1.3;
+    stage.canvas.setAttribute('aria-label', '미니어처 3D 미리보기. 페이지를 스크롤하면 도면, 재단, 조립, 완성 순서로 바뀝니다.');
     stage.setTheme({ dark: ctx.isDark() });
     stage.setLineTheme('blueprint');
     stage.mini = true; stage.N = N;

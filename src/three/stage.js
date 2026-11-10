@@ -437,7 +437,10 @@ export class Stage {
   }
 
   _layoutSet() {
-    for (const o of [...this.props.children]) { o.traverse((c) => { if (c.geometry) c.geometry.dispose(); }); this.props.remove(o); }
+    for (const o of [...this.props.children]) {
+      o.traverse((c) => { if (c.geometry) c.geometry.dispose(); for (const m of [].concat(c.material || [])) m.dispose(); });
+      this.props.remove(o);
+    }
     const R = this.R;
     if (this.cutout) {
       this.ground.scale.set(R * 14, R * 14, 1);
@@ -604,6 +607,15 @@ export class Stage {
       this.invalidate();
     }, { passive: false });
     el.addEventListener('contextmenu', (e) => e.preventDefault());
+    el.tabIndex = 0;
+    el.addEventListener('keydown', (e) => {
+      const k = e.key;
+      if (k === 'ArrowLeft') this.goal.theta -= 0.18; else if (k === 'ArrowRight') this.goal.theta += 0.18;
+      else if (k === 'ArrowUp') this.goal.phi = Math.max(0.05, this.goal.phi - 0.12); else if (k === 'ArrowDown') this.goal.phi = Math.min(Math.PI / 2 - 0.02, this.goal.phi + 0.12);
+      else if (k === '+' || k === '=') this.goal.dist = Math.max(this.R * 0.9, this.goal.dist * 0.88); else if (k === '-') this.goal.dist = Math.min(this.R * 14, this.goal.dist * 1.14);
+      else if (k === '0') { this.setView('iso'); return; } else return;
+      e.preventDefault(); this.autoRotate = false; this.invalidate();
+    });
     el.addEventListener('dblclick', () => { this.setView('iso'); });
   }
 

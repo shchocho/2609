@@ -74,7 +74,12 @@ export function itemPage(root, id, ctx) {
     h('div', { class: 'ctl__row' }, h('span', {}, '마감'), swatches),
     fitSw);
 
-  const tabBar = h('div', { class: 'tabs', role: 'tablist', 'aria-label': '작업 단계' }, TABS.map(([k, label]) => h('button', { type: 'button', role: 'tab', id: `tab-${k}`, 'aria-selected': String(k === S.tab), 'aria-controls': 'tabpanel', onclick: () => setTab(k) }, label)));
+  const tabBar = h('div', { class: 'tabs', role: 'tablist', 'aria-label': '작업 단계' }, TABS.map(([k, label]) => h('button', { type: 'button', role: 'tab', id: `tab-${k}`, 'aria-selected': String(k === S.tab), 'aria-controls': 'tabpanel', tabindex: k === S.tab ? '0' : '-1', onclick: () => setTab(k) }, label)));
+  tabBar.addEventListener('keydown', (e) => {
+    const i = TABS.findIndex(([k]) => k === S.tab), d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : e.key === 'Home' ? -i : e.key === 'End' ? TABS.length - 1 - i : 0;
+    if (!d) return;
+    e.preventDefault(); setTab(TABS[(i + d + TABS.length) % TABS.length][0]); document.getElementById(`tab-${S.tab}`).focus();
+  });
   const panel = h('div', { class: 'tabpanel', id: 'tabpanel', role: 'tabpanel' });
   const side = h('div', { class: 'bench__side' },
     h('header', { class: 'title' }, h('span', { class: 'tape', style: { justifySelf: 'start' } }, `No.${no3(item.no)} · ${cat ? cat.ko : ''}`), h('h1', {}, item.name), h('p', {}, `${item.ko} ${item.type}`)),
@@ -111,7 +116,7 @@ export function itemPage(root, id, ctx) {
   function setTab(k) {
     stopPlay();
     S.tab = k;
-    for (const b of tabBar.children) b.setAttribute('aria-selected', String(b.id === `tab-${k}`));
+    for (const b of tabBar.children) { b.setAttribute('aria-selected', String(b.id === `tab-${k}`)); b.tabIndex = b.id === `tab-${k}` ? 0 : -1; }
     const draw = k === 'draw';
     sheetView.hidden = !draw; stageHost.hidden = draw; toolsTL.hidden = draw; toolsTR.hidden = draw; toolsB.hidden = draw; hint.hidden = draw || hint.dataset.gone === '1';
     if (stage) { stage.visible = !draw; stage.setStep(k === 'asm' ? S.step : null); stage.highlight(null); if (!draw) stage.invalidate(); }
@@ -216,7 +221,7 @@ export function itemPage(root, id, ctx) {
   // 조립
   const saveDone = () => store.setItem(id, { done: [...S.done], started: store.item(id).started || Date.now() });
   function stopPlay() { if (S.playing) { clearInterval(S.playing); S.playing = null; } }
-  function goStep(n) { S.step = n == null ? null : Math.max(1, Math.min(model.steps.length, n)); if (stage) stage.setStep(S.step); renderTab(); const el = panel.querySelector('[aria-current="step"]'); if (el && window.innerWidth >= 1040) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+  function goStep(n) { S.step = n == null ? null : Math.max(1, Math.min(model.steps.length, n)); if (stage) stage.setStep(S.step); renderTab(); const el = panel.querySelector('.step.is-cur'); if (el && window.innerWidth >= 1040) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
   function tabAsm() {
     const steps = model.steps, cur = S.step, doneN = steps.filter((s) => S.done.has(s.n)).length;
     const bPlay = h('button', { type: 'button', class: 'btn btn--sm btn--mat', html: S.playing ? `${icon('pause')} 멈춤` : `${icon('play')} 처음부터 재생`, onclick: () => {
@@ -234,13 +239,13 @@ export function itemPage(root, id, ctx) {
       h('ol', { class: 'steps' }, steps.map((s) => {
         const names = [...new Set(model.parts.filter((p) => p.step === s.n && !p.opt).map((p) => { const r = list.byId.get(p.id); return r ? `${r.label} ${p.name}` : p.name; }))].slice(0, 6).join(' · ');
         const done = S.done.has(s.n);
-        return h('li', {}, h('div', { class: `step${done ? ' is-done' : ''}`, role: 'button', tabindex: '0', 'aria-current': cur === s.n ? 'step' : null,
-          onclick: () => { stopPlay(); goStep(s.n); }, onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); stopPlay(); goStep(s.n); } } },
-          h('span', { class: 'step__n' }, s.n), h('span', { class: 'step__t' }, s.title),
+        return h('li', { class: `step${done ? ' is-done' : ''}${cur === s.n ? ' is-cur' : ''}` },
+          h('button', { type: 'button', class: 'step__go', 'aria-current': cur === s.n ? 'step' : null, 'aria-label': `${s.n}단계 ${s.title} 3D로 보기`, onclick: () => { stopPlay(); goStep(s.n); } },
+            h('span', { class: 'step__n' }, s.n), h('span', { class: 'step__t' }, s.title)),
           h('button', { type: 'button', class: 'step__ck', 'aria-label': done ? `${s.n}단계 완료 취소` : `${s.n}단계 완료로 표시`, 'aria-pressed': String(done), html: icon('check'),
-            onclick: (e) => { e.stopPropagation(); if (done) S.done.delete(s.n); else S.done.add(s.n); saveDone(); renderTab(); if (S.done.size === steps.length) toast('모든 단계를 마쳤습니다. 완성을 축하합니다!'); } }),
+            onclick: () => { if (done) S.done.delete(s.n); else S.done.add(s.n); saveDone(); renderTab(); if (S.done.size === steps.length) toast('모든 단계를 마쳤습니다. 완성을 축하합니다!'); } }),
           h('span', { class: 'step__d' }, s.desc), names ? h('span', { class: 'step__parts' }, names) : null,
-          s.tip ? h('span', { class: 'step__tip' }, s.tip) : null));
+          s.tip ? h('span', { class: 'step__tip' }, s.tip) : null);
       })),
     ];
   }
@@ -290,7 +295,7 @@ export function itemPage(root, id, ctx) {
   }
   sheetView.addEventListener('wheel', (e) => { e.preventDefault(); zoom(Math.exp(-e.deltaY * 0.0016), e.clientX, e.clientY); }, { passive: false });
   sheetView.addEventListener('dblclick', fitSheet);
-  sheetView.addEventListener('keydown', (e) => { if (e.key === '+' || e.key === '=') zoom(1.25, innerWidth / 2, innerHeight / 2); else if (e.key === '-') zoom(0.8, innerWidth / 2, innerHeight / 2); else if (e.key === '0') fitSheet(); });
+  sheetView.addEventListener('keydown', (e) => { if (e.key === '+' || e.key === '=') zoom(1.25, innerWidth / 2, innerHeight / 2); else if (e.key === '-') zoom(0.8, innerWidth / 2, innerHeight / 2); else if (e.key === '0') fitSheet(); else if (e.key.startsWith('Arrow')) { e.preventDefault(); pan.x += e.key === 'ArrowLeft' ? 40 : e.key === 'ArrowRight' ? -40 : 0; pan.y += e.key === 'ArrowUp' ? 40 : e.key === 'ArrowDown' ? -40 : 0; placeSheet(); } });
   const ro = new ResizeObserver(() => { if (!sheetView.hidden) fitSheet(); });
   ro.observe(sheetView);
 
@@ -318,6 +323,7 @@ export function itemPage(root, id, ctx) {
     });
     stage.setTheme({ dark: ctx.isDark() });
     stage.setLineTheme(ctx.isDark() ? 'night' : 'blueprint');
+    stage.canvas.setAttribute('aria-label', `${item.name} ${item.type} 3D 모델. 화살표 키로 돌리고 +, - 키로 확대·축소합니다.`);
     stage.setModel(model, item.finishes[S.fin]);
     stage.setLamp(S.lamp);
     ctx.onTheme = () => { stage.setTheme({ dark: ctx.isDark() }); stage.setLineTheme(ctx.isDark() ? 'night' : 'blueprint'); };
