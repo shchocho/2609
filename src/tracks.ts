@@ -81,6 +81,7 @@ export const TRACKS: Track[] = [
   {
     id: 'copilot-code',
     group: 'product',
+    products: ['code'],
     name: 'Copilot Code',
     icon: '🧩',
     color: '#0f7b6c',

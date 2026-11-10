@@ -1,6 +1,6 @@
 /** 시나리오 JSON 스키마 (src/scenarios/<track>/<id>.scenario.json) */
 
-export type AgentKind = 'chat' | 'cowork' | 'scout' | 'office' | 'flow' | 'studio';
+export type AgentKind = 'chat' | 'cowork' | 'scout' | 'office' | 'flow' | 'studio' | 'code';
 export type AppKind = 'excel' | 'word' | 'powerpoint' | 'outlook' | 'teams' | 'onenote';
 
 /** only: 고른 선택지 id(또는 "hunted") 중 하나라도 있을 때만 / not: 하나라도 있으면 숨김 */
@@ -53,6 +53,8 @@ export interface DocBlock extends Filterable {
   no?: string;
   src?: string;
   textBy?: Record<string, string>;
+  /** kind: 'chart' 블록의 막대 차트 */
+  chart?: Chart;
   tpl?: string;
   q?: string;
   a?: string;

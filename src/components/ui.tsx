@@ -79,6 +79,7 @@ const LETTER: Record<string, [string, string]> = {
   cloudflow: ['▸', '#0066ff'],
   deskflow: ['▸', '#0066ff'],
   studio: ['✦', '#7a5cff'],
+  code: ['◇', '#0f7b6c'],
   scout: ['S', 'var(--copilot-black, #242424)'],
 };
 

@@ -1,6 +1,6 @@
 /** 작업 결과물 뷰어: Excel 시트 · Word 문서 · Outlook 메일 · PowerPoint 덱 · Teams 게시물 */
 import { useState, type ReactNode } from 'react';
-import type { Artifact, Deck, DocBlock, FlowAct, FlowScreen, Sheet, Vars } from '../types';
+import type { Artifact, Chart, Deck, DocBlock, FlowAct, FlowScreen, Sheet, Vars } from '../types';
 import { Blanks, Bold, filterBy, fill, flowBeats, artifactName } from '../engine/text';
 import { AppIcon, FT, WE, X } from './ui';
 
@@ -22,6 +22,21 @@ const colName = (i: number) => {
   return s;
 };
 
+/* ---------------- 막대 차트 (시트 · 문서 블록) ---------------- */
+function ChartView({ chart }: { chart: Chart }) {
+  const top = Math.max(1, ...chart.bars.map(b => b.value));
+  return (
+    <figure className="wb-xl-chart">
+      <figcaption>{chart.title}</figcaption>
+      {chart.bars.map(b => (
+        <p key={b.label} className={b.warn ? 'is-warn' : undefined}>
+          <span>{b.label}</span><i style={{ width: `${(b.value / top) * 100}%` }} /><b>{b.value.toFixed(chart.digits ?? 0)}{chart.unit}</b>
+        </p>
+      ))}
+    </figure>
+  );
+}
+
 /* ---------------- Excel ---------------- */
 function SheetView({ sheet, writing, vars, ids }: { sheet: Sheet; writing: number | null; vars: Vars; ids: string[] }) {
   const tabs = [
@@ -37,7 +52,6 @@ function SheetView({ sheet, writing, vars, ids }: { sheet: Sheet; writing: numbe
   const heads = [...(page?.head ?? sheet.head), ...(addKey ? sheet.headAdd?.[addKey] ?? [] : [])];
   const nums = new Set(page?.num ?? sheet.num ?? []);
   const chart = writing == null && !page ? filterBy(sheet.charts ?? [], ids)[0] : undefined;
-  const top = Math.max(1, ...(chart?.bars ?? []).map(b => b.value));
   return (
     <div className="wb-xl">
       {writing != null && (
@@ -60,16 +74,7 @@ function SheetView({ sheet, writing, vars, ids }: { sheet: Sheet; writing: numbe
             })}
           </tbody>
         </table>
-        {chart && (
-          <figure className="wb-xl-chart">
-            <figcaption>{chart.title}</figcaption>
-            {chart.bars.map(b => (
-              <p key={b.label} className={b.warn ? 'is-warn' : undefined}>
-                <span>{b.label}</span><i style={{ width: `${(b.value / top) * 100}%` }} /><b>{b.value.toFixed(chart.digits ?? 0)}{chart.unit}</b>
-              </p>
-            ))}
-          </figure>
-        )}
+        {chart && <ChartView chart={chart} />}
       </div>
       {tabs.length > 0 && (
         <p className="wb-xl-tabs">
@@ -143,6 +148,8 @@ export function DocBlockView({ b, vars, ids }: { b: DocBlock; vars: Vars; ids: s
     }
     case 'qa': return <section className="wb-ct"><p className="wb-ct-h"><b>Q</b><span>{o(b.q)}</span></p><p><Bold text={o(b.a)} /></p></section>;
     case 'note': return <p className="wb-ct-note"><Bold text={o(b.text)} /></p>;
+    case 'button': return <p className="wb-app-btn"><u>{o(b.text)}</u></p>;
+    case 'chart': return b.chart ? <ChartView chart={b.chart} /> : null;
     default: return null;
   }
 }

@@ -225,3 +225,22 @@
 .sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-canvas .wb-wd-page > div { animation: sf-rise .35s ease both; }
 @keyframes sf-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .sc-shell.is-office .sc-canvas .wb-wd-page > div { animation: none; } }
+
+/* ---------- Copilot Code: 앱 미리보기 (문서 블록을 앱 화면처럼 보인다 — 체험 화면과 결과 화면 모두) ---------- */
+.sc-shell.is-office[data-app=code], .desk-win.is-doc[data-app=code] { --track: #0f7b6c; --track-ink: #0b5a4f; }
+.sc-shell.is-office[data-app=code] .sc-canvas { background: #eef1f0; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-wd { padding: 18px 22px 26px; background: #eef1f0; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-wd-page { max-width: 600px; padding: 0 20px 20px; display: grid; gap: 10px; line-height: 1.6; overflow: hidden; background: #fff; border: 1px solid #d6dbd9; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .08); }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-wd-h1 { margin: 0 -20px; padding: 12px 20px; font-size: 16px; color: #fff; background: var(--track); border-bottom: 0; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-wd-meta { margin: 0 -20px; padding: 5px 20px; font-size: 11.5px; color: var(--track-ink); background: color-mix(in srgb, var(--track) 10%, #fff); }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-wd-sec { margin: 4px 0 0; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-wd-sec h4 { margin: 0 0 4px; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-ol-f { margin: 0; padding: 0; display: grid; grid-template-columns: 84px minmax(0, 1fr); align-items: center; gap: 10px; border: 0; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-ol-f u { font-size: 12.5px; text-decoration: none; color: #605e5c; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-ol-f b { min-height: 32px; padding: 5px 10px; font-size: 13px; font-weight: 400; background: #fff; border: 1px solid #c8c6c4; border-radius: 6px; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-ct-note { margin: 0; padding: 8px 12px; font-size: 12.5px; color: var(--track-ink); background: color-mix(in srgb, var(--track) 10%, #fff); border: 0; border-radius: 6px; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-xl-chart { width: auto; margin: 0; box-shadow: none; border-color: #e1dfdd; border-radius: 8px; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-xl-chart i { background: var(--track); }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-xl-chart .is-warn i { background: #d13438; }
+.wb-app-btn { margin: 2px 0 0; text-align: right; }
+.wb-app-btn u { display: inline-block; padding: 7px 22px; font-size: 13px; font-weight: 600; text-decoration: none; color: #fff; background: var(--track, #0f7b6c); border-radius: 6px; }

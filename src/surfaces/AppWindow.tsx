@@ -1,6 +1,7 @@
 /**
  * 앱 창 + 오른쪽 창: Word · Excel · PowerPoint(구조: docs/reference/render-spec.md §3.5),
- * Power Automate 흐름 디자이너(클라우드 흐름 · 데스크톱 흐름), Copilot Studio 에이전트 화면.
+ * Power Automate 흐름 디자이너(클라우드 흐름 · 데스크톱 흐름), Copilot Studio 에이전트 화면,
+ * Microsoft Copilot 앱의 Code 탭(가운데 앱 미리보기 · 오른쪽 Copilot 대화).
  * 배치는 원본의 .sc-shell.is-office 스타일을 그대로 쓴다.
  */
 import type { ReactNode, RefObject } from 'react';
@@ -73,6 +74,16 @@ const UI: Record<string, Ui> = {
     head: '만든 에이전트와 바로 대화해 볼 수 있습니다.',
     input: '메시지를 입력하세요',
     status: 'Copilot Studio · 에이전트',
+  },
+  code: {
+    app: 'Microsoft Copilot',
+    tabs: ['Home', 'Code', 'Autopilot'],
+    groups: [['👁', '미리보기'], ['🗄', '데이터'], ['🔒', '권한'], ['🚀', '게시']],
+    pane: 'Copilot',
+    head: '만들고 싶은 앱을 말로 설명해 보세요.',
+    sub: '화면·데이터·권한 계획을 먼저 보여 드린 뒤 샌드박스에서 만듭니다.',
+    input: '만들거나 바꿀 내용을 설명하세요',
+    status: 'Code · 테넌트 안의 샌드박스',
   },
 };
 

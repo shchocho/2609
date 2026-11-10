@@ -72,7 +72,7 @@
 2. **(완료)** `m365-apps` 나머지 2편(`ppt-from-doc`, `excel-sales-analysis`)
 3. **(완료)** `power-automate` 화면 + 3편 — `agent: "flow"`, `surface: "cloudflow" | "deskflow"`, 결과물 `kind: "flow"` (화면은 `src/surfaces/AppWindow.tsx` 를 같이 씀)
 4. **(완료)** `copilot-studio` 화면 + 3편 — `agent: "studio"`, `surface: "studio"`. 에이전트 설정은 새 결과물 종류 대신 문서 블록(`kind: "doc"`, `app: "studio"`)을 카드처럼 보이게 했고, 단계마다 설정이 늘어나는 것은 도구 메시지의 `sets` 로 처리
-5. `copilot-code` 화면 + 3편
+5. **(완료)** `copilot-code` 화면 + 3편 — `agent: "code"`, `surface: "code"`. 앱 미리보기도 문서 블록(`app: "code"`)으로 그리고 `button`·`chart` 블록을 더함
 6. 전체 점검: `npm run check:scenarios`, `npm run build`, `npm run build:local`, e2e 로 새 시나리오 전부 결과 화면까지
 
 ## 완료 기준

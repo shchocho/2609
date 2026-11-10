@@ -15,6 +15,7 @@ const PRODUCTS: Record<string, { label: string; plain?: boolean; description: Re
   powerpoint: { label: 'in PowerPoint', description: <>문서 한 편으로 <strong>발표자료 초안</strong>을 만들고 슬라이드를 정리합니다.</> },
   excel: { label: 'in Excel', description: <>표에 대해 질문하고 <strong>수식 열과 차트</strong>를 제안받습니다.</> },
   deskflow: { label: '데스크톱 흐름 (RPA)', plain: true, description: <>커넥터가 없는 프로그램은 <strong>사람이 하던 화면 조작을 그대로</strong> 따라 합니다.</> },
+  code: { label: 'Code', description: <>개발자가 아니어도 <strong>말로 설명해 앱</strong>을 만들고, 미리보기에서 써 본 뒤 게시합니다.</> },
   studio: { label: 'Studio', description: <>지식·토픽 또는 지침·스킬·도구로 <strong>우리 업무에 맞는 에이전트</strong>를 만들고 게시합니다.</> },
   cloudflow: { label: '클라우드 흐름 (DPA)', plain: true, description: <>커넥터로 <strong>메일·승인·알림 같은 서비스를 이어</strong> 업무 절차를 자동화합니다.</> },
 };
