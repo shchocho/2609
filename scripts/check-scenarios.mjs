@@ -9,12 +9,12 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('../src/scenarios/', import.meta.url)); // .pathname 은 Windows 에서 경로가 깨짐
 const TRACKS = ['sales', 'hr', 'finance', 'procurement', 'ops', 'm365-apps', 'copilot-code', 'power-automate', 'copilot-studio'];
-const AGENTS = ['chat', 'cowork', 'office', 'flow'];
+const AGENTS = ['chat', 'cowork', 'office', 'flow', 'studio'];
 /** 앱 창에서 재생하는 agent 와 그 화면(surface) */
-const WINDOWS = { office: ['word', 'excel', 'powerpoint'], flow: ['cloudflow', 'deskflow'] };
+const WINDOWS = { office: ['word', 'excel', 'powerpoint'], flow: ['cloudflow', 'deskflow'], studio: ['studio'] };
 const ROLES = new Set(['user', 'assistant', 'tool', 'note', 'cue', 'spot', 'approve', 'choice', 'hunt']);
 const HUNT_TARGETS = new Set(['model', 'effort', 'attach', 'new', 'mine', 'auto', 'custom']);
-const ZONES = { chat: ['rail', 'top', 'stream', 'actions', 'composer'], cowork: ['rail', 'stream', 'composer'], office: ['ribbon', 'canvas', 'pane', 'composer'], flow: ['ribbon', 'canvas', 'pane', 'composer'] };
+const ZONES = { chat: ['rail', 'top', 'stream', 'actions', 'composer'], cowork: ['rail', 'stream', 'composer'], office: ['ribbon', 'canvas', 'pane', 'composer'] }; // 앱 창 화면(WINDOWS)은 모두 office 와 같은 영역을 쓴다
 const ICONS = new Set(['box', 'briefcase', 'chart', 'megaphone', 'people', 'code', 'clock', 'calx', 'scales', 'split', 'docsearch', 'calc', 'target', 'mail', 'share', 'checkdoc', 'factory', 'coin', 'network', 'alert', 'bolt', 'sliders', 'link', 'check', 'send', 'truck', 'refresh', 'gauge', 'shield']);
 const BANNED = (process.env.BANNED ?? 'POSTECH,포스텍').split(',').filter(Boolean);
 
@@ -46,6 +46,7 @@ for (const track of readdirSync(ROOT)) {
       if (!ROLES.has(m.role)) return err(file, `${at}: 알 수 없는 role`);
       if (m.role === 'cue' && (!m.text || !m.action)) err(file, `${at}: text·action 이 필요합니다`);
       if (m.role === 'tool' && !m.tool) err(file, `${at}: tool 이 필요합니다`);
+      if (m.role === 'tool' && m.sets) { optionIds.add(m.sets); if (!WINDOWS[s.agent]) err(file, `${at}: sets 는 앱 창 화면 시나리오에서만 쓸 수 있습니다`); }
       if (m.role === 'tool') for (const k of ['opens', 'shows', 'writes']) if (m[k] && !arts[m[k]]) err(file, `${at}: ${k} "${m[k]}" 결과물이 없습니다`);
       if (m.role === 'assistant') for (const id of m.files ?? []) if (!arts[id]) err(file, `${at}: files "${id}" 결과물이 없습니다`);
       if (['user', 'assistant', 'note'].includes(m.role) && typeof m.text !== 'string') err(file, `${at}: text 가 필요합니다`);
@@ -64,7 +65,7 @@ for (const track of readdirSync(ROOT)) {
         if (!HUNT_TARGETS.has(m.target)) err(file, `${at}: target "${m.target}" 은 지원하지 않습니다`);
       }
       if (m.role === 'spot') {
-        const zones = ZONES[s.agent] ?? [];
+        const zones = WINDOWS[s.agent] ? ZONES.office : ZONES[s.agent] ?? [];
         if (!Array.isArray(m.options) || m.options.length < 2) err(file, `${at}: 보기가 2개 이상 필요합니다`);
         for (const o of m.options ?? []) if (!zones.includes(o.at)) err(file, `${at}: 영역 "${o.at}" 은 ${s.agent} 화면에 없습니다`);
         if (typeof m.answer !== 'number' || m.answer < 0 || m.answer >= (m.options?.length ?? 0)) err(file, `${at}: answer 범위 오류`);

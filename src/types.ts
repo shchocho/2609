@@ -1,6 +1,6 @@
 /** 시나리오 JSON 스키마 (src/scenarios/<track>/<id>.scenario.json) */
 
-export type AgentKind = 'chat' | 'cowork' | 'scout' | 'office' | 'flow';
+export type AgentKind = 'chat' | 'cowork' | 'scout' | 'office' | 'flow' | 'studio';
 export type AppKind = 'excel' | 'word' | 'powerpoint' | 'outlook' | 'teams' | 'onenote';
 
 /** only: 고른 선택지 id(또는 "hunted") 중 하나라도 있을 때만 / not: 하나라도 있으면 숨김 */
@@ -135,6 +135,8 @@ export interface MsgAssistant extends Filterable {
 }
 export interface MsgTool extends Filterable {
   role: 'tool'; tool: string; delayMs?: number; opens?: string; shows?: string; writes?: string; translate?: boolean;
+  /** 이 도구가 끝나면 켜지는 깃발. 선택지 id 처럼 only/not 에 쓸 수 있다 (앱 창 화면에서 단계마다 설정이 늘어나는 연출) */
+  sets?: string;
 }
 export interface MsgNote extends Filterable { role: 'note'; text: string; delayMs?: number }
 export interface MsgApprove extends Filterable {
@@ -219,6 +221,7 @@ export interface PlayState {
   model: string | null;
   effort: string | null;
   hunted: string | null;
+  flags: string[];
   allowed: boolean;
   opened: string[];
   tab: string | null;
@@ -230,7 +233,7 @@ export interface PlayState {
   slide: number;
 }
 export const INITIAL_STATE: PlayState = {
-  picks: [], model: null, effort: null, hunted: null, allowed: false, opened: [], tab: null,
+  picks: [], model: null, effort: null, hunted: null, flags: [], allowed: false, opened: [], tab: null,
   writing: null, rows: 0, moved: 0, moving: 0, over: false, slide: 1,
 };
 

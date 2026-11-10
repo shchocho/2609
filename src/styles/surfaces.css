@@ -211,3 +211,17 @@
   .fl-cursor { transition: none; }
   .fl-screen-form > p > b { animation: none; }
 }
+
+/* ---------- Copilot Studio: 에이전트 설정 (문서 블록을 설정 카드처럼 보인다 — 체험 화면과 결과 화면 모두) ---------- */
+.sc-shell.is-office[data-app=studio], .desk-win.is-doc[data-app=studio] { --track: #7a5cff; --track-ink: #5c3d8a; }
+.sc-shell.is-office[data-app=studio] .sc-canvas { background: #faf9f8; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=studio] .wb-wd { padding: 20px 24px 28px; background: #faf9f8; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=studio] .wb-wd-page { max-width: 760px; padding: 0; display: grid; gap: 12px; line-height: 1.7; background: none; box-shadow: none; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=studio] .wb-wd-h1 { padding: 0; font-size: 20px; border-bottom: 0; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=studio] .wb-wd-meta span { padding: 2px 10px; color: var(--track-ink); background: color-mix(in srgb, var(--track) 10%, #fff); border-radius: var(--borderRadiusCircular); }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=studio] .wb-wd-sec { margin: 0; padding: 14px 18px 16px; background: #fff; border: 1px solid #e1dfdd; border-radius: var(--borderRadiusXLarge); box-shadow: 0 1px 2px rgba(0, 0, 0, .05); }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=studio] .wb-wd-sec h4 { margin-top: 0; color: var(--track-ink); }
+/* 단계마다 새로 붙는 설정·화면 조각이 떠오르듯 나타난다 */
+.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-canvas .wb-wd-page > div { animation: sf-rise .35s ease both; }
+@keyframes sf-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .sc-shell.is-office .sc-canvas .wb-wd-page > div { animation: none; } }

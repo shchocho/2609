@@ -23,6 +23,7 @@ export function useWriting(
         setSt(x => ({ ...x, opened: x.opened.includes(w) ? x.opened : [...x.opened, w], writing: w, rows: 0 }));
       }
       if (m.translate) setSt(x => ({ ...x, moved: 0, moving: 1 }));
+      if (m.sets) { const f = m.sets; setSt(x => (x.flags.includes(f) ? x : { ...x, flags: [...x.flags, f] })); }
       return;
     }
     if (m.role === 'assistant' && m.over) setSt(x => ({ ...x, over: true }));

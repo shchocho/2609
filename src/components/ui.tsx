@@ -78,6 +78,7 @@ const LETTER: Record<string, [string, string]> = {
   cowork: ['C', 'var(--copilot-black, #242424)'],
   cloudflow: ['▸', '#0066ff'],
   deskflow: ['▸', '#0066ff'],
+  studio: ['✦', '#7a5cff'],
   scout: ['S', 'var(--copilot-black, #242424)'],
 };
 

@@ -10,9 +10,9 @@ export function fill(text: string, v: Vars): string {
     .replace(/\{val:([^}]+)\}/g, (m, k: string) => v.vals[k] ?? m);
 }
 
-/** 고른 선택지 id 목록 (+ 기능 찾기 성공 시 "hunted") */
+/** 고른 선택지 id 목록 (+ 도구가 켠 깃발, 기능 찾기 성공 시 "hunted") */
 export const pickIds = (st: PlayState) => {
-  const ids = st.picks.map(p => p.option.id);
+  const ids = [...st.picks.map(p => p.option.id), ...st.flags];
   return st.hunted ? [...ids, 'hunted'] : ids;
 };
 

@@ -35,6 +35,7 @@ export const AGENTS = {
   scout: { name: 'Microsoft Scout', full: 'Microsoft Scout' },
   office: { name: 'Copilot', full: 'Microsoft 365 Copilot' },
   flow: { name: 'Copilot', full: 'Power Automate' },
+  studio: { name: '에이전트', full: 'Copilot Studio' },
 } as const;
 
 export const APPS = {

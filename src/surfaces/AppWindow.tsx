@@ -1,6 +1,6 @@
 /**
- * 앱 창 + 오른쪽 창: Word · Excel · PowerPoint(구조: docs/reference/render-spec.md §3.5)와
- * Power Automate 흐름 디자이너(클라우드 흐름 · 데스크톱 흐름).
+ * 앱 창 + 오른쪽 창: Word · Excel · PowerPoint(구조: docs/reference/render-spec.md §3.5),
+ * Power Automate 흐름 디자이너(클라우드 흐름 · 데스크톱 흐름), Copilot Studio 에이전트 화면.
  * 배치는 원본의 .sc-shell.is-office 스타일을 그대로 쓴다.
  */
 import type { ReactNode, RefObject } from 'react';
@@ -64,6 +64,15 @@ const UI: Record<string, Ui> = {
     pane: '녹화 · 실행 기록',
     head: '이 컴퓨터의 화면을 직접 조작하는 흐름입니다.',
     status: '데스크톱 흐름 · 이 컴퓨터에서 실행',
+  },
+  studio: {
+    app: 'Copilot Studio',
+    tabs: ['에이전트', '개요', '지식', '도구', '채널', '분석'],
+    groups: [['💾', '저장'], ['🧪', '테스트'], ['🚀', '게시'], ['⚙', '설정']],
+    pane: '에이전트 테스트',
+    head: '만든 에이전트와 바로 대화해 볼 수 있습니다.',
+    input: '메시지를 입력하세요',
+    status: 'Copilot Studio · 에이전트',
   },
 };
 

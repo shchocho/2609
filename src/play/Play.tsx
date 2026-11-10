@@ -36,8 +36,8 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
   const [holdAt, setHoldAt] = useState<number | null>(null);
   const streamRef = useRef<HTMLDivElement>(null);
 
-  // 앱 창 시나리오(Office · Power Automate)는 결과물(workbench)이 있어도 Cowork 화면이 아니라 그 앱 화면에서 재생한다
-  const office = s?.agent === 'office' || s?.agent === 'flow';
+  // 앱 창 시나리오(Office · Power Automate · Copilot Studio …)는 결과물(workbench)이 있어도 Cowork 화면이 아니라 그 앱 화면에서 재생한다
+  const office = !!s && !['chat', 'cowork', 'scout'].includes(s.agent);
   const cowork = !!s?.workbench && !office;
   const steps = s ? ['pain', ...(s.overview?.length ? ['overview'] : []), 'demo', 'done'] : [];
   const step = steps[Math.min(stepIdx, steps.length - 1)] ?? 'demo';
