@@ -71,7 +71,7 @@ fs.mkdirSync(OUT, { recursive: true });
     // 3) 말풍선 버튼 (이어서 보기 · 다음 단계 · 결과 보기 · cue)
     if (!acted) acted = await click('.wb-tip .sc-cue-btn', 'cue-btn');
     // 4) 보내기
-    if (!acted) acted = await click('.cw-send.is-hunt:not([disabled]), .composer .round-btn.send.is-hunt', 'send');
+    if (!acted) acted = await click(".cw-send.is-hunt:not([disabled]), .composer .round-btn.send.is-hunt, .sc-pane-send.is-hunt", "send");
     // 5) "/" 자료 고르기
     if (!acted) acted = await click('.wb-slash-row.is-pick', 'slash');
     // 6) 결과물 검토

@@ -1,0 +1,83 @@
+/* 확장 영역(제품 기능 체험)용 스타일 — 원본 재현 스타일(reference.css)은 고치지 않고 여기에만 더합니다. */
+
+/* ---------- 홈: 업무 영역 5개 + 제품 기능 체험 4개를 두 줄로 ---------- */
+.booth-track-groups {
+  width: 100%;
+  margin: 10px auto auto;
+  display: grid;
+  gap: 10px;
+}
+.booth-track-groups h2 {
+  margin: 0 0 6px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: var(--w-label, 600);
+  letter-spacing: .02em;
+  color: var(--copilot-ink-2);
+}
+/* 가로 화면(1371×768 기준)에서만 카드를 줄여 두 줄에 맞춘다. 세로 화면은 원본 배치를 그대로 쓴다 */
+:root[data-orient=landscape] .booth-track-groups .booth-track-grid {
+  margin: 0 auto;
+  gap: 16px;
+  grid-template-columns: repeat(var(--cols, 5), minmax(0, 178px));
+  justify-content: center;
+}
+:root[data-orient=landscape] .booth-home .booth-foot {
+  padding-top: 10px;
+}
+
+/* ---------- Office 화면: Copilot 창 안에 입력란을 둔다 ---------- */
+.sc-shell.is-office[data-app=word] { --track: var(--m365-word-bright); --track-ink: var(--m365-word-dark); }
+.sc-shell.is-office[data-app=excel] { --track: var(--m365-excel-bright); --track-ink: var(--m365-excel-dark); }
+.sc-shell.is-office[data-app=powerpoint] { --track: var(--m365-powerpoint-bright); --track-ink: var(--m365-powerpoint-dark); }
+.sc-shell.is-office .sc-pane {
+  display: flex;
+  flex-direction: column;
+}
+.sc-shell.is-office .sc-pane .sc-stream-in {
+  flex: 1;
+  align-content: start;
+}
+.sc-shell.is-office .sc-pane .sc-composer.is-pane {
+  position: relative;
+  margin: 0;
+  background: #fff;
+}
+.sc-shell.is-office .sc-canvas .wb-wd {
+  padding: 20px 0 28px;
+}
+
+/* Copilot 창 입력란의 "/" 자료 찾기 (Copilot Chat 입력창과 같은 모양) */
+.sc-shell .wb-slashq { color: #0f6cbd; background: #eaf3fb; border-radius: 5px; padding: 0 3px; white-space: nowrap; }
+.sc-shell .wb-caret { display: inline-block; width: 1.5px; height: 1.05em; margin-left: 1px; background: #1b1a19; vertical-align: -2px; animation: wb-caret-blink 1.05s steps(1) infinite; }
+.sc-shell .cwr-link { color: #0f6cbd; background: #eaf3fb; border-radius: 5px; padding: 0 4px; }
+.sc-shell .wb-slash {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 10px);
+  z-index: 40;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #e4e4e4;
+  border-radius: 12px;
+  box-shadow: var(--shadow8);
+  animation: wb-slash-in .16s ease both;
+}
+.sc-shell .wb-slash-tabs { display: flex; gap: 12px; list-style: none; margin: 0 0 6px; padding: 4px 8px 8px; font-size: 12px; color: var(--sc-ink-2, #605e5c); border-bottom: 1px solid #efefef; }
+.sc-shell .wb-slash-tabs .on { color: #1b1a19; font-weight: 700; }
+.sc-shell .wb-slash-row { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; font: inherit; text-align: left; background: #fff; border: 1.5px solid transparent; border-radius: 8px; }
+.sc-shell .wb-slash-row.is-pick { cursor: pointer; }
+.sc-shell .wb-slash-row.is-pick:hover,
+.sc-shell .wb-slash-row.on { border-color: #1b1a19; background: #fafafa; }
+.sc-shell .wb-slash-name { flex: 1; min-width: 0; font-size: 13px; color: #1b1a19; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sc-shell .wb-slash-meta { display: none; }
+
+/* 좁은 Copilot 창에 맞춘 대화 글자 크기. 대화가 시작되면 인사말을 접어 자리를 넓힌다 */
+.sc-shell.is-office .sc-pane:has(.sc-stream-in > .sc-user) :is(.sc-pane-head, .sc-pane-sub, .sc-pane-allow) { display: none; }
+.sc-shell.is-office .sc-pane :is(.sc-user-box p, .sc-answer-body p, .sc-check li) { font-size: 13px; line-height: 1.65; }
+.sc-shell.is-office .sc-pane .sc-user-box { max-width: 92%; padding: 10px 14px; }
+.sc-shell.is-office .sc-pane .sc-answer-acts svg { width: 16px; height: 16px; }
+
+/* 목록: 회전 카드 영역이 "제품별 시나리오 보기" 단추 위를 덮어 눌리지 않던 것을 막는다 */
+.booth-view-action { position: relative; z-index: 1; }

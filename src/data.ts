@@ -33,6 +33,7 @@ export const AGENTS = {
   chat: { name: 'Copilot Chat', full: 'Copilot Chat' },
   cowork: { name: 'Copilot Cowork', full: 'Copilot Cowork' },
   scout: { name: 'Microsoft Scout', full: 'Microsoft Scout' },
+  office: { name: 'Copilot', full: 'Microsoft 365 Copilot' },
 } as const;
 
 export const APPS = {
@@ -45,6 +46,10 @@ export const APPS = {
 } as const;
 export type AppId = keyof typeof APPS;
 export const isApp = (x: string): x is AppId => x in APPS;
+
+/** 화면에 보일 제품 이름 — Office 앱 안의 Copilot 은 "Copilot in Word" 처럼 앱 이름을 붙인다 */
+export const productName = (s: Scenario) =>
+  s.agent === 'office' && s.surface && isApp(s.surface) ? `Copilot in ${APPS[s.surface].name}` : AGENTS[s.agent].full;
 
 export const MODELS = [
   { v: '자동', d: '작업에 가장 적합한 모델' },

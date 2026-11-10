@@ -5,3 +5,4 @@ dist
 *.tsbuildinfo
 dist-local
 release
+e2e-out

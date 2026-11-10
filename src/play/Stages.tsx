@@ -2,7 +2,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowRightRegular, Dismiss20Regular, QrCode24Regular } from '@fluentui/react-icons';
 import type { OverviewStep, PlayState, Scenario, Scene, Vars } from '../types';
-import { AGENTS } from '../data';
+import { productName } from '../data';
 import { SemIcon } from '../components/Icons';
 import { AppIcon } from '../components/ui';
 import { ArtifactView, DocTabs, DocWindow } from '../components/artifacts';
@@ -69,17 +69,21 @@ export function PainStage({ title, caption, onNext }: { title: string; caption: 
   );
 }
 
-export function ProductName({ agent }: { agent: Scenario['agent'] }) {
+/** 제품 이름 뒤 조사: Chat·Excel 은 "과", 나머지는 "와" */
+const withParticle = (product: string) => (/(Chat|Excel)$/.test(product) ? '과' : '와');
+const suffix = (product: string) => product.replace(/^Copilot /, '');
+
+export function ProductName({ product }: { product: string }) {
   return (
     <span className="sc-overview-product-name">
       <span className="sc-overview-copilot-logo"><img src="logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}
-      <span className="sc-overview-product-suffix">{agent === 'chat' ? 'Chat' : 'Cowork'}</span>
+      <span className="sc-overview-product-suffix">{suffix(product)}</span>
     </span>
   );
 }
 
 /** 흐름: 단계 카드를 눌러 하나씩 연 뒤 "지금 시작하기" */
-export function OverviewStage({ agent, steps, hook, onNext }: { agent: Scenario['agent']; steps: OverviewStep[]; hook?: string; onNext: () => void }) {
+export function OverviewStage({ product, steps, hook, onNext }: { product: string; steps: OverviewStep[]; hook?: string; onNext: () => void }) {
   const [shown, setShown] = useState(0);
   const all = shown >= steps.length;
   const more = () => setShown(n => Math.min(n + 1, steps.length));
@@ -89,8 +93,8 @@ export function OverviewStage({ agent, steps, hook, onNext }: { agent: Scenario[
         <h2>
           <span className="sc-overview-product-name">
             <span className="sc-overview-copilot-logo"><img src="logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}
-            <span className="sc-overview-product-suffix">{agent === 'chat' ? 'Chat' : 'Cowork'}</span>
-            <span className="sc-overview-product-particle">{agent === 'chat' ? '과' : '와'}</span>
+            <span className="sc-overview-product-suffix">{suffix(product)}</span>
+            <span className="sc-overview-product-particle">{withParticle(product)}</span>
           </span>{' '}함께라면?
         </h2>
         {hook && <span className="sc-hook">{hook}</span>}
@@ -160,7 +164,8 @@ export function DoneStage({ s, st, vars, completed }: { s: Scenario; st: PlaySta
   const [slide, setSlide] = useState(1);
   const current = made.find(m => m.id === cur) ?? made[0];
   const progressive = s.messages.some(m => m.role === 'tool' && m.translate);
-  const madeLabel = `${AGENTS[s.agent].name} 생성`;
+  const product = productName(s);
+  const madeLabel = `${product} 생성`;
   return (
     <div className={`sc-done sc-stage-sky${made.length || hasArt || talk ? ' is-split' : ''}`}>
       {current && (
@@ -195,7 +200,7 @@ export function DoneStage({ s, st, vars, completed }: { s: Scenario; st: PlaySta
         <div className="sc-done-head">
           <h2>
             {completed
-              ? <><ProductName agent={s.agent} /><span>{s.agent === 'chat' ? '과 함께' : '와 함께'}</span></>
+              ? <><ProductName product={product} /><span>{withParticle(product)} 함께</span></>
               : <><img src="logo/copilot/copilot-lockup-horiz.png" alt="Microsoft Copilot" /><span>체험 미완료</span></>}
           </h2>
           <p>{completed ? s.finish?.sub ?? s.hook ?? s.summary : '체험을 끝까지 진행하지 않았습니다.'}</p>

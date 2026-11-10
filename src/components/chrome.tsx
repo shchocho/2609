@@ -267,7 +267,7 @@ export function ChatMain({ model, streamRef, children, composer, mark }: {
 }
 
 export type PickPhase = 'type' | 'search' | 'pick' | 'done';
-function SlashPopup({ pick, active, onPick }: { pick: Pick; active: boolean; onPick?: () => void }) {
+export function SlashPopup({ pick, active, onPick }: { pick: Pick; active: boolean; onPick?: () => void }) {
   const at = pick.name.indexOf(pick.query);
   const name = at < 0 ? <>{pick.name}</> : <>{pick.name.slice(0, at)}<b>{pick.query}</b>{pick.name.slice(at + pick.query.length)}</>;
   const row = (<><AppIcon app={pick.app ?? 'word'} /><span className="wb-slash-name">{name}</span>{pick.meta && <span className="wb-slash-meta">{pick.meta}</span>}</>);
@@ -280,17 +280,19 @@ function SlashPopup({ pick, active, onPick }: { pick: Pick; active: boolean; onP
     </div>
   );
 }
+/** 입력창 글: "/검색어" 를 입력하는 중 → 고른 자료 이름 */
+export function PickText({ text, pick, phase }: { text: string; pick: Pick; phase: PickPhase }) {
+  if (!text.includes(pick.token)) return <>{text}</>;
+  const [a, ...rest] = text.split(pick.token);
+  return phase === 'done'
+    ? <>{a}<span className="cwr-link">{pick.name}</span>{rest.join(pick.token)}</>
+    : <>{a}<span className="wb-slashq">/{pick.query}<i className="wb-caret" /></span></>;
+}
 export function ChatComposer({ text, filled, onSend, mark, pick, pickPhase = 'done', onPickSelect }: {
   text: string; filled: boolean; onSend?: () => void; mark: Mark; pick?: Pick; pickPhase?: PickPhase; onPickSelect?: () => void;
 }) {
   const hasClip = !!(pick && filled && pickPhase === 'done');
-  let body: ReactNode = text;
-  if (pick && filled && text.includes(pick.token)) {
-    const [a, ...rest] = text.split(pick.token);
-    body = pickPhase === 'done'
-      ? <>{a}<span className="cwr-link">{pick.name}</span>{rest.join(pick.token)}</>
-      : <>{a}<span className="wb-slashq">/{pick.query}<i className="wb-caret" /></span></>;
-  }
+  const body: ReactNode = pick && filled ? <PickText text={text} pick={pick} phase={pickPhase} /> : text;
   return (
     <>
       <div className={`composer sc-zone ${mark('composer')}${hasClip ? ' has-clip' : ''}`}>

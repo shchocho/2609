@@ -4,7 +4,12 @@ import { go, hashTrack } from '../router';
 import { TrackIcon } from '../components/Icons';
 import { COPY } from '../copy';
 
-/** 홈(#/start) — 업무 영역(트랙) 선택 */
+const GROUPS = [
+  { title: COPY.groupWork, tracks: TRACKS.filter(t => !t.group) },
+  { title: COPY.groupProduct, tracks: TRACKS.filter(t => t.group === 'product') },
+];
+
+/** 홈(#/start) — 업무 영역 · 제품 기능 체험(트랙) 선택 */
 export function Home() {
   const counts = countByTrack();
   return (
@@ -38,27 +43,34 @@ export function Home() {
           </p>
         </div>
       </header>
-      <ul className="booth-track-grid">
-        {TRACKS.map(t => (
-          <li key={t.id}>
-            <button
-              type="button"
-              className="booth-track-card"
-              data-track={t.id}
-              disabled={!counts[t.id]}
-              onClick={() => go(hashTrack(t.id))}
-            >
-              <span className="booth-track-inner">
-                <span className="booth-track-icon"><TrackIcon id={t.id} fallback={t.icon} /></span>
-                <div className="booth-track-body">
-                  <strong>{t.name}</strong>
-                  <p>{t.about}</p>
-                </div>
-              </span>
-            </button>
-          </li>
+      <div className="booth-track-groups">
+        {GROUPS.map(g => (
+          <section key={g.title} aria-label={g.title}>
+            <h2>{g.title}</h2>
+            <ul className="booth-track-grid" style={{ '--cols': g.tracks.length } as React.CSSProperties}>
+              {g.tracks.map(t => (
+                <li key={t.id}>
+                  <button
+                    type="button"
+                    className="booth-track-card"
+                    data-track={t.id}
+                    disabled={!counts[t.id]}
+                    onClick={() => go(hashTrack(t.id))}
+                  >
+                    <span className="booth-track-inner">
+                      <span className="booth-track-icon"><TrackIcon id={t.id} fallback={t.icon} /></span>
+                      <div className="booth-track-body">
+                        <strong>{t.name}</strong>
+                        <p>{t.about}</p>
+                      </div>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
         ))}
-      </ul>
+      </div>
       <footer className="booth-foot">
         <span>{COPY.footerLeft}</span>
         <span className="booth-em">{COPY.footerRight}</span>

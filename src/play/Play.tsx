@@ -3,17 +3,19 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ArrowCounterclockwiseRegular, ArrowLeftRegular, ArrowPreviousRegular, HomeRegular, NextRegular,
 } from '@fluentui/react-icons';
-import { INITIAL_STATE, type Message, type PlayState } from '../types';
-import { AGENTS, scenarioById } from '../data';
+import { INITIAL_STATE, type ChoiceOption, type Message, type MsgChoice, type PlayState } from '../types';
+import { productName, scenarioById } from '../data';
 import { trackById } from '../tracks';
 import { go, HASH_ATTRACT, hashTrack } from '../router';
 import { useEngine } from '../engine/useEngine';
+import { useWriting } from '../engine/useWriting';
 import { fill, makeVars, passes, pickIds } from '../engine/text';
 import { MessageView, Permission, Working } from '../components/messages';
-import { Bubble, CueButton, Hint, Key, Solved, SpotOptions, Tip, TipLayer } from '../components/coach';
+import { Bubble, CueButton, Hint, Key, Options, Solved, SpotOptions, Tip, TipLayer } from '../components/coach';
 import { CHAT_NAV, ChatComposer, ChatMain, CpApp, History, NavItem, RailTabs, scrollToBottom, scrollToHold, type PickPhase } from '../components/chrome';
 import { WE } from '../components/ui';
 import { Cowork } from './Cowork';
+import { Office } from '../surfaces/Office';
 import { DoneStage, OverviewStage, PainStage, SceneStage } from './Stages';
 
 const LABEL: Record<string, string> = { pain: '상황', overview: '흐름', demo: '체험', done: '결과' };
@@ -34,6 +36,9 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
   const [holdAt, setHoldAt] = useState<number | null>(null);
   const streamRef = useRef<HTMLDivElement>(null);
 
+  // Office(Word·Excel·PowerPoint) 시나리오는 결과물(workbench)이 있어도 Cowork 화면이 아니라 앱 화면에서 재생한다
+  const office = s?.agent === 'office';
+  const cowork = !!s?.workbench && !office;
   const steps = s ? ['pain', ...(s.overview?.length ? ['overview'] : []), 'demo', 'done'] : [];
   const step = steps[Math.min(stepIdx, steps.length - 1)] ?? 'demo';
 
@@ -46,11 +51,13 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
 
   // Copilot Chat: 답변이 나오면 멈추고 "이어서 보기"
   useEffect(() => {
-    if (step !== 'demo' || s?.workbench || p.shown === 0) return;
+    if (step !== 'demo' || cowork || p.shown === 0) return;
     const m = s?.messages[p.shown - 1];
     if (m?.role === 'assistant' && passes(ids, m)) setHoldAt(p.shown - 1);
   }, [step, p.shown, s, ids.length]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (step === 'demo' && holdAt !== null) p.pause(); }, [step, holdAt, p.pause, p.playing]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useWriting(office ? s : undefined, step === 'demo', p.shown, st, setSt, ids);
 
   // "/" 로 자료를 찾아 붙이는 연출
   const firstUserIdx = s ? s.messages.findIndex(m => m.role === 'user') : -1;
@@ -114,6 +121,47 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
     setStepIdx(i => Math.max(i - 1, 0));
   };
   const isLast = stepIdx === steps.length - 1;
+  /** 선택지를 고르면 바로 다음으로 (되돌아와 다시 고르면 앞선 선택을 바꾼다) */
+  const choose = (c: MsgChoice, o: ChoiceOption) => {
+    setSt(x => ({
+      ...x,
+      picks: [...x.picks.filter(q => q.key !== c.key), { key: c.key, option: o }],
+      ...(c.builds ? { opened: x.opened.includes(c.builds) ? x.opened : [...x.opened, c.builds], writing: c.builds, rows: 0 } : {}),
+    }));
+    p.act();
+  };
+  const ask = p.ask ? fill(p.ask, vars) : null;
+  const onSend = holdAt === null && pickDone && p.pending ? p.act : undefined;
+  const stream = (
+    <>
+      {s.startedAt && <p className="sc-date">{s.startedAt}</p>}
+      {s.messages.slice(0, p.shown).map((m, i) => (!passes(ids, m) ? null : m.role === 'choice' ? (
+        <div key={i} className="sc-user"><div className="sc-user-box"><p>{(o => o?.say ?? o?.label)(st.picks.find(x => x.key === m.key)?.option)}</p></div></div>
+      ) : (
+        <MessageView
+          key={i}
+          m={m.role === 'assistant' || m.role === 'user' ? { ...m, text: fill(m.text, vars) } : m}
+          active={i === p.shown - 1 && p.playing}
+          ids={ids}
+          hold={i === holdAt}
+          acts={actsMark}
+          {...(i === firstUserIdx && pick ? { pick } : {})}
+        />
+      )))}
+      {p.approve && (
+        <Permission
+          key={p.shown}
+          a={p.approve}
+          denied={deniedAt === p.shown}
+          onAllow={p.act}
+          onDeny={() => setDeniedAt(p.shown)}
+          onBack={() => setDeniedAt(null)}
+          note={p.approve.warn ? <>⚠ {p.approve.warn}</> : undefined}
+        />
+      )}
+      {p.busy && <Working />}
+    </>
+  );
 
   return (
     <main className="sc" data-track={track} data-scenario={scenario} data-brand-theme="copilot">
@@ -143,18 +191,27 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
       {step === 'pain' && (s.scene
         ? <SceneStage scene={s.scene} onNext={next} />
         : <PainStage title={s.title} caption={s.before ?? s.summary} onNext={next} />)}
-      {step === 'overview' && <OverviewStage agent={s.agent} steps={s.overview ?? []} hook={s.hook} onNext={next} />}
+      {step === 'overview' && <OverviewStage product={productName(s)} steps={s.overview ?? []} hook={s.hook} onNext={next} />}
       {step === 'done' && <DoneStage s={s} st={st} vars={vars} completed={p.done} />}
 
-      {s.workbench && (
+      {cowork && (
         <div style={{ display: step === 'demo' ? 'contents' : 'none' }}>
           <Cowork key={`${scenario}:${restarts}`} active={step === 'demo'} s={s} p={p} st={st} setSt={setSt} onDone={next} />
         </div>
       )}
 
-      {step === 'demo' && !s.workbench && (
+      {step === 'demo' && !cowork && (
         <div className="sc-feed">
           <div className="desk-win is-app">
+            {office ? (
+              <Office
+                s={s} st={st} vars={vars} ids={ids} streamRef={streamRef} mark={mark}
+                ask={ask} onSend={onSend} pick={pick} pickPhase={pickPhase} onPickSelect={selectPick}
+                onSlide={n => setSt(x => ({ ...x, slide: n }))}
+              >
+                {stream}
+              </Office>
+            ) : (
             <CpApp
               mode="chat"
               mark={mark}
@@ -174,9 +231,9 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
                 mark={mark}
                 composer={(
                   <ChatComposer
-                    text={p.ask ? fill(p.ask, vars) : 'Copilot에 메시지 보내기'}
-                    filled={!!p.ask}
-                    onSend={holdAt === null && pickDone && p.pending ? p.act : undefined}
+                    text={ask ?? 'Copilot에 메시지 보내기'}
+                    filled={!!ask}
+                    onSend={onSend}
                     mark={mark}
                     pick={pick}
                     pickPhase={pickPhase}
@@ -184,42 +241,27 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
                   />
                 )}
               >
-                {s.startedAt && <p className="sc-date">{s.startedAt}</p>}
-                {s.messages.slice(0, p.shown).map((m, i) => (passes(ids, m) ? (
-                  <MessageView
-                    key={i}
-                    m={m.role === 'assistant' || m.role === 'user' ? { ...m, text: fill(m.text, vars) } : m}
-                    active={i === p.shown - 1 && p.playing}
-                    ids={ids}
-                    hold={i === holdAt}
-                    acts={actsMark}
-                    {...(i === firstUserIdx && pick ? { pick } : {})}
-                  />
-                ) : null))}
-                {p.approve && (
-                  <Permission
-                    key={p.shown}
-                    a={p.approve}
-                    denied={deniedAt === p.shown}
-                    onAllow={p.act}
-                    onDeny={() => setDeniedAt(p.shown)}
-                    onBack={() => setDeniedAt(null)}
-                    note={p.approve.warn ? <>⚠ {p.approve.warn}</> : undefined}
-                  />
-                )}
-                {p.busy && <Working />}
+                {stream}
               </ChatMain>
             </CpApp>
+            )}
             <TipLayer>
               {holdAt !== null && (
                 <Tip zone=".cwr-hold">
-                  <Bubble q={`${AGENTS[s.agent].name}의 답변입니다.\n내용을 확인한 뒤 이어서 진행해 주세요.`}>
+                  <Bubble q={`${productName(s)}의 답변입니다.\n내용을 확인한 뒤 이어서 진행해 주세요.`}>
                     <CueButton next onClick={() => { setHoldAt(null); p.play(); }}>이어서 보기</CueButton>
                   </Bubble>
                 </Tip>
               )}
               {holdAt === null && p.approve && (
                 <Tip zone=".wb-perm"><Bubble q={'실행하기 전에 사람에게 한 번 확인합니다.\n확인하고 이상이 없다면 승인을 눌러주세요.'} /></Tip>
+              )}
+              {holdAt === null && p.choice && (
+                <Tip>
+                  <Bubble kind="choice" q={p.choice.text}>
+                    <Options options={p.choice.options} onPick={o => p.choice && choose(p.choice, o as ChoiceOption)} />
+                  </Bubble>
+                </Tip>
               )}
               {holdAt === null && p.spot && (
                 <SpotTip key={p.shown} spot={p.spot} lit={lit} onPick={setLit} onPass={() => { setLit(null); p.act(); }} />

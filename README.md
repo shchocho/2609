@@ -11,7 +11,7 @@ Microsoft **Copilot Chat**과 **Copilot Cowork**가 실제 업무를 어떻게 �
 | 화면 | 주소 | 내용 |
 |---|---|---|
 | 대기 | `#/` | 배경 영상과 "체험해보기". 아무 곳이나 누르면 홈으로 |
-| 홈 | `#/start` | 업무 영역 5개 선택 |
+| 홈 | `#/start` | 업무 영역 5개 · 제품 기능 체험 4개 선택 |
 | 시나리오 목록 | `#/t/<영역>` | 카드 회전 보기 / 제품별(Chat·Cowork) 보기 |
 | 재생 | `#/t/<영역>/<시나리오>` | 상황 → 흐름 → 체험 → 결과 |
 
@@ -40,6 +40,14 @@ Microsoft **Copilot Chat**과 **Copilot Cowork**가 실제 업무를 어떻게 �
 | 운영·소통 | 핵심 부품 통관 지연에 따른 생산 라인 대응안 | Cowork |
 | | 설비 모니터링 SaaS 기술 문의 답변과 고객 안내 자료 준비 | Cowork |
 | | 차세대 진동 센서·예지보전 출시 보도자료 초안 | Chat |
+
+### 제품 기능 체험 (추가 중 · `docs/EXPANSION-PLAN.md`)
+
+| 영역 | 시나리오 | 제품 |
+|---|---|---|
+| Copilot in 앱 | 회의 메모와 지난 제안서로 고객 제안서 초안 쓰기 | Copilot in Word |
+
+Copilot Code · Power Automate · Copilot Studio 영역은 홈에 카드만 있고 시나리오는 아직 없습니다.
 
 ## 로컬에서 확인하기
 
@@ -82,6 +90,7 @@ Azure Static Web Apps를 쓸 때는 함께 들어 있는 `staticwebapp.config.js
 
 - **문구(제목, 안내, 푸터)**: `src/copy.ts`
 - **업무 영역(이름, 설명, 색)**: `src/tracks.ts`. 홈 카드 아이콘은 `src/components/Icons.tsx`
+- **Office 화면 시나리오**: `"agent": "office"` 와 `"surface": "word" | "excel" | "powerpoint"` 를 주면 Cowork 화면 대신 앱 창과 오른쪽 Copilot 창에서 재생합니다. 가운데 문서는 `workbench.artifacts` 중 그 앱의 결과물입니다(화면: `src/surfaces/Office.tsx`, 스타일: `src/styles/surfaces.css`).
 - **시나리오**: `src/scenarios/<영역>/<id>.scenario.json`. 파일을 추가하면 목록에 자동으로 나타납니다. 고친 뒤 검사를 돌리세요.
 
 ```bash

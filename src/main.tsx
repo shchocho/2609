@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import './styles/reference.css';
 import './styles/overrides.css';
+import './styles/surfaces.css';
 import { App } from './App';
 import { applyTrackColors } from './tracks';
 

@@ -60,7 +60,7 @@
 1. **영역 추가**: `src/tracks.ts`, `scripts/check-scenarios.mjs` 의 `TRACKS`, 홈 카드 아이콘(`src/components/Icons.tsx`).
    홈 그리드는 5열 고정(`.booth-track-grid { grid-template-columns: repeat(5, 1fr) }`)이므로, "업무 영역" 5개와 "제품 기능 체험" 4개를 **두 줄·두 묶음**으로 나눠 보여 줍니다(묶음 제목 추가, 두 번째 줄은 4열).
 2. **제품 이름**: `src/data.ts` 의 `AGENTS` 에 `office`, `code`, `flow`, `studio` 추가. 목록 카드 배지는 surface 에 따라 "Copilot in Word" 등으로 표시.
-3. **체험 화면 선택**: `src/play/Play.tsx` 에서 `workbench` 가 있으면 Cowork, 아니면 `scenario.surface` 로 화면을 고릅니다. 새 화면은 `src/surfaces/` 에 하나씩 만듭니다.
+3. **체험 화면 선택**: `src/play/Play.tsx` 에서 `agent` 가 `office` 면 `scenario.surface`(word · excel · powerpoint)의 앱 화면, 그 밖에는 `workbench` 가 있으면 Cowork, 없으면 Chat 화면을 고릅니다. Office 시나리오도 결과물은 `workbench.artifacts` 에 두고(가운데 문서 = 그 앱의 결과물), 대화·선택지·화면 찾기·"/" 자료 붙이기는 Chat 화면과 같은 코드를 씁니다. 나머지 화면(code · flow · studio)도 같은 자리에 분기를 더하면 됩니다. 새 화면은 `src/surfaces/` 에 하나씩 만듭니다.
    - `word` · `excel` · `powerpoint`: 원본에 있던 Office 화면을 그대로 재현합니다. 구조는 `docs/reference/render-spec.md` §3.5, 스타일은 이미 `reference.css` 의 `.sc-shell.is-office`, `.sc-ribbon`, `.sc-canvas`, `.sc-pane` 에 있습니다. 화면 찾기 퀴즈 영역은 `ribbon · canvas · pane · composer`.
    - `code` · `flow` · `studio`: 원본에 없는 화면이라 새 CSS(`src/styles/surfaces.css`)를 만듭니다. 색·글꼴·둥근 모서리는 기존 토큰(`--copilot-*`, `--desk-font`, `--borderRadius*`)을 씁니다. 에이전트가 도구를 실행하는 장면은 원본의 Scout 화면 부품(`.sct-tool-card`, `.sct-permission` — render-spec §4.6·§4.7, 스타일은 reference.css 에 있음)을 재사용할 수 있습니다.
 4. **새 결과물 종류**(`src/components/artifacts.tsx`): `flow`(트리거·작업 카드 목록), `app`(앱 미리보기 화면·폼), `agent`(지침·지식·도구·스킬 설정 카드). 기존 `sheet`·`doc`·`deck`·`mail` 은 Office 캔버스에서 그대로 씁니다.
@@ -68,7 +68,7 @@
 
 ## 작업 순서 (영역 하나 끝날 때마다 커밋)
 
-1. 엔진: 영역 4개 등록, 홈 두 묶음, `Play.tsx` 의 surface 분기, Office 화면 → `m365-apps` 시나리오 1편으로 확인
+1. **(완료)** 엔진: 영역 4개 등록, 홈 두 묶음, `Play.tsx` 의 surface 분기, Office 화면 → `m365-apps` 시나리오 1편(`word-proposal-draft`)으로 확인
 2. `m365-apps` 나머지 2편
 3. `power-automate` 화면 + 3편
 4. `copilot-studio` 화면 + 3편

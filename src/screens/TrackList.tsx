@@ -2,15 +2,20 @@ import { useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { ArrowLeftRegular, ChevronLeftRegular, ChevronRightRegular, ColumnTripleRegular, SlideMultipleRegular, ChevronRight20Regular } from '@fluentui/react-icons';
 import { trackById } from '../tracks';
-import { AGENTS, APP_LOGO, appsOf, madeAppOf, scenariosOf } from '../data';
+import { APP_LOGO, appsOf, madeAppOf, productName, scenariosOf } from '../data';
 import { go, HASH_HOME, hashPlay } from '../router';
 import { COPY } from '../copy';
 import type { Scenario } from '../types';
 
-const PRODUCTS = [
-  { id: 'chat', label: 'Chat', description: <>요약·초안·아이디어가 필요할 때, <strong>대화로 빠르게</strong> 해결합니다.</> },
-  { id: 'cowork', label: 'Cowork', description: <>목표를 주면 <strong>여러 앱과 파일에 걸친 작업</strong>을 단계별로 실행합니다.</> },
-] as const;
+const PRODUCTS: Record<string, { label: string; description: React.ReactNode }> = {
+  chat: { label: 'Chat', description: <>요약·초안·아이디어가 필요할 때, <strong>대화로 빠르게</strong> 해결합니다.</> },
+  cowork: { label: 'Cowork', description: <>목표를 주면 <strong>여러 앱과 파일에 걸친 작업</strong>을 단계별로 실행합니다.</> },
+  word: { label: 'in Word', description: <>참고할 파일을 붙여 <strong>문서 안에서 바로 초안</strong>을 쓰고, 요약하고, 다시 씁니다.</> },
+  powerpoint: { label: 'in PowerPoint', description: <>문서 한 편으로 <strong>발표자료 초안</strong>을 만들고 슬라이드를 정리합니다.</> },
+  excel: { label: 'in Excel', description: <>표에 대해 질문하고 <strong>수식 열과 차트</strong>를 제안받습니다.</> },
+};
+/** 제품별 보기의 열 id — Office 화면은 앱(surface)별로 나눈다 */
+const productOf = (s: Scenario) => (s.agent === 'office' ? s.surface ?? '' : s.agent);
 
 interface Entry { id: string; order: number; title: string; badge: string; scenario: Scenario | null }
 
@@ -23,7 +28,7 @@ export function TrackList({ track }: { track: string }) {
   const transitioning = useRef(false);
 
   const entries: Entry[] = scenariosOf(track)
-    .map(s => ({ id: s.id, order: s.order ?? 99, title: s.title, badge: AGENTS[s.agent].full, scenario: s }))
+    .map(s => ({ id: s.id, order: s.order ?? 99, title: s.title, badge: productName(s), scenario: s }))
     .sort((a, b) => a.order - b.order);
   const first = entries.findIndex(e => e.scenario);
   const fanK = Math.round((1 - Math.cos(Math.min(Math.floor(entries.length / 2), 2) * Math.PI / 4)) * 1.4 * 1000) / 1000;
@@ -74,10 +79,12 @@ export function TrackList({ track }: { track: string }) {
       {expanded ? (
         <section id="product-view" className="booth-product-guide" aria-label="제품별 체험">
           <div className="booth-product-board">
-            {PRODUCTS.map(p => {
-              const list = entries.flatMap(e => (e.scenario?.agent === p.id ? [e.scenario] : []));
+            {(t?.products ?? ['chat', 'cowork']).map(id => {
+              const p = PRODUCTS[id];
+              if (!p) return null;
+              const list = entries.flatMap(e => (e.scenario && productOf(e.scenario) === id ? [e.scenario] : []));
               return (
-                <article key={p.id} data-agent={p.id}>
+                <article key={id} data-agent={id}>
                   <header>
                     <h2 className="sc-overview-product-name">
                       <span className="sc-overview-copilot-logo"><img src="logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}

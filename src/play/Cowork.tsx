@@ -3,7 +3,8 @@ import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import type { ChoiceOption, Message, PlayState, Scenario } from '../types';
 import type { Engine } from '../engine/useEngine';
 import { AGENTS, EFFORTS, MODELS } from '../data';
-import { appFromName, artifactName, fill, makeVars, passes, pickIds, writeLength, objParticle, Rich } from '../engine/text';
+import { appFromName, artifactName, fill, makeVars, passes, pickIds, objParticle, Rich } from '../engine/text';
+import { useWriting } from '../engine/useWriting';
 import { ArtifactView, CoworkMail } from '../components/artifacts';
 import { MessageView, Permission, SchedulePermission, Working, isSchedule, type Clip } from '../components/messages';
 import { Bubble, CueButton, Hint, Key, Options, Solved, Tip, TipLayer } from '../components/coach';
@@ -13,7 +14,7 @@ import {
 } from '../components/chrome';
 import { AnswerActs, AppIcon, WE, X } from '../components/ui';
 
-const CHOICE_DELAY = 1100, ROW_MS = 320, SLIDE_MS = 260;
+const CHOICE_DELAY = 1100, SLIDE_MS = 260;
 const KIND_LABEL: Record<string, string> = {
   excel: 'Excel 스프레드시트', word: 'Word 문서', powerpoint: 'PowerPoint 프레젠테이션', onenote: 'OneNote 전자 필기장', teams: 'Teams 메시지',
 };
@@ -120,30 +121,7 @@ export function Cowork({ active, s, p, st, setSt, onDone }: {
   }, [active, p.hunt, p.act, st.hunted, menu]);
 
   // 도구 메시지의 효과: 파일 열기 / 작성 / 슬라이드 옮기기
-  useEffect(() => {
-    const m = s.messages[p.shown - 1];
-    if (!m || !passes(ids, m)) return;
-    if (m.role === 'tool') {
-      const open = m.opens ?? m.shows;
-      if (open) setSt(x => ({ ...x, opened: x.opened.includes(open) ? x.opened : [...x.opened, open] }));
-      if (m.writes) {
-        const w = m.writes;
-        setSt(x => ({ ...x, opened: x.opened.includes(w) ? x.opened : [...x.opened, w], writing: w, rows: 0 }));
-      }
-      if (m.translate) setSt(x => ({ ...x, moved: 0, moving: 1 }));
-      return;
-    }
-    if (m.role === 'assistant' && m.over) setSt(x => ({ ...x, over: true }));
-  }, [p.shown, s.messages, st.picks.length, st.hunted, setSt]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    const id = st.writing;
-    if (!active || !id) return;
-    const a = wb.artifacts[id];
-    if (!a) return;
-    if (st.rows >= writeLength(a, ids)) { setSt(x => ({ ...x, writing: null })); return; }
-    const t = window.setTimeout(() => setSt(x => ({ ...x, rows: x.rows + 1 })), ROW_MS);
-    return () => window.clearTimeout(t);
-  }, [active, st.writing, st.rows, st.picks.length, st.hunted, setSt]); // eslint-disable-line react-hooks/exhaustive-deps
+  useWriting(s, active, p.shown, st, setSt, ids);
   useEffect(() => {
     if (!active || !st.moving) return;
     const deck = Object.values(wb.artifacts).find(a => a.deck && !a.deck.src)?.deck;

@@ -1,6 +1,6 @@
 /** 시나리오 JSON 스키마 (src/scenarios/<track>/<id>.scenario.json) */
 
-export type AgentKind = 'chat' | 'cowork' | 'scout';
+export type AgentKind = 'chat' | 'cowork' | 'scout' | 'office';
 export type AppKind = 'excel' | 'word' | 'powerpoint' | 'outlook' | 'teams' | 'onenote';
 
 /** only: 고른 선택지 id(또는 "hunted") 중 하나라도 있을 때만 / not: 하나라도 있으면 숨김 */
@@ -186,6 +186,10 @@ export interface Track {
   color: string;
   textColor: string;
   about: string;
+  /** 'product' 면 홈의 "제품 기능 체험" 묶음에 놓인다 */
+  group?: 'product';
+  /** 목록의 제품별 보기에 세울 열 (기본 chat · cowork) */
+  products?: string[];
   intro?: TrackIntro[];
 }
 

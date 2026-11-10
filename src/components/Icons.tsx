@@ -1,6 +1,7 @@
 import { SEMANTIC_ICONS } from './semanticIcons';
 import {
   MegaphoneLoudFilled, PeopleFilled, MoneyFilled, ScalesFilled, HandshakeFilled, BriefcaseFilled,
+  AppsFilled, CodeFilled, FlowFilled, BotFilled,
 } from '@fluentui/react-icons';
 import type { JSX } from 'react';
 
@@ -19,6 +20,10 @@ const TRACK_ICONS: Record<string, JSX.Element> = {
   procurement: <ScalesFilled />,
   ops: <HandshakeFilled />,
   dev: <BriefcaseFilled />,
+  'm365-apps': <AppsFilled />,
+  'copilot-code': <CodeFilled />,
+  'power-automate': <FlowFilled />,
+  'copilot-studio': <BotFilled />,
 };
 export function TrackIcon({ id, fallback }: { id: string; fallback?: string }) {
   return TRACK_ICONS[id] ?? <span>{fallback}</span>;

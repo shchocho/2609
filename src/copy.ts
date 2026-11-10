@@ -5,10 +5,13 @@ export const COPY = {
   /** 대기 화면·홈 타이틀 둘째 줄 */
   tagline: '우리 회사의 일하는 방식은 어떻게 달라질까요?',
   /** 홈 화면 안내 두 줄 */
-  homeLead: '업무 영역을 선택해 보세요.',
+  homeLead: '체험할 영역을 선택해 보세요.',
   homeSub: 'Copilot Chat과 Copilot Cowork가 영업·인사·재무·구매·운영 업무를 어떻게 바꾸는지 시나리오로 체험해 보세요.',
+  /** 홈 화면 카드 묶음 제목 */
+  groupWork: '업무 영역',
+  groupProduct: '제품 기능 체험',
   /** 목록 화면 뒤로가기 라벨 */
-  backToHome: '업무 영역',
+  backToHome: '영역 선택',
   /** 푸터 */
   footerLeft: '© Microsoft 2026',
   footerRight: 'Copilot Cowork Experience',

@@ -67,6 +67,44 @@ export const TRACKS: Track[] = [
       caption: '부품 통관 지연 메일이 오면 재고·소요량·생산 계획을 각각 확인해야 합니다.\n고객 기술 문의와 신제품 보도자료도 매뉴얼과 홍보 기준에 맞춰 다듬어야 합니다.',
     }],
   },
+  /* ---------- 제품 기능 체험 (docs/EXPANSION-PLAN.md) ---------- */
+  {
+    id: 'm365-apps',
+    group: 'product',
+    products: ['word', 'powerpoint', 'excel'],
+    name: 'Copilot in 앱',
+    icon: '📝',
+    color: '#185abd',
+    textColor: '#124078',
+    about: 'Word·PowerPoint·Excel 안에서 초안, 발표자료, 데이터 분석을 맡깁니다.',
+  },
+  {
+    id: 'copilot-code',
+    group: 'product',
+    name: 'Copilot Code',
+    icon: '🧩',
+    color: '#0f7b6c',
+    textColor: '#0b5a4f',
+    about: '개발자가 아니어도 말로 설명해 업무용 앱과 자동화를 만듭니다.',
+  },
+  {
+    id: 'power-automate',
+    group: 'product',
+    name: 'Power Automate',
+    icon: '⚙️',
+    color: '#0066ff',
+    textColor: '#0047b3',
+    about: '데스크톱 흐름(RPA)과 클라우드 흐름(DPA)으로 반복 업무를 자동화합니다.',
+  },
+  {
+    id: 'copilot-studio',
+    group: 'product',
+    name: 'Copilot Studio',
+    icon: '🤖',
+    color: '#7a5cff',
+    textColor: '#5c3d8a',
+    about: '하네스를 골라 우리 업무에 맞는 에이전트를 만들고 게시합니다.',
+  },
 ];
 
 export const TRACK_IDS = TRACKS.map(t => t.id);

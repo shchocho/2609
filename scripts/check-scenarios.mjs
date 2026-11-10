@@ -5,12 +5,15 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, basename } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = new URL('../src/scenarios/', import.meta.url).pathname;
-const TRACKS = ['sales', 'hr', 'finance', 'procurement', 'ops'];
+const ROOT = fileURLToPath(new URL('../src/scenarios/', import.meta.url)); // .pathname 은 Windows 에서 경로가 깨짐
+const TRACKS = ['sales', 'hr', 'finance', 'procurement', 'ops', 'm365-apps', 'copilot-code', 'power-automate', 'copilot-studio'];
+const AGENTS = ['chat', 'cowork', 'office'];
+const OFFICE = ['word', 'excel', 'powerpoint'];
 const ROLES = new Set(['user', 'assistant', 'tool', 'note', 'cue', 'spot', 'approve', 'choice', 'hunt']);
 const HUNT_TARGETS = new Set(['model', 'effort', 'attach', 'new', 'mine', 'auto', 'custom']);
-const ZONES = { chat: ['rail', 'top', 'stream', 'actions', 'composer'], cowork: ['rail', 'stream', 'composer'] };
+const ZONES = { chat: ['rail', 'top', 'stream', 'actions', 'composer'], cowork: ['rail', 'stream', 'composer'], office: ['ribbon', 'canvas', 'pane', 'composer'] };
 const ICONS = new Set(['box', 'briefcase', 'chart', 'megaphone', 'people', 'code', 'clock', 'calx', 'scales', 'split', 'docsearch', 'calc', 'target', 'mail', 'share', 'checkdoc', 'factory', 'coin', 'network', 'alert', 'bolt', 'sliders', 'link', 'check', 'send', 'truck', 'refresh', 'gauge', 'shield']);
 const BANNED = (process.env.BANNED ?? 'POSTECH,포스텍').split(',').filter(Boolean);
 
@@ -31,7 +34,8 @@ for (const track of readdirSync(ROOT)) {
     if (basename(f, '.scenario.json') !== s.id) err(file, `파일 이름과 id(${s.id})가 다릅니다`);
     if (ids.has(s.id)) err(file, `id 중복: ${s.id}`);
     ids.add(s.id);
-    if (!['chat', 'cowork'].includes(s.agent)) err(file, `agent 는 chat 또는 cowork 이어야 합니다`);
+    if (!AGENTS.includes(s.agent)) err(file, `agent 는 ${AGENTS.join(' · ')} 중 하나여야 합니다`);
+    if (s.agent === 'office' && !(OFFICE.includes(s.surface) && Object.values(s.workbench?.artifacts ?? {}).some(a => a.app === s.surface))) err(file, `office 시나리오는 surface(${OFFICE.join(' · ')})와 그 앱의 결과물이 필요합니다`);
     if (!Array.isArray(s.messages) || !s.messages.length) { err(file, 'messages 가 비어 있습니다'); continue; }
     const arts = s.workbench?.artifacts ?? {};
     const optionIds = new Set(['hunted']);
@@ -51,6 +55,7 @@ for (const track of readdirSync(ROOT)) {
         for (const o of m.options ?? []) { if (!o.id || !o.label) err(file, `${at}: 선택지마다 id·label 이 필요합니다`); optionIds.add(o.id); }
         if (m.builds && !arts[m.builds]) err(file, `${at}: builds "${m.builds}" 결과물이 없습니다`);
       }
+      if (m.role === 'hunt' && s.agent === 'office') err(file, `${at}: Office 화면에서는 hunt 를 쓸 수 없습니다`);
       if (m.role === 'hunt') {
         if (!m.text || !m.hint || !m.does) err(file, `${at}: text·hint·does 가 필요합니다`);
         if (!['composer', 'rail'].includes(m.at)) err(file, `${at}: at 은 composer 또는 rail`);
