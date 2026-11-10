@@ -18,6 +18,12 @@ npm start
 npm test
 ```
 
+Claude 아티팩트로 올릴 묶음은 아래 명령으로 `dist/` 에 만듭니다(three.js 는 같은 버전을 CDN에서 불러오도록 바뀝니다).
+
+```bash
+npm run artifact
+```
+
 ## 무엇을 할 수 있나
 
 | 화면 | 내용 |
