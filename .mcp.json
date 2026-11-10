@@ -3,6 +3,10 @@
     "rea": {
       "command": "npx",
       "args": ["-y", "rea-agents@6.7.0", "mcp"]
+    },
+    "higgsfield": {
+      "type": "http",
+      "url": "https://mcp.higgsfield.ai/mcp"
     }
   }
 }
