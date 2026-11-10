@@ -100,6 +100,13 @@ npm run check:scenarios
   - `approve` 실행 전 권한 확인, `choice` 기준 고르기(`only`/`not` 으로 선택별 내용 분기), `hunt` 기능 찾기 퀴즈, `spot` 화면 영역 찾기 퀴즈
 - `recap`, `finish`: 결과 화면의 요약.
 
+## 문서
+
+- `docs/EXPANSION-PLAN.md`: Copilot in 앱(Word·PowerPoint·Excel), Copilot Code, Power Automate, Copilot Studio 영역을 추가하는 계획
+- `docs/LOCAL-HANDOFF.md`: 내 PC 의 Claude Code 로 이어서 작업하는 방법과 붙여 넣을 프롬프트
+- `docs/reference/`: 원본 부스 화면을 분석한 엔진·렌더링 명세(필요한 절만 찾아 읽기)
+- `scripts/e2e.cjs`: 시나리오 하나를 결과 화면까지 자동 진행하는 테스트(Playwright 필요)
+
 ## 참고
 
 - 화면 구성과 스타일은 원본 부스 화면을 기준으로 다시 구현했습니다(`src/styles/reference.css`).
