@@ -69,7 +69,7 @@
 ## 작업 순서 (영역 하나 끝날 때마다 커밋)
 
 1. **(완료)** 엔진: 영역 4개 등록, 홈 두 묶음, `Play.tsx` 의 surface 분기, Office 화면 → `m365-apps` 시나리오 1편(`word-proposal-draft`)으로 확인
-2. `m365-apps` 나머지 2편
+2. **(완료)** `m365-apps` 나머지 2편(`ppt-from-doc`, `excel-sales-analysis`)
 3. `power-automate` 화면 + 3편
 4. `copilot-studio` 화면 + 3편
 5. `copilot-code` 화면 + 3편

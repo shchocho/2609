@@ -148,7 +148,7 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
           {...(i === firstUserIdx && pick ? { pick } : {})}
         />
       )))}
-      {p.approve && (
+      {holdAt === null && p.approve && (
         <Permission
           key={p.shown}
           a={p.approve}

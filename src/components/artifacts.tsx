@@ -36,6 +36,8 @@ function SheetView({ sheet, writing, vars, ids }: { sheet: Sheet; writing: numbe
   const addKey = page ? undefined : Object.keys(sheet.headAdd ?? {}).find(k => ids.includes(k));
   const heads = [...(page?.head ?? sheet.head), ...(addKey ? sheet.headAdd?.[addKey] ?? [] : [])];
   const nums = new Set(page?.num ?? sheet.num ?? []);
+  const chart = writing == null && !page ? filterBy(sheet.charts ?? [], ids)[0] : undefined;
+  const top = Math.max(1, ...(chart?.bars ?? []).map(b => b.value));
   return (
     <div className="wb-xl">
       {writing != null && (
@@ -58,6 +60,16 @@ function SheetView({ sheet, writing, vars, ids }: { sheet: Sheet; writing: numbe
             })}
           </tbody>
         </table>
+        {chart && (
+          <figure className="wb-xl-chart">
+            <figcaption>{chart.title}</figcaption>
+            {chart.bars.map(b => (
+              <p key={b.label} className={b.warn ? 'is-warn' : undefined}>
+                <span>{b.label}</span><i style={{ width: `${(b.value / top) * 100}%` }} /><b>{b.value.toFixed(chart.digits ?? 0)}{chart.unit}</b>
+              </p>
+            ))}
+          </figure>
+        )}
       </div>
       {tabs.length > 0 && (
         <p className="wb-xl-tabs">
@@ -316,6 +328,9 @@ function TeamsView({ a, writing }: ViewProps) {
 export function ArtifactView(p: ViewProps) {
   const { a } = p;
   if (a.kind === 'sheet' && a.sheet) return <SheetView key={a.name} sheet={a.sheet} writing={p.writing} vars={p.vars} ids={p.ids} />;
+  if (a.kind === 'deck' && a.deck?.slides.some(s => s.only || s.not)) {
+    return <DeckView {...p} a={{ ...a, deck: { ...a.deck, slides: filterBy(a.deck.slides, p.ids).map((s, i) => ({ ...s, n: i + 1 })) } }} />;
+  }
   if (a.kind === 'deck') return <DeckView {...p} />;
   if (a.kind === 'teams') return <TeamsView {...p} />;
   if (a.kind === 'mail') return <MailView {...p} />;

@@ -24,7 +24,10 @@ export interface Finish { sub?: string; outs?: FinishOut[]; outsBy?: Record<stri
 /* ---------- 작업 영역 결과물 ---------- */
 export interface SheetRow extends Filterable { cells: string[]; tone?: string; add?: Record<string, string[]> }
 export interface SheetPage { head: string[]; num?: number[]; rows: SheetRow[] }
+/** 시트에 넣은 막대 차트 (only/not 으로 선택에 따라 고름) */
+export interface Chart extends Filterable { title: string; unit?: string; digits?: number; bars: { label: string; value: number; warn?: boolean }[] }
 export interface Sheet {
+  charts?: Chart[];
   head: string[];
   num?: number[];
   rows: SheetRow[];
@@ -55,7 +58,8 @@ export interface DocBlock extends Filterable {
   a?: string;
 }
 export interface DeckVariant { head?: string; sub?: string; body?: string[] }
-export interface DeckSlide {
+/** only/not 을 쓰면 선택에 따라 슬라이드가 들어가고 빠지며, 번호(n)는 보이는 순서대로 다시 매긴다 */
+export interface DeckSlide extends Filterable {
   n: number;
   head: string;
   sub?: string;

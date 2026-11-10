@@ -2,7 +2,7 @@
 import type { ReactNode, RefObject } from 'react';
 import type { Pick, PlayState, Scenario, Vars } from '../types';
 import { APPS, type AppId } from '../data';
-import { artifactName } from '../engine/text';
+import { artifactName, filterBy } from '../engine/text';
 import { ArtifactView } from '../components/artifacts';
 import { PickText, SlashPopup, type Mark, type PickPhase } from '../components/chrome';
 
@@ -41,6 +41,11 @@ export function Office({ s, st, vars, ids, streamRef, mark, ask, onSend, pick, p
   const doc = id ? arts[id] : undefined;
   // Copilot 이 쓰기 전의 새 결과물은 빈 문서로 둔다
   const writing = !id || !doc ? null : st.writing === id ? st.rows : doc.origin === 'made' && !st.opened.includes(id) ? 0 : null;
+  // 덱은 만드는 동안 지금까지 만든 슬라이드만 보여 준다 (덱 뷰어는 writing 을 쓰지 않는다)
+  const building = doc?.deck && writing != null ? doc.deck.slides.slice(0, writing) : null;
+  const view = doc?.deck && building ? { ...doc, deck: { slides: building.length ? building : [{ n: 1, head: '제목을 추가하려면 클릭' }] } } : doc;
+  const slide = building ? Math.max(1, filterBy(building, ids).length) : st.slide;
+  const slides = view?.deck ? view.deck.total ?? filterBy(view.deck.slides, ids).length : 1;
   const slashOpen = !!(pick && ask && (pickPhase === 'search' || pickPhase === 'pick'));
   return (
     <div className="sc-shell is-office" data-app={surface}>
@@ -59,7 +64,7 @@ export function Office({ s, st, vars, ids, streamRef, mark, ask, onSend, pick, p
       </div>
       <div className="sc-office-body">
         <div className={`sc-canvas sc-zone ${mark('canvas')}`}>
-          {doc && <ArtifactView a={doc} writing={writing} vars={vars} ids={ids} slide={st.slide} moved={st.moved} over={st.over} onSlide={onSlide} />}
+          {view && <ArtifactView a={view} writing={writing} vars={vars} ids={ids} slide={slide} moved={st.moved} over={st.over} onSlide={onSlide} />}
         </div>
         <div className={`sc-pane sc-zone ${mark('pane')}`}>
           <span className="sc-pane-top"><i>≡</i><i>⛨</i><i className="sc-chip">{vars.model} ⌄</i><i>⋯</i><i>✕</i></span>
@@ -77,7 +82,7 @@ export function Office({ s, st, vars, ids, streamRef, mark, ask, onSend, pick, p
         </div>
       </div>
       <div className="sc-status">
-        <span>{surface === 'powerpoint' ? `슬라이드 ${st.slide}/${doc?.deck?.total ?? doc?.deck?.slides.length ?? 1}` : surface === 'excel' ? '준비' : '1/5 페이지'}</span>
+        <span>{surface === 'powerpoint' ? `슬라이드 ${slide}/${slides}` : surface === 'excel' ? '준비' : '1/5 페이지'}</span>
         <span>한국어</span>
         <span className="sc-status-end">─ ───●─── ＋ 77%</span>
       </div>

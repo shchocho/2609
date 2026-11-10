@@ -46,6 +46,8 @@ Microsoft **Copilot Chat**과 **Copilot Cowork**가 실제 업무를 어떻게 �
 | 영역 | 시나리오 | 제품 |
 |---|---|---|
 | Copilot in 앱 | 회의 메모와 지난 제안서로 고객 제안서 초안 쓰기 | Copilot in Word |
+| | 회사 템플릿에서 Word 제안서로 10장 발표자료 만들기 | Copilot in PowerPoint |
+| | 분기 영업 실적 시트에서 원인 분석·수식 열·차트 만들기 | Copilot in Excel |
 
 Copilot Code · Power Automate · Copilot Studio 영역은 홈에 카드만 있고 시나리오는 아직 없습니다.
 
@@ -90,7 +92,7 @@ Azure Static Web Apps를 쓸 때는 함께 들어 있는 `staticwebapp.config.js
 
 - **문구(제목, 안내, 푸터)**: `src/copy.ts`
 - **업무 영역(이름, 설명, 색)**: `src/tracks.ts`. 홈 카드 아이콘은 `src/components/Icons.tsx`
-- **Office 화면 시나리오**: `"agent": "office"` 와 `"surface": "word" | "excel" | "powerpoint"` 를 주면 Cowork 화면 대신 앱 창과 오른쪽 Copilot 창에서 재생합니다. 가운데 문서는 `workbench.artifacts` 중 그 앱의 결과물입니다(화면: `src/surfaces/Office.tsx`, 스타일: `src/styles/surfaces.css`).
+- **Office 화면 시나리오**: `"agent": "office"` 와 `"surface": "word" | "excel" | "powerpoint"` 를 주면 Cowork 화면 대신 앱 창과 오른쪽 Copilot 창에서 재생합니다. 가운데 문서는 `workbench.artifacts` 중 그 앱의 결과물입니다(화면: `src/surfaces/Office.tsx`, 스타일: `src/styles/surfaces.css`). 덱 슬라이드에 `only`/`not` 을 쓰면 선택에 따라 슬라이드가 들어가고 빠지며, 시트의 `charts` 는 표 아래에 막대 차트를 넣습니다.
 - **시나리오**: `src/scenarios/<영역>/<id>.scenario.json`. 파일을 추가하면 목록에 자동으로 나타납니다. 고친 뒤 검사를 돌리세요.
 
 ```bash
