@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import type { PlayState, Scenario } from '../types';
 import { passes, writeLength } from './text';
 
-const ROW_MS = 320;
+const ROW_MS = 320, BEAT_MS = 650; // 화면 조작을 보여 주는 흐름은 커서가 움직일 시간을 준다
 
 /**
  * 도구 메시지의 효과: 결과물 열기(opens·shows) · 한 줄씩 작성(writes) · 슬라이드 옮기기 시작(translate).
@@ -33,7 +33,7 @@ export function useWriting(
     const a = s?.workbench?.artifacts[id];
     if (!a) return;
     if (st.rows >= writeLength(a, ids)) { setSt(x => ({ ...x, writing: null })); return; }
-    const t = window.setTimeout(() => setSt(x => ({ ...x, rows: x.rows + 1 })), ROW_MS);
+    const t = window.setTimeout(() => setSt(x => ({ ...x, rows: x.rows + 1 })), a.flow?.steps.some(x => x.do) ? BEAT_MS : ROW_MS);
     return () => window.clearTimeout(t);
   }, [active, s, st.writing, st.rows, st.picks.length, st.hunted, setSt]); // eslint-disable-line react-hooks/exhaustive-deps
 }

@@ -76,6 +76,8 @@ const LETTER: Record<string, [string, string]> = {
   onenote: ['N', 'var(--m365-onenote-bright, #de4aff)'],
   teams: ['T', 'var(--m365-teams-bright, #9443ff)'],
   cowork: ['C', 'var(--copilot-black, #242424)'],
+  cloudflow: ['▸', '#0066ff'],
+  deskflow: ['▸', '#0066ff'],
   scout: ['S', 'var(--copilot-black, #242424)'],
 };
 

@@ -4,7 +4,7 @@ import {
   ArrowCounterclockwiseRegular, ArrowLeftRegular, ArrowPreviousRegular, HomeRegular, NextRegular,
 } from '@fluentui/react-icons';
 import { INITIAL_STATE, type ChoiceOption, type Message, type MsgChoice, type PlayState } from '../types';
-import { productName, scenarioById } from '../data';
+import { AGENTS, productName, scenarioById } from '../data';
 import { trackById } from '../tracks';
 import { go, HASH_ATTRACT, hashTrack } from '../router';
 import { useEngine } from '../engine/useEngine';
@@ -15,7 +15,7 @@ import { Bubble, CueButton, Hint, Key, Options, Solved, SpotOptions, Tip, TipLay
 import { CHAT_NAV, ChatComposer, ChatMain, CpApp, History, NavItem, RailTabs, scrollToBottom, scrollToHold, type PickPhase } from '../components/chrome';
 import { WE } from '../components/ui';
 import { Cowork } from './Cowork';
-import { Office } from '../surfaces/Office';
+import { AppWindow } from '../surfaces/AppWindow';
 import { DoneStage, OverviewStage, PainStage, SceneStage } from './Stages';
 
 const LABEL: Record<string, string> = { pain: '상황', overview: '흐름', demo: '체험', done: '결과' };
@@ -36,8 +36,8 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
   const [holdAt, setHoldAt] = useState<number | null>(null);
   const streamRef = useRef<HTMLDivElement>(null);
 
-  // Office(Word·Excel·PowerPoint) 시나리오는 결과물(workbench)이 있어도 Cowork 화면이 아니라 앱 화면에서 재생한다
-  const office = s?.agent === 'office';
+  // 앱 창 시나리오(Office · Power Automate)는 결과물(workbench)이 있어도 Cowork 화면이 아니라 그 앱 화면에서 재생한다
+  const office = s?.agent === 'office' || s?.agent === 'flow';
   const cowork = !!s?.workbench && !office;
   const steps = s ? ['pain', ...(s.overview?.length ? ['overview'] : []), 'demo', 'done'] : [];
   const step = steps[Math.min(stepIdx, steps.length - 1)] ?? 'demo';
@@ -204,13 +204,13 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
         <div className="sc-feed">
           <div className="desk-win is-app">
             {office ? (
-              <Office
+              <AppWindow
                 s={s} st={st} vars={vars} ids={ids} streamRef={streamRef} mark={mark}
-                ask={ask} onSend={onSend} pick={pick} pickPhase={pickPhase} onPickSelect={selectPick}
+                ask={ask} onSend={ask ? onSend : undefined} pick={pick} pickPhase={pickPhase} onPickSelect={selectPick}
                 onSlide={n => setSt(x => ({ ...x, slide: n }))}
               >
                 {stream}
-              </Office>
+              </AppWindow>
             ) : (
             <CpApp
               mode="chat"
@@ -248,7 +248,7 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
             <TipLayer>
               {holdAt !== null && (
                 <Tip zone=".cwr-hold">
-                  <Bubble q={`${productName(s)}의 답변입니다.\n내용을 확인한 뒤 이어서 진행해 주세요.`}>
+                  <Bubble q={`${s.agent === 'office' ? productName(s) : AGENTS[s.agent].name}의 답변입니다.\n내용을 확인한 뒤 이어서 진행해 주세요.`}>
                     <CueButton next onClick={() => { setHoldAt(null); p.play(); }}>이어서 보기</CueButton>
                   </Bubble>
                 </Tip>

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { Artifact, Filterable, PlayState, Vars } from '../types';
+import type { Artifact, Filterable, FlowStep, PlayState, Vars } from '../types';
 
 /** {model} {effort} {pick:KEY} {val:KEY} 치환 */
 export function fill(text: string, v: Vars): string {
@@ -40,11 +40,15 @@ export function artifactName(a: Artifact, ids: string[]): string {
   return a.name;
 }
 
+/** 흐름의 박자: 화면 조작(do)이 있는 단계는 조작 하나가 한 박자, 없는 단계는 단계가 한 박자 */
+export const flowBeats = (steps: FlowStep[]) => steps.flatMap((x, step) => (x.do?.length ? x.do : [undefined]).map(act => ({ step, act })));
+
 /** 작성 애니메이션 길이(행/블록 수) */
 export function writeLength(a: Artifact, ids: string[]): number {
   if (a.kind === 'sheet') return a.sheet ? filterBy(a.sheet.rows, ids).length : 0;
   if (a.kind === 'teams') return a.teams ? a.teams.body.length + 2 : 0;
   if (a.kind === 'deck') return a.deck ? a.deck.slides.length : 0;
+  if (a.kind === 'flow') return a.flow ? flowBeats(filterBy(a.flow.steps, ids)).length : 0;
   return a.blocks ? filterBy(a.blocks, ids).length : 0;
 }
 

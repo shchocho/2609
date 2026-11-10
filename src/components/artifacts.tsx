@@ -1,7 +1,7 @@
 /** 작업 결과물 뷰어: Excel 시트 · Word 문서 · Outlook 메일 · PowerPoint 덱 · Teams 게시물 */
 import { useState, type ReactNode } from 'react';
-import type { Artifact, Deck, DocBlock, Sheet, Vars } from '../types';
-import { Blanks, Bold, filterBy, fill, artifactName } from '../engine/text';
+import type { Artifact, Deck, DocBlock, FlowAct, FlowScreen, Sheet, Vars } from '../types';
+import { Blanks, Bold, filterBy, fill, flowBeats, artifactName } from '../engine/text';
 import { AppIcon, FT, WE, X } from './ui';
 
 export interface ViewProps {
@@ -324,6 +324,65 @@ function TeamsView({ a, writing }: ViewProps) {
   );
 }
 
+/* ---------------- Power Automate 흐름 ---------------- */
+const RUN_MARK = { ok: '✓', fail: '✕', skip: '–' };
+/** 데스크톱 흐름이 조작하는 대상 프로그램 화면: 지금까지의 조작을 차례로 적용한 모습 + 커서 */
+function FlowScreenView({ screen, acts, live, run }: { screen: FlowScreen; acts: FlowAct[]; live: boolean; run: boolean }) {
+  let form: Record<string, string> = {};
+  for (const x of acts) { if (x.reset) form = {}; if (x.type != null) form = { ...form, [x.to]: x.type }; }
+  const last = acts.at(-1);
+  const row = !last || last.to === 'menu' ? -1 : last.to === 'save' ? screen.fields.length : screen.fields.findIndex(f => f.id === last.to);
+  return (
+    <div className={`fl-screen${live ? ' is-live' : ''}`} aria-hidden="true">
+      <p className="fl-screen-bar"><b>{screen.title}</b><span>{live ? (run ? '▶ 자동 실행 중' : '● 녹화 중') : '대기'}</span></p>
+      <p className={`fl-screen-menu${last?.to === 'menu' ? ' is-on' : ''}`}>{screen.menu}</p>
+      <div className="fl-screen-form">
+        {screen.fields.map(f => (
+          <p key={f.id} className={last?.to === f.id ? 'is-on' : undefined}><span>{f.label}</span><b key={form[f.id] ?? ''}>{form[f.id]}</b></p>
+        ))}
+        <p><u className={last?.to === 'save' ? 'is-on' : undefined}>{screen.button}</u></p>
+        {last?.popup && <div className="fl-screen-popup"><b>{last.popup}</b><span /><span /></div>}
+        {last && <i className="fl-cursor" data-to={row < 0 ? 'menu' : row >= screen.fields.length ? 'save' : 'field'} style={{ '--row': row } as React.CSSProperties} />}
+      </div>
+      <p className="fl-screen-say">{acts.filter(x => x.say).at(-1)?.say}</p>
+    </div>
+  );
+}
+
+function FlowView({ a, writing, vars, ids }: ViewProps) {
+  if (!a.flow) return null;
+  const steps = filterBy(a.flow.steps, ids);
+  const beats = flowBeats(steps);
+  const beat = writing == null ? beats.length : Math.min(writing, beats.length);
+  const at = beat < beats.length ? beats[beat].step : steps.length; // 끝난 단계 수
+  const now = writing != null && beat > 0 ? beats[beat - 1].step : -1; // 지금 하고 있는 단계
+  const run = !!a.flow.run;
+  const list = (
+    <ol className={`fl${run ? ' is-run' : ''}`} data-app={a.app}>
+      {(run ? steps : steps.slice(0, Math.max(at, now + 1))).map((x, i) => {
+        const ran = run && i < at;
+        const cls = [ran ? `is-${x.state ?? 'ok'}` : '', i === now ? 'is-now' : ''].filter(Boolean).join(' ');
+        return (
+          <li key={i} className={cls || undefined} style={x.indent ? { marginInlineStart: x.indent * 28 } : undefined}>
+            <i aria-hidden="true">{x.icon ?? '▸'}</i>
+            <b>{fill(x.title, vars)}</b>
+            {x.desc && <span><Bold text={fill(x.desc, vars)} /></span>}
+            {ran && <u>{RUN_MARK[x.state ?? 'ok']}</u>}
+            {ran && x.note && <em>{fill(x.note, vars)}</em>}
+          </li>
+        );
+      })}
+    </ol>
+  );
+  if (!a.flow.screen) return list;
+  return (
+    <div className="fl-wrap">
+      {list}
+      <FlowScreenView screen={a.flow.screen} acts={beats.slice(0, beat).flatMap(b => (b.act ? [b.act] : []))} live={writing != null} run={run} />
+    </div>
+  );
+}
+
 /** 결과물 종류별 뷰어 선택 */
 export function ArtifactView(p: ViewProps) {
   const { a } = p;
@@ -333,6 +392,7 @@ export function ArtifactView(p: ViewProps) {
   }
   if (a.kind === 'deck') return <DeckView {...p} />;
   if (a.kind === 'teams') return <TeamsView {...p} />;
+  if (a.kind === 'flow') return <FlowView {...p} />;
   if (a.kind === 'mail') return <MailView {...p} />;
   return <DocView {...p} />;
 }

@@ -90,6 +90,7 @@ export const TRACKS: Track[] = [
   {
     id: 'power-automate',
     group: 'product',
+    products: ['deskflow', 'cloudflow'],
     name: 'Power Automate',
     icon: '⚙️',
     color: '#0066ff',

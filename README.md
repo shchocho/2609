@@ -48,8 +48,11 @@ Microsoft **Copilot Chat**과 **Copilot Cowork**가 실제 업무를 어떻게 �
 | Copilot in 앱 | 회의 메모와 지난 제안서로 고객 제안서 초안 쓰기 | Copilot in Word |
 | | 회사 템플릿에서 Word 제안서로 10장 발표자료 만들기 | Copilot in PowerPoint |
 | | 분기 영업 실적 시트에서 원인 분석·수식 열·차트 만들기 | Copilot in Excel |
+| Power Automate | 레거시 ERP에 발주서 입력하는 데스크톱 흐름(RPA) | 데스크톱 흐름 |
+| | 경비 증빙 메일을 승인과 Teams 알림까지 잇는 클라우드 흐름(DPA) | 클라우드 흐름 |
+| | 매일 아침 재고 보고: 클라우드 흐름이 데스크톱 흐름 호출 | 클라우드 + 데스크톱 흐름 |
 
-Copilot Code · Power Automate · Copilot Studio 영역은 홈에 카드만 있고 시나리오는 아직 없습니다.
+Copilot Code · Copilot Studio 영역은 홈에 카드만 있고 시나리오는 아직 없습니다.
 
 ## 로컬에서 확인하기
 
@@ -92,7 +95,7 @@ Azure Static Web Apps를 쓸 때는 함께 들어 있는 `staticwebapp.config.js
 
 - **문구(제목, 안내, 푸터)**: `src/copy.ts`
 - **업무 영역(이름, 설명, 색)**: `src/tracks.ts`. 홈 카드 아이콘은 `src/components/Icons.tsx`
-- **Office 화면 시나리오**: `"agent": "office"` 와 `"surface": "word" | "excel" | "powerpoint"` 를 주면 Cowork 화면 대신 앱 창과 오른쪽 Copilot 창에서 재생합니다. 가운데 문서는 `workbench.artifacts` 중 그 앱의 결과물입니다(화면: `src/surfaces/Office.tsx`, 스타일: `src/styles/surfaces.css`). 덱 슬라이드에 `only`/`not` 을 쓰면 선택에 따라 슬라이드가 들어가고 빠지며, 시트의 `charts` 는 표 아래에 막대 차트를 넣습니다.
+- **앱 창 시나리오**: `"agent": "office"` 와 `"surface": "word" | "excel" | "powerpoint"`, 또는 `"agent": "flow"` 와 `"surface": "cloudflow" | "deskflow"`(Power Automate 흐름 디자이너)를 주면 Cowork 화면 대신 앱 창과 오른쪽 창에서 재생합니다. 흐름은 결과물 `kind: "flow"` 의 `flow.steps`(트리거·작업 카드)로 적고, `flow.run` 이 참이면 단계마다 결과(`state`, `note`)가 붙는 실행 기록이 됩니다. `flow.screen`(대상 프로그램의 메뉴·입력란·단추)과 단계의 `do`(화면 조작 목록)를 적으면, 흐름 옆에 그 프로그램 화면이 뜨고 커서가 움직이며 값이 입력되는 모습이 재생됩니다. 가운데 문서는 `workbench.artifacts` 중 그 앱의 결과물입니다(화면: `src/surfaces/AppWindow.tsx`, 스타일: `src/styles/surfaces.css`). 덱 슬라이드에 `only`/`not` 을 쓰면 선택에 따라 슬라이드가 들어가고 빠지며, 시트의 `charts` 는 표 아래에 막대 차트를 넣습니다.
 - **시나리오**: `src/scenarios/<영역>/<id>.scenario.json`. 파일을 추가하면 목록에 자동으로 나타납니다. 고친 뒤 검사를 돌리세요.
 
 ```bash

@@ -72,11 +72,14 @@ export function PainStage({ title, caption, onNext }: { title: string; caption: 
 /** 제품 이름 뒤 조사: Chat·Excel 은 "과", 나머지는 "와" */
 const withParticle = (product: string) => (/(Chat|Excel)$/.test(product) ? '과' : '와');
 const suffix = (product: string) => product.replace(/^Copilot /, '');
+const CopilotLogo = ({ product }: { product: string }) => (product.startsWith('Copilot')
+  ? <><span className="sc-overview-copilot-logo"><img src="logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}</>
+  : null);
 
 export function ProductName({ product }: { product: string }) {
   return (
     <span className="sc-overview-product-name">
-      <span className="sc-overview-copilot-logo"><img src="logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}
+      <CopilotLogo product={product} />
       <span className="sc-overview-product-suffix">{suffix(product)}</span>
     </span>
   );
@@ -92,7 +95,7 @@ export function OverviewStage({ product, steps, hook, onNext }: { product: strin
       <div className="sc-stage-head">
         <h2>
           <span className="sc-overview-product-name">
-            <span className="sc-overview-copilot-logo"><img src="logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}
+            <CopilotLogo product={product} />
             <span className="sc-overview-product-suffix">{suffix(product)}</span>
             <span className="sc-overview-product-particle">{withParticle(product)}</span>
           </span>{' '}함께라면?

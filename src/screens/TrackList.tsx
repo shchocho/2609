@@ -7,15 +7,18 @@ import { go, HASH_HOME, hashPlay } from '../router';
 import { COPY } from '../copy';
 import type { Scenario } from '../types';
 
-const PRODUCTS: Record<string, { label: string; description: React.ReactNode }> = {
+/** plain: Copilot 로고 없이 이름만 쓰는 열 */
+const PRODUCTS: Record<string, { label: string; plain?: boolean; description: React.ReactNode }> = {
   chat: { label: 'Chat', description: <>요약·초안·아이디어가 필요할 때, <strong>대화로 빠르게</strong> 해결합니다.</> },
   cowork: { label: 'Cowork', description: <>목표를 주면 <strong>여러 앱과 파일에 걸친 작업</strong>을 단계별로 실행합니다.</> },
   word: { label: 'in Word', description: <>참고할 파일을 붙여 <strong>문서 안에서 바로 초안</strong>을 쓰고, 요약하고, 다시 씁니다.</> },
   powerpoint: { label: 'in PowerPoint', description: <>문서 한 편으로 <strong>발표자료 초안</strong>을 만들고 슬라이드를 정리합니다.</> },
   excel: { label: 'in Excel', description: <>표에 대해 질문하고 <strong>수식 열과 차트</strong>를 제안받습니다.</> },
+  deskflow: { label: '데스크톱 흐름 (RPA)', plain: true, description: <>커넥터가 없는 프로그램은 <strong>사람이 하던 화면 조작을 그대로</strong> 따라 합니다.</> },
+  cloudflow: { label: '클라우드 흐름 (DPA)', plain: true, description: <>커넥터로 <strong>메일·승인·알림 같은 서비스를 이어</strong> 업무 절차를 자동화합니다.</> },
 };
 /** 제품별 보기의 열 id — Office 화면은 앱(surface)별로 나눈다 */
-const productOf = (s: Scenario) => (s.agent === 'office' ? s.surface ?? '' : s.agent);
+const productOf = (s: Scenario) => (s.agent === 'office' || s.agent === 'flow' ? s.surface ?? '' : s.agent);
 
 interface Entry { id: string; order: number; title: string; badge: string; scenario: Scenario | null }
 
@@ -87,7 +90,7 @@ export function TrackList({ track }: { track: string }) {
                 <article key={id} data-agent={id}>
                   <header>
                     <h2 className="sc-overview-product-name">
-                      <span className="sc-overview-copilot-logo"><img src="logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}
+                      {!p.plain && <><span className="sc-overview-copilot-logo"><img src="logo/copilot/copilot-logo-horiz-gray.png" alt="Copilot" /></span>{' '}</>}
                       <span className="sc-overview-product-suffix">{p.label}</span>
                     </h2>
                   </header>

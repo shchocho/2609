@@ -105,3 +105,109 @@
 .sc-shell.is-office .sc-canvas .wb-xl-chart { margin: 12px 16px; padding: 10px 14px 12px; gap: 5px; }
 .sc-shell.is-office .sc-canvas .wb-xl-chart i { height: 12px; }
 .sc-shell.is-office .sc-canvas .wb-pp-slide { zoom: 1.45; }
+
+/* ---------- Power Automate 흐름 (kind: flow) ---------- */
+.fl {
+  --fl: #0066ff;
+  margin: 0;
+  padding: 22px 24px 28px;
+  list-style: none;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  counter-reset: fl;
+  font-family: var(--desk-font);
+}
+.fl li {
+  position: relative;
+  width: min(440px, 100%);
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  column-gap: 12px;
+  align-items: center;
+  padding: 8px 14px;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: var(--borderRadiusXLarge);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+  counter-increment: fl;
+}
+.fl li + li::before { content: ""; position: absolute; left: 50%; top: -18px; height: 18px; border-left: 2px solid #c4c4c4; }
+.fl li > i { grid-row: 1 / span 3; width: 34px; height: 34px; display: grid; place-items: center; font-style: normal; font-size: 16px; color: #fff; background: var(--fl); border-radius: var(--borderRadiusLarge); }
+.fl li > b { grid-column: 2; font-size: 13.5px; font-weight: 600; color: #1b1a19; }
+.fl li > span { grid-column: 2; font-size: 12px; line-height: 1.5; color: #605e5c; }
+.fl li > u { grid-column: 3; grid-row: 1; width: 22px; height: 22px; display: grid; place-items: center; text-decoration: none; font-size: 12px; font-weight: 700; color: #fff; background: #107c41; border-radius: 50%; }
+.fl li > em { grid-column: 2 / span 2; margin-top: 2px; font-style: normal; font-size: 12px; color: #0b6a3a; }
+.fl li:first-child { border-top: 3px solid var(--fl); }
+.fl li.is-now { border-color: var(--fl); box-shadow: 0 0 0 3px color-mix(in srgb, var(--fl) 22%, transparent); }
+.fl li.is-fail { border-color: #d13438; }
+.fl li.is-fail > u { background: #d13438; }
+.fl li.is-fail > em { color: #a4262c; }
+.fl li.is-skip > u { background: #8a8886; }
+.fl li.is-skip > em { color: #605e5c; }
+/* 데스크톱 흐름: 번호가 붙은 작업 목록 */
+.fl[data-app=deskflow] { justify-items: stretch; gap: 0; padding: 12px 16px 20px; }
+.fl[data-app=deskflow] li { width: auto; grid-template-columns: 26px 30px minmax(0, 1fr) auto; padding: 8px 12px; border-radius: 0; border-width: 0 0 1px; box-shadow: none; }
+.fl[data-app=deskflow] li::before { content: counter(fl); position: static; height: auto; border: 0; grid-row: 1 / span 3; font-size: 12px; color: #8a8886; text-align: right; }
+.fl[data-app=deskflow] li:first-child { border-top: 0; }
+.fl[data-app=deskflow] li > i { width: 28px; height: 28px; font-size: 14px; }
+.fl[data-app=deskflow] li > b,
+.fl[data-app=deskflow] li > span { grid-column: 3; }
+.fl[data-app=deskflow] li > u { grid-column: 4; }
+.fl[data-app=deskflow] li > em { grid-column: 3 / span 2; }
+.fl[data-app=deskflow] li.is-now { box-shadow: inset 3px 0 0 var(--fl); background: color-mix(in srgb, var(--fl) 6%, #fff); }
+.fl[data-app=deskflow] li.is-fail { background: #fdf3f4; }
+
+/* 흐름 디자이너 창 */
+.sc-shell.is-office[data-app$=flow] { --track: #0066ff; --track-ink: #0047b3; }
+.sc-shell.is-office[data-app$=flow] .sc-canvas { background: #f5f5f5; }
+.sc-shell.is-office[data-app=deskflow] .sc-canvas { background: #fff; }
+/* 데스크톱 흐름 창의 기록은 Copilot 이 한 일이 아니므로 Copilot 표시 없이 한 줄 기록으로 보인다 */
+.sc-pane[data-pane=deskflow] .sc-act { padding: 6px 10px; }
+.sc-pane[data-pane=deskflow] .sc-act-h { display: none; }
+.sc-shell.is-office .sc-pane .sc-note { text-align: left; font-size: 12.5px; line-height: 1.6; }
+
+/* ---------- 데스크톱 흐름이 조작하는 대상 프로그램 화면 (flow.screen) ---------- */
+.fl-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 40%); align-items: start; min-height: 100%; }
+.fl-wrap > .fl { min-width: 0; }
+.sc-done .fl-wrap { display: block; }
+.sc-done .fl-screen { display: none; }
+/* 일부러 예전 업무 프로그램처럼 그린다 */
+.fl-screen {
+  position: sticky;
+  top: 16px;
+  margin: 16px 16px 16px 4px;
+  font-family: "Malgun Gothic", var(--desk-font);
+  font-size: 12px;
+  color: #1b1a19;
+  background: #d4d0c8;
+  border: 2px solid #fff;
+  border-right-color: #808080;
+  border-bottom-color: #808080;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .22);
+}
+.fl-screen p { margin: 0; }
+.fl-screen-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 4px 8px; color: #fff; background: linear-gradient(90deg, #0a246a, #3a6ea5); }
+.fl-screen-bar span { font-size: 11px; opacity: .85; }
+.fl-screen.is-live .fl-screen-bar span { padding: 1px 7px; opacity: 1; color: #1b1a19; background: #ffe066; border-radius: var(--borderRadiusCircular); }
+.fl-screen-menu { padding: 4px 8px; word-spacing: 10px; border-bottom: 1px solid #808080; }
+.fl-screen-menu.is-on { background: #0a246a; color: #fff; }
+.fl-screen-form { --rh: 38px; position: relative; padding: 12px 14px 6px; }
+.fl-screen-form > p { height: var(--rh); display: grid; grid-template-columns: 76px minmax(0, 1fr); align-items: center; gap: 8px; }
+.fl-screen-form > p > b { height: 24px; padding: 3px 6px; font-weight: 400; font-family: Consolas, "Malgun Gothic", monospace; background: #fff; border: 2px solid #808080; border-right-color: #fff; border-bottom-color: #fff; animation: fl-type .3s steps(8) both; }
+.fl-screen-form > p.is-on > b { outline: 2px solid #0a246a; }
+.fl-screen-form > p > u { grid-column: 2; justify-self: end; padding: 4px 16px; text-decoration: none; background: #d4d0c8; border: 2px solid #fff; border-right-color: #404040; border-bottom-color: #404040; }
+.fl-screen-form > p > u.is-on { border-color: #404040 #fff #fff #404040; background: #c2beb5; }
+.fl-screen-popup { position: absolute; inset: 26px 12px auto 64px; padding: 0 0 12px; display: grid; gap: 7px; background: #d4d0c8; border: 2px solid #fff; border-right-color: #404040; border-bottom-color: #404040; box-shadow: 3px 3px 0 rgba(0, 0, 0, .25); }
+.fl-screen-popup b { padding: 3px 8px; font-weight: 400; color: #fff; background: #0a246a; }
+.fl-screen-popup span { height: 14px; margin: 0 10px; background: #fff; border: 1px solid #808080; }
+.fl-screen-say { min-height: 24px; padding: 4px 8px; font-size: 11.5px; border-top: 1px solid #808080; }
+/* 커서: 조작하는 줄로 미끄러져 간다 */
+.fl-cursor { position: absolute; z-index: 2; left: 55%; top: calc(12px + var(--row) * var(--rh) + 18px); width: 16px; height: 22px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 22'%3E%3Cpath d='M1 1v17l4.2-4 2.9 6.6 2.6-1.1-2.9-6.5H14z' fill='%23111' stroke='%23fff' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat; filter: drop-shadow(1px 2px 1px rgba(0, 0, 0, .3)); transition: top .4s cubic-bezier(.2, 0, 0, 1), left .4s cubic-bezier(.2, 0, 0, 1); }
+.fl-cursor[data-to=menu] { left: 24%; top: -6px; }
+.fl-cursor[data-to=save] { left: calc(100% - 50px); }
+@keyframes fl-type { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@media (prefers-reduced-motion: reduce) {
+  .fl-cursor { transition: none; }
+  .fl-screen-form > p > b { animation: none; }
+}
