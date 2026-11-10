@@ -36,7 +36,8 @@ export function itemPage(root, id, ctx) {
       next ? h('a', { class: 'btn btn--sm', href: `#item-${next.id}`, title: `${next.name} ${next.type}`, html: `<span class="mono">${no3(next.no)}</span> ${icon('next')}` }) : null)));
 
   const stageHost = h('div', { class: 'viewer__host' });
-  const sheetPaper = h('div', { class: 'sheetview__paper' });
+  const sheetInner = h('div', { class: 'sheetview__tilt' });
+  const sheetPaper = h('div', { class: 'sheetview__paper' }, sheetInner);
   const sheetView = h('div', { class: 'sheetview', hidden: true, tabindex: '0', role: 'img', 'aria-label': '도면 시트. 끌어서 이동, 휠로 확대합니다.' }, sheetPaper);
   const tip = h('div', { class: 'viewer__tip', hidden: true });
   const hud = { az: h('span', { class: 'mono' }, ''), info: h('span', { class: 'mono' }, '') };
@@ -102,6 +103,7 @@ export function itemPage(root, id, ctx) {
       stage.setModel(model, item.finishes[S.fin], { keepView });
       stage.setMini(S.mini, S.N); stage.setExplode(S.explode, false); stage.setSplit(S.split); stage.setDims(S.dims);
       stage.setShowOptional(S.opt); stage.setLamp(S.lamp); stage.setStep(S.tab === 'asm' ? S.step : null);
+      stage.setCallouts(list.rows.filter((r) => !r.opt).slice(0, 12).map((r) => ({ id: r.parts[0], text: r.label })));
     } else fallback();
     renderTab();
   }
@@ -119,6 +121,7 @@ export function itemPage(root, id, ctx) {
     for (const b of tabBar.children) { b.setAttribute('aria-selected', String(b.id === `tab-${k}`)); b.tabIndex = b.id === `tab-${k}` ? 0 : -1; }
     const draw = k === 'draw';
     sheetView.hidden = !draw; stageHost.hidden = draw; toolsTL.hidden = draw; toolsTR.hidden = draw; toolsB.hidden = draw; hint.hidden = draw || hint.dataset.gone === '1';
+    hud.az.parentElement.hidden = draw; hud.info.parentElement.hidden = draw;
     if (stage) { stage.visible = !draw; stage.setStep(k === 'asm' ? S.step : null); stage.highlight(null); if (!draw) stage.invalidate(); }
     renderTab();
   }
@@ -153,16 +156,20 @@ export function itemPage(root, id, ctx) {
   const pan = { x: 0, y: 0, k: 1 };
   function fitSheet() {
     const w = sheetView.clientWidth, hgt = sheetView.clientHeight;
-    pan.k = Math.min((w - 28) / 297, (hgt - 28) / 210); pan.x = -148.5 * pan.k; pan.y = -105 * pan.k;
+    pan.k = Math.min((w - 28) / 297, (hgt - 28) / 210) * 0.9; pan.fit = pan.k; pan.x = -148.5 * pan.k; pan.y = -105 * pan.k;
     placeSheet();
   }
-  const placeSheet = () => { sheetPaper.style.transform = `translate(${pan.x}px, ${pan.y}px) scale(${pan.k})`; };
+  const placeSheet = () => {
+    sheetPaper.style.transform = `translate(${pan.x}px, ${pan.y}px) scale(${pan.k})`;
+    // 전체가 보일 때는 책상에 놓인 종이처럼 기울이고, 확대하면 평평하게 편다.
+    sheetInner.classList.toggle('is-flat', pan.k > pan.fit * 1.12);
+  };
   function ensureSheets() {
     if (!sheets) sheets = buildSheets(model, { style: S.sheetStyle, list, finish: item.finishes[S.fin].name });
     S.sheet = Math.min(S.sheet, sheets.length - 1);
     return sheets;
   }
-  function showSheet() { sheetPaper.innerHTML = ensureSheets()[S.sheet].svg; fitSheet(); }
+  function showSheet() { sheetInner.innerHTML = ensureSheets()[S.sheet].svg; fitSheet(); }
   function tabDraw() {
     ensureSheets();
     requestAnimationFrame(showSheet);
@@ -326,6 +333,7 @@ export function itemPage(root, id, ctx) {
     stage.canvas.setAttribute('aria-label', `${item.name} ${item.type} 3D 모델. 화살표 키로 돌리고 +, - 키로 확대·축소합니다.`);
     stage.setModel(model, item.finishes[S.fin]);
     stage.setLamp(S.lamp);
+    stage.setCallouts(list.rows.filter((r) => !r.opt).slice(0, 12).map((r) => ({ id: r.parts[0], text: r.label })));
     ctx.onTheme = () => { stage.setTheme({ dark: ctx.isDark() }); stage.setLineTheme(ctx.isDark() ? 'night' : 'blueprint'); };
     setTimeout(() => { if (!hint.dataset.gone) { hint.dataset.gone = '1'; hint.style.opacity = '0'; } }, 7000);
   }).catch(() => {});

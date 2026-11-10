@@ -328,6 +328,7 @@ export class Stage {
 
   setMini(on, N = this.N) {
     this.mini = !!on; this.N = N;
+    if (this.autoDof !== false) this.dof = this.mini ? 0.007 : 0;
     this._layoutSet();
     this._dimsText();
     this.shadowDirty = true;
@@ -551,7 +552,26 @@ export class Stage {
     });
   }
 
+  /** 분해했을 때 부품에 붙는 라벨. items = [{ id, text }] */
+  setCallouts(items) {
+    if (!this.callBox) { this.callBox = document.createElement('div'); this.callBox.className = 'stage-labels'; this.host.appendChild(this.callBox); }
+    this.callBox.innerHTML = '';
+    this.calls = (items || []).map((it) => { const el = document.createElement('span'); el.className = 'stage-call'; el.textContent = it.text; this.callBox.appendChild(el); return { id: it.id, el }; });
+    this.invalidate();
+  }
+
   _placeLabels() {
+    if (this.calls && this.calls.length) {
+      const w = this.host.clientWidth, h = this.host.clientHeight, v = new THREE.Vector3(), on = this.explode > 0.4 && this.style !== 'line';
+      for (const c of this.calls) {
+        const mesh = this.meshes.get(c.id);
+        if (!on || !mesh || !mesh.visible) { c.el.style.opacity = '0'; continue; }
+        const p = mesh.userData.part;
+        v.set(mesh.position.x - p.pos[0] + p.center[0], mesh.position.y - p.pos[1] + p.center[1], mesh.position.z - p.pos[2] + p.center[2]).project(this.camera);
+        c.el.style.transform = `translate(-50%,-50%) translate(${((v.x + 1) / 2) * w}px, ${((1 - v.y) / 2) * h}px)`;
+        c.el.style.opacity = String(Math.min(1, (this.explode - 0.4) * 3.5));
+      }
+    }
     if (!this.dimsOn || !this.dimAnchors) return;
     const w = this.host.clientWidth, h = this.host.clientHeight, v = new THREE.Vector3();
     this.dimLabels.forEach((el, i) => {
@@ -739,8 +759,16 @@ export class Stage {
 
   _renderScene(target, jitter, i) {
     const r = this.renderer;
-    if (jitter) this.camera.setViewOffset(this.pw, this.ph, halton(i + 1, 2) - 0.5, halton(i + 1, 3) - 0.5, this.pw, this.ph);
-    else this.camera.clearViewOffset();
+    if (jitter) {
+      this._viewOffset(halton(i + 1, 2) - 0.5, halton(i + 1, 3) - 0.5);
+      if (this.dof > 0) {
+        // 얇은 렌즈: 조리개 원판 위의 한 점에서 초점(타깃)을 바라본다 → 매크로 사진 같은 얕은 심도
+        const a = halton(i, 13) * Math.PI * 2, rad = Math.sqrt(halton(i, 17)) * this.dof * this.cam.dist;
+        const rt = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 0), up = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 1);
+        this.camera.position.addScaledVector(rt, Math.cos(a) * rad).addScaledVector(up, Math.sin(a) * rad);
+        this.camera.lookAt(this.cam.target); this.camera.updateMatrixWorld();
+      }
+    } else this._viewOffset(0, 0);
     if (jitter || this.shadowDirty) { this._lights(jitter, i); r.shadowMap.needsUpdate = true; this.shadowDirty = jitter; }
     this.root.visible = true; this.lineRoot.visible = false; this.ground.visible = true; this.props.visible = true;
     this.dimLines.visible = this.dimsOn;
@@ -750,7 +778,14 @@ export class Stage {
     r.clear();
     r.render(this.scene, this.camera);
     r.setRenderTarget(null);
-    this.camera.clearViewOffset();
+    if (jitter) { if (this.dof > 0) this._placeCamera(); this._viewOffset(0, 0); }
+  }
+
+  /** 모델을 화면 한쪽으로 밀어 그린다(글자와 겹치지 않게). viewShift = [가로, 세로] 비율. */
+  _viewOffset(jx, jy) {
+    const vs = this.viewShift;
+    if (!vs && !jx && !jy) { this.camera.clearViewOffset(); return; }
+    this.camera.setViewOffset(this.pw, this.ph, (vs ? -vs[0] * this.pw : 0) + jx, (vs ? -vs[1] * this.ph : 0) + jy, this.pw, this.ph);
   }
 
   _renderLines() {
@@ -840,6 +875,6 @@ export class Stage {
     for (const k of ['rtA', 'rtS', 'rtB', 'rtL']) if (this[k]) this[k].dispose();
     this.envRT.dispose();
     this.renderer.dispose();
-    this.canvas.remove(); this.labelBox.remove();
+    this.canvas.remove(); this.labelBox.remove(); if (this.callBox) this.callBox.remove();
   }
 }

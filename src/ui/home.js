@@ -4,6 +4,7 @@ import { h, icon, tilt, store, thumb, no3, pips, tick, esc } from './dom.js';
 import { CATALOG, CATS, getItem, searchText } from '../data/catalog.js';
 import { buildModel } from '../core/kit.js';
 import { fmt } from '../core/scale.js';
+import { cutList } from '../core/cutlist.js';
 
 const FEATURED = ['billy', 'poang', 'strandmon', 'raskog', 'hemnes-dresser', 'kallax'];
 // 장면별 연출값: 도면선 비율(split), 분해(explode), 카메라 방위·고도
@@ -44,7 +45,7 @@ export function homePage(root, ctx) {
     const it = getItem(id);
     return h('button', { type: 'button', 'aria-pressed': String(id === feat), onclick: () => setFeat(id) }, it.name.split(' ')[0]);
   }));
-  const stageCol = h('div', { class: 'story__stage' }, h('div', { class: 'shot' }, frame), h('div', { class: 'shot__cap' }, chips, h('a', { class: 'btn btn--sm', href: `#item-${feat}`, id: 'hero-open' }, '이 가구 만들기')));
+  const stageCol = h('div', { class: 'story__stage' }, frame, h('div', { class: 'story__veil' }), h('div', { class: 'shot__cap' }, chips, h('a', { class: 'btn btn--sm btn--tape', href: `#item-${feat}`, id: 'hero-open' }, '이 가구 만들기')));
 
   const hero = h('article', { class: 'chapter chapter--hero', dataset: { ch: '0' } },
     h('span', { class: 'tape' }, `아이코닉 가구 100 · 1:6 – 1:48`),
@@ -62,7 +63,7 @@ export function homePage(root, ctx) {
   const chapEls = [hero, ...CHAPTERS.map((c, i) => h('article', { class: 'chapter', dataset: { ch: String(i + 1) } },
     h('span', { class: 'eyebrow' }, `${c.n} — ${c.k}`), h('h2', {}, c.t), h('p', {}, c.d),
     i === 3 ? h('a', { class: 'btn btn--tape', href: '#collection', onclick: (e) => { e.preventDefault(); document.getElementById('collection').scrollIntoView({ behavior: 'smooth' }); } }, '100가지 가구 고르기') : null))];
-  const story = h('section', { class: 'story wrap', 'aria-label': '만드는 과정' }, h('div', { class: 'story__text' }, chapEls), stageCol);
+  const story = h('section', { class: 'story', 'aria-label': '만드는 과정' }, stageCol, h('div', { class: 'story__text wrap' }, chapEls));
 
   // ───── 컬렉션
   const f = { cat: 'all', q: '', sort: 'no', view: 'grid' };
@@ -82,7 +83,7 @@ export function homePage(root, ctx) {
   page.append(story, coll);
   root.append(page);
   const offTilt = tilt(grid, '.card', 8);
-  const offTilt2 = tilt(stageCol, '.shot__frame', 2.4);
+  const offTilt2 = () => {};
 
   function press(group, btn) { for (const b of group.children) b.setAttribute('aria-pressed', String(b === btn)); }
 
@@ -140,7 +141,13 @@ export function homePage(root, ctx) {
     const [w, hh, d] = model.bbox.size;
     tick(hud.code, `MN-${no3(it.no)} ${it.name}`);
     tick(hud.size, `${fmt(w / N, 1)} × ${fmt(d / N, 1)} × ${fmt(hh / N, 1)} mm`);
-    if (stage) { stage.setModel(model, it.finishes[0]); stage.setMini(true, N); apply(true); }
+    if (stage) { stage.setModel(model, it.finishes[0]); stage.setMini(true, N); calls(); apply(true); }
+  }
+  const wide = () => window.innerWidth > 1040;
+  function calls() {
+    const rows = cutList(model).rows.filter((r) => !r.opt).slice(0, 7);
+    stage.setCallouts(rows.map((r) => ({ id: r.parts[0], text: `${r.label} ${r.name}` })));
+    stage.viewShift = wide() ? [0.19, 0] : null;
   }
   let prog = 0;
   function measure() {
@@ -166,7 +173,7 @@ export function homePage(root, ctx) {
     stage.goal.phi = (lerp(a.phi, b.phi, t) * Math.PI) / 180;
     stage.fit(false, true);
   }
-  const onScroll = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => apply(false)); };
+  const onScroll = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { if (stage) stage.viewShift = wide() ? [0.19, 0] : null; apply(false); }); };
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
   load();
@@ -184,6 +191,7 @@ export function homePage(root, ctx) {
     const it = getItem(feat);
     stage.setModel(model, it.finishes[0]);
     stage.setMini(true, N);
+    calls();
     apply(true);
     requestAnimationFrame(() => { poster.style.opacity = '0'; });
     ctx.onTheme = () => stage && stage.setTheme({ dark: ctx.isDark() });
