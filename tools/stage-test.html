@@ -1,0 +1,33 @@
+<!doctype html><meta charset="utf8"><title>stage test</title>
+<style>html,body{margin:0;height:100%;background:#e9ecea}#host{position:fixed;inset:0}.stage-labels{position:absolute;inset:0;pointer-events:none}.stage-dim{position:absolute;left:0;top:0;font:12px monospace;background:#f4c430;padding:2px 6px}</style>
+<div id="host"></div>
+<script type="module">
+import { Stage } from '../src/three/stage.js';
+import { getItem } from '../src/data/catalog.js';
+import { buildModel } from '../src/core/kit.js';
+const q = new URLSearchParams(location.search);
+const it = getItem(q.get('id') || 'billy');
+const N = Number(q.get('n') || 12);
+const model = buildModel(it, { N, variant: q.get('v') || undefined });
+const fin = it.finishes[Number(q.get('f') || 0)];
+const stage = new Stage(document.getElementById('host'), { cutout: q.has('cutout'), maxDpr: Number(q.get('dpr') || 1), interactive: true });
+stage.setTheme({ dark: q.has('dark') });
+if (q.has('mini')) { stage.mini = true; stage.N = N; }
+stage.setModel(model, fin);
+if (q.has('mini')) stage.setMini(true, N);
+if (q.has('explode')) stage.setExplode(Number(q.get('explode')), false);
+if (q.has('split')) stage.setSplit(Number(q.get('split')));
+if (q.has('line')) stage.setStyle('line');
+if (q.has('dims')) stage.setDims(true);
+if (q.has('view')) stage.setView(q.get('view'), false);
+if (q.has('gain')) stage.domeGain = Number(q.get('gain'));
+if (q.has('key')) stage.key.intensity = Number(q.get('key'));
+if (q.has('env')) stage.scene.environmentIntensity = Number(q.get('env'));
+if (q.has('exp')) stage.presentMat.uniforms.uExposure.value = Number(q.get('exp'));
+if (q.has('yaw')) { stage.goal.theta = Number(q.get('yaw')) * Math.PI / 180; stage.goal.phi = Number(q.get('pitch') || 66) * Math.PI / 180; stage.fit(true, true); }
+if (q.has('ibl')) stage.iblAccum = Number(q.get('ibl'));
+window.stage = stage;
+window.still = (samples) => { stage.frozen = true; stage.renderStill({ samples }); return true; };
+window.addEventListener('message', (e) => { if (e.data && e.data.still != null) { stage.renderStill({ samples: e.data.still }); parent.postMessage({ done: location.search }, '*'); } });
+window.ready = true;
+</script>

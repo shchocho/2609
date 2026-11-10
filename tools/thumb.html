@@ -1,0 +1,24 @@
+<!doctype html><meta charset="utf8"><title>thumb</title>
+<style>html,body{margin:0;background:transparent}#host{width:720px;height:720px;position:relative}</style>
+<div id="host"></div>
+<script type="module">
+import { Stage } from '../src/three/stage.js';
+import { CATALOG, getItem } from '../src/data/catalog.js';
+import { buildModel } from '../src/core/kit.js';
+const stage = new Stage(document.getElementById('host'), { cutout: true, maxDpr: 1, interactive: false, preserve: true });
+stage.frozen = true;
+stage.fitScale = 1.02;
+window.ids = CATALOG.map((it) => it.id);
+window.render = (id, samples, finishIndex = 0) => {
+  const it = getItem(id), model = buildModel(it, { N: 12 });
+  stage.setModel(model, it.finishes[finishIndex] || it.finishes[0]);
+  stage.goal.theta = 35 * Math.PI / 180; stage.goal.phi = 69 * Math.PI / 180; stage.fit(true, true);
+  stage.renderStill({ samples });
+  const cam = stage.camera, h = 720;
+  const k = (h / 2) / (stage.cam.dist * Math.tan((stage.fov * Math.PI / 180) / 2));
+  const v = stage.center.clone(); v.y = 0; v.project(cam);
+  const t = stage.center.clone(); t.y = stage.bbMax.y; t.project(cam);
+  return { url: stage.canvas.toDataURL('image/webp', 0.9), meta: { k: +k.toFixed(5), base: +((1 - v.y) / 2).toFixed(4), top: +((1 - t.y) / 2).toFixed(4), h: Math.round(model.bbox.size[1]) } };
+};
+window.ready = true;
+</script>

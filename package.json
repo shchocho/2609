@@ -1,0 +1,14 @@
+{
+  "name": "miniatyr",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "아이코닉 가구 100선 미니어처 공방 — 도면에서 3D까지",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "thumbs": "node tools/render-thumbs.mjs",
+    "artifact": "node tools/build-artifact.mjs"
+  },
+  "license": "MIT"
+}
