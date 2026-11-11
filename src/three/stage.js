@@ -7,7 +7,8 @@ import { MaterialLib, patchShaderChunks, iblDiffuse, withIbl } from './materials
 import { partGeometry, edgeGeometry, draftGeometry } from './meshes.js';
 import { cuttingMatTexture, rulerTexture, MAT_MM } from './textures.js';
 import { materialKey } from '../data/materials.js';
-import { mergedGroup } from './merge.js';
+import { mergedGroup, decorGroup } from './merge.js';
+import { RealAssets } from './real.js';
 import { itemRoom } from '../data/rooms.js';
 import { styleModel } from '../core/styling.js';
 
@@ -132,6 +133,10 @@ export class Stage {
     this.lineRoot.visible = false;
     this.scene.add(this.root, this.lineRoot, this.props);
     this.lib = new MaterialLib({ cutout: this.cutout });
+    // 실물 재질 사진·스캔 소품이 도착하면 다시 그린다
+    const redraw = () => { this.shadowDirty = true; this.invalidate(); };
+    this.lib.onChange = redraw; this._redraw = redraw;
+    this.assets = new RealAssets({ hook: withIbl });
     this.meshes = new Map();
     this.R = 1000;
     this.center = new THREE.Vector3();
@@ -525,12 +530,12 @@ export class Stage {
   /** 룸 배경: 바닥·벽(그림자를 받기만 함)·방 소품·가구 스타일링 소품. */
   _buildRoom() {
     const item = this.model.item, spec = itemRoom(item, this.model, { finish: this.finish });
-    const add = (parts, cast) => { const g = mergedGroup(parts, this.lib, { detail: 1, cast }); this.props.add(g); return g; };
+    const add = (parts, cast) => { const g = decorGroup(parts, this.lib, this.assets, { detail: 1, cast, onReady: this._redraw }); this.props.add(g); return g; };
     add([spec.floor], false);
     for (const w of spec.walls) {
       const g = new THREE.Group();
-      g.add(mergedGroup([w.part], this.lib, { detail: 1, cast: false }), mergedGroup(w.decor, this.lib, { detail: 1 }));
       this.props.add(g);
+      g.add(mergedGroup([w.part], this.lib, { detail: 1, cast: false }), decorGroup(w.decor, this.lib, this.assets, { detail: 1, onReady: this._redraw }));
       this.roomWalls.push({ name: w.name, group: g });
     }
     add(spec.base, true);
@@ -933,7 +938,7 @@ export class Stage {
     this.disposed = true;
     this._ro.disconnect(); this._io.disconnect();
     this._clearModel();
-    this.lib.dispose();
+    this.lib.dispose(); this.assets.dispose();
     for (const k of ['rtA', 'rtS', 'rtB', 'rtL']) if (this[k]) this[k].dispose();
     this.envRT.dispose();
     this.renderer.dispose();

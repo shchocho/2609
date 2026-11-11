@@ -46,6 +46,30 @@ export function mergedGroup(parts, lib, { detail = 0, finish = null, cast = true
   return group;
 }
 
+/**
+ * 소품 묶음. parts.reals 가 있으면 그 소품들은 실물 스캔 모델로 바꿔 그린다:
+ * 먼저 절차적 소품을 보여 주고, 스캔 모델이 모두 준비되면 갈아 끼운다(실패하면 그대로 둔다).
+ */
+export function decorGroup(parts, lib, assets, opts = {}) {
+  const reals = parts.reals || [], g = new THREE.Group();
+  if (!reals.length || !assets) { g.add(mergedGroup(parts, lib, opts)); return g; }
+  g.add(mergedGroup(parts.filter((p) => p.real == null), lib, opts));
+  const fb = mergedGroup(parts.filter((p) => p.real != null), lib, opts);
+  g.add(fb);
+  Promise.all(reals.map((r) => assets.instance(r.id, r.h))).then((list) => {
+    if (!g.parent || list.some((x) => !x)) return;
+    list.forEach((inst, i) => {
+      const r = reals[i], o = inst.userData.offset, a = ((r.yaw || 0) + i * 73) * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+      inst.rotation.y = a;
+      inst.position.set(r.pos[0] + o[0] * c + o[2] * s, r.pos[1] + o[1], r.pos[2] - o[0] * s + o[2] * c);
+      g.add(inst);
+    });
+    g.remove(fb); disposeGroup(fb);
+    if (opts.onReady) opts.onReady();
+  }).catch(() => {});
+  return g;
+}
+
 /** 그룹 안의 지오메트리를 모두 해제한다(재질은 MaterialLib 이 관리). */
 export function disposeGroup(group) {
   group.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

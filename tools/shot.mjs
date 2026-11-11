@@ -15,6 +15,6 @@ await pg.goto(`http://localhost:5199/tools/stage-test.html?${query}`);
 await pg.waitForFunction('window.ready === true', null, { timeout: 60000 }).catch(() => logs.push('ready timeout'));
 const t0 = Date.now();
 await pg.evaluate((n) => window.still(n), Number(samples)).catch((e) => logs.push('still: ' + e.message));
-await pg.screenshot({ path: out });
+await pg.screenshot({ path: out, timeout: 300000 });
 console.log('shot', out, `${Date.now() - t0}ms`, logs.slice(0, 12).join('\n'));
 await b.close(); server.close();

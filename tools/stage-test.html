@@ -27,7 +27,7 @@ if (q.has('exp')) stage.presentMat.uniforms.uExposure.value = Number(q.get('exp'
 if (q.has('yaw')) { stage.goal.theta = Number(q.get('yaw')) * Math.PI / 180; stage.goal.phi = Number(q.get('pitch') || 66) * Math.PI / 180; stage.fit(true, true); }
 if (q.has('ibl')) stage.iblAccum = Number(q.get('ibl'));
 window.stage = stage;
-window.still = (samples) => { stage.frozen = true; stage.renderStill({ samples }); return true; };
+window.still = async (samples) => { for (let i = 0; i < 80 && (stage.lib.pending > 0 || i < 12); i++) await new Promise((r) => setTimeout(r, 250)); stage.frozen = true; stage.renderStill({ samples }); return true; };
 window.addEventListener('message', (e) => { if (e.data && e.data.still != null) { stage.renderStill({ samples: e.data.still }); parent.postMessage({ done: location.search }, '*'); } });
 window.ready = true;
 </script>

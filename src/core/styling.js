@@ -245,6 +245,9 @@ function palette(R) {
   return { ...pick(R, sets), recent: [] };
 }
 
+/** 소품 부품 목록에 실물 스캔 대체 정보(reals)를 붙여 돌려준다. */
+const done = (k) => { const parts = k.parts; parts.reals = k.reals || []; return parts; };
+
 // ───────────────────────────────────────────── 종류별 규칙
 function styleSeat(k, R, model, item, fin, arm, throws) {
   const soft = model.parts.filter((p) => !p.opt && SOFT.has(p.role));
@@ -310,14 +313,14 @@ export function styleModel(item, model, opts = {}) {
   if (kind === 'none') return [];
   const R = rng(hashStr(item.id) + (opts.seed || 0) * 977), k = new Kit({ N: 12 }), pal = palette(R);
   const fin = opts.finish || item.finishes[0];
-  if (kind === 'sofa' || kind === 'armchair') { styleSeat(k, R, model, item, fin, kind === 'armchair', opts.throws || null); return k.parts; }
-  if (kind === 'bed' || kind === 'kidsbed') { styleBed(k, R, model, kind === 'kidsbed'); return k.parts; }
+  if (kind === 'sofa' || kind === 'armchair') { styleSeat(k, R, model, item, fin, kind === 'armchair', opts.throws || null); return done(k); }
+  if (kind === 'bed' || kind === 'kidsbed') { styleBed(k, R, model, kind === 'kidsbed'); return done(k); }
   if (kind === 'daybed') {
     const m = model.parts.filter((p) => p.role === 'mattress').sort((a, b) => b.bb.max[1] - a.bb.max[1])[0];
     if (m) k.at([m.bb.max[0] - 330, m.bb.max[1] - 4, m.bb.max[2] - 260], 8, () => PR.blanket(k, { mat: pick(R, ['fab-ochre', 'fab-sage', 'fab-terracotta']) }));
-    return k.parts;
+    return done(k);
   }
-  if (kind === 'rack') { styleRack(k, R, model); return k.parts; }
+  if (kind === 'rack') { styleRack(k, R, model); return done(k); }
   const bays = findBays(model), H = model.bbox.max[1];
   const tops = bays.filter((b) => b.clear > 560).sort((a, b) => (b.x1 - b.x0) * (b.z1 - b.z0) - (a.x1 - a.x0) * (a.z1 - a.z0));
   const inner = bays.filter((b) => b.clear <= 560);
@@ -351,5 +354,5 @@ export function styleModel(item, model, opts = {}) {
     const t = tops.filter((b) => b.y > H - 80 && b.y <= 2050)[0];
     if (t && R() < 0.7) k.at([(t.x0 + t.x1) / 2 + (R() - 0.5) * (t.x1 - t.x0) * 0.4, t.y, (t.z0 + t.z1) / 2], 0, () => PR.storageBox(k, { w: 300, h: 150, d: Math.min(260, t.z1 - t.z0 - 16), mat: pick(R, pal.boxes) }));
   }
-  return k.parts;
+  return done(k);
 }

@@ -4,7 +4,8 @@
 
 import * as THREE from '../../vendor/three.module.min.js';
 import { MaterialLib, patchShaderChunks } from './materials.js';
-import { mergedGroup, disposeGroup } from './merge.js';
+import { mergedGroup, decorGroup, disposeGroup } from './merge.js';
+import { RealAssets } from './real.js';
 import { studioEnv, ENV_LEVEL, KEY_DIR } from './stage.js';
 import { radialAlpha } from './textures.js';
 import { layoutShowroom, modelOf, WALL_T } from '../data/rooms.js';
@@ -39,6 +40,10 @@ export class Showroom {
     this.camera = new THREE.PerspectiveCamera(this.fov, 1, 50, 400000);
     this.ibl = { value: 1 };
     this.lib = new MaterialLib({ ibl: this.ibl, cutout: true });
+    // 실물 재질 사진·스캔 소품이 도착하면 다시 그린다. 저사양에서는 무거운 스캔 모델을 쓰지 않는다.
+    const redraw = () => this.invalidate();
+    this.lib.onChange = redraw; this._redraw = redraw;
+    this.assets = this.low ? null : new RealAssets({ lite: true, hook: (m) => { m.onBeforeCompile = (sh) => { sh.uniforms.uIblDiffuse = this.ibl; }; return m; } });
     this.envRT = studioEnv(r);
     this.scene.environment = this.envRT.texture; this.scene.environmentIntensity = ENV_LEVEL * 0.8;
     this.keyDir = new THREE.Vector3(...KEY_DIR).normalize();
@@ -171,11 +176,11 @@ export class Showroom {
 
   /** 방의 소품(러그·화분·액자·창…)과 조명 번짐. */
   _decor(q) {
-    const d = q.def, base = mergedGroup(d.decor.base, this.lib);
+    const d = q.def, base = decorGroup(d.decor.base, this.lib, this.assets, { onReady: this._redraw });
     q.group.add(base);
     this._glows(d.decor.base, base, null);
     for (const w of q.walls) {
-      w.decor = mergedGroup(d.decor[w.name], this.lib);
+      w.decor = decorGroup(d.decor[w.name], this.lib, this.assets, { onReady: this._redraw });
       q.group.add(w.decor);
       this._glows(d.decor[w.name], w.decor, null);
     }
@@ -197,7 +202,7 @@ export class Showroom {
     const p = s.p, it = s.it, model = modelOf(it), fin = it.finishes[p.fin] || it.finishes[0], bb = model.bbox;
     const group = mergedGroup(model.parts, this.lib, { finish: fin });
     const props = styleModel(it, model, { finish: fin, avoid: p.avoid, seed: p.seed, throws: p.throws });
-    if (props.length) { const pg = mergedGroup(props, this.lib); group.add(pg); }
+    if (props.length) group.add(decorGroup(props, this.lib, this.assets, { onReady: this._redraw }));
     group.position.set(p.room.x + p.x, p.y, p.room.z + p.z);
     group.rotation.y = p.yaw * D2R;
     // 받침 가구와 함께 들리도록, 위에 올린 것은 받침 그룹의 자식으로 둔다
@@ -460,7 +465,7 @@ export class Showroom {
     this.scene.traverse((o) => { if (o.geometry && o.geometry !== this.quad && o.geometry !== this.pinGeo) o.geometry.dispose(); });
     for (const o of this.groundObjs) for (const m of [].concat(o.material)) m.dispose();
     for (const m of [...this.aoMats, this.glowMat, this.tile.material, this.pinMat]) m.dispose();
-    this.quad.dispose(); this.pinGeo.dispose(); this.radTex.dispose(); this.matTex.dispose(); this.lib.dispose(); this.envRT.dispose();
+    this.quad.dispose(); this.pinGeo.dispose(); this.radTex.dispose(); this.matTex.dispose(); this.lib.dispose(); if (this.assets) this.assets.dispose(); this.envRT.dispose();
     this.renderer.dispose(); this.canvas.remove(); this.labelBox.remove();
   }
 }

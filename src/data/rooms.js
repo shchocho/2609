@@ -393,7 +393,8 @@ export function layoutShowroom() {
       def.build(r);
       const shell = r.shell();
       x += WALL_T;
-      const room = { id, name: def.name, row: ri, x, z: z0, w: def.w, d: def.d, H: r.H, floorMat: r.floor, wallMat: r.walls, shell, decor: { base: r.k.base.parts, back: r.k.back.parts, left: r.k.left.parts, right: r.k.right.parts }, places: r.places };
+      const seg = (k) => { const parts = k.parts; parts.reals = k.reals || []; return parts; };
+      const room = { id, name: def.name, row: ri, x, z: z0, w: def.w, d: def.d, H: r.H, floorMat: r.floor, wallMat: r.walls, shell, decor: { base: seg(r.k.base), back: seg(r.k.back), left: seg(r.k.left), right: seg(r.k.right) }, places: r.places };
       for (const p of r.places) { p.room = room; p.wx = x + p.x; p.wz = z0 + p.z; }
       rooms.push(room);
       x += def.w + WALL_T + ROOM_GAP;
@@ -523,10 +524,12 @@ export function itemRoom(item, model, { finish = null, seed = 0 } = {}) {
   }
   const shell = r.shell();
   const move = (parts) => { for (const p of parts) { p.pos[0] += xl; p.pos[1] -= lift; p.pos[2] += zb; } return parts; };
+  // 방 좌표 → 모델 좌표. 실물 스캔 대체 정보(reals)도 함께 옮긴다.
+  const seg = (k) => { const parts = move(k.parts); parts.reals = (k.reals || []).map((q) => ({ ...q, pos: [q.pos[0] + xl, q.pos[1] - lift, q.pos[2] + zb] })); return parts; };
   move([shell.floor, shell.walls.back, shell.walls.left]);
   return {
     floor: shell.floor, lift, H, planes: { xl, zb },
-    walls: [{ name: 'back', part: shell.walls.back, decor: move(r.k.back.parts) }, { name: 'left', part: shell.walls.left, decor: move(r.k.left.parts) }],
-    base: move(r.k.base.parts),
+    walls: [{ name: 'back', part: shell.walls.back, decor: seg(r.k.back) }, { name: 'left', part: shell.walls.left, decor: seg(r.k.left) }],
+    base: seg(r.k.base),
   };
 }

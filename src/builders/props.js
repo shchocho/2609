@@ -95,7 +95,14 @@ function monsteraPts(L, W) {
  * 화분 식물. kind: snake(산세베리아) | rubber(고무나무) | monstera | bush(둥근 잎 덤불) | cactus | ivy(늘어지는 덩굴)
  * s = 크기 배율(1 = 바닥에 두는 큰 화분). 전체 높이를 돌려준다.
  */
-export function plant(k, { kind = 'rubber', s = 1, potMat = 'terracotta', R }) {
+export function plant(k, o) {
+  const start = k.parts.length, top = plantParts(k, o), kind = o.kind || 'rubber';
+  // 실물 스캔 화분으로 바꿔 그릴 수 있게 표시(덩굴은 모양이 달라 그대로 둔다)
+  if (kind === 'bush' || kind === 'cactus') k.real('potted_plant_04', start, Math.max(120, top * 0.92));
+  else if (kind !== 'ivy') k.real(kind === 'snake' ? 'potted_plant_02' : 'potted_plant_01', start, top);
+  return top;
+}
+function plantParts(k, { kind = 'rubber', s = 1, potMat = 'terracotta', R }) {
   if (kind === 'snake') {
     const pr = 105 * s, ph = pot(k, { r: pr, h: 190 * s, mat: potMat, taper: 0.8 }), n = 8 + Math.floor(R() * 4);
     let top = 0;
@@ -164,8 +171,9 @@ export function plant(k, { kind = 'rubber', s = 1, potMat = 'terracotta', R }) {
 /** 꽃병. kind: branch(유칼립투스 가지) | tulip | dried(팜파스) | empty */
 export function vase(k, { kind = 'branch', s = 1, mat = 'ceramic', R }) {
   const h = (170 + R() * 80) * s, r = (38 + R() * 16) * s, nk = r * (0.42 + R() * 0.2);
+  const start = k.parts.length;
   k.lathe('꽃병', [[0, 0], [r * 0.7, 0], [r, h * 0.34], [r * 0.92, h * 0.58], [nk, h * 0.86], [nk * 1.12, h], [nk * 0.8, h], [nk * 0.72, h - 10], [0, h - 10]], [0, 0, 0], P(mat));
-  if (kind === 'empty') return h;
+  if (kind === 'empty') { k.real(R() < 0.5 ? 'ceramic_vase_01' : 'ceramic_vase_03', start, h * 1.15); return h; }
   const n = kind === 'tulip' ? 5 + Math.floor(R() * 3) : 3 + Math.floor(R() * 2);
   for (let i = 0; i < n; i++) {
     const a = (360 * i) / n + R() * 40, out = (30 + R() * 90) * s * (kind === 'tulip' ? 0.7 : 1), up = (kind === 'tulip' ? 150 + R() * 70 : 230 + R() * 190) * s;

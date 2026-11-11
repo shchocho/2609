@@ -3,6 +3,10 @@
 import * as THREE from '../../vendor/three.module.min.js';
 import { woodTextures, fabricTextures, noiseTextures, galvTextures, pegboardTexture, floorTextures, WOOD_MM, FABRIC_MM, NOISE_MM, PEG_MM } from './textures.js';
 import { MATERIALS } from '../data/materials.js';
+import { realManifest, realTexture } from './real.js';
+
+// 수종 → 실물 무늬목 사진 [id, 결 방향을 90° 돌릴지]
+const WOOD_REAL = { birch: ['white_oak_veneer', true], beech: ['white_oak_veneer', true], pine: ['coated_pine', false], oak: ['oak_veneer_01', true], walnut: ['walnut_veneer', true] };
 
 // IBL 확산광 세기를 유니폼으로 분리한다(누적 렌더에서 그림자 있는 돔 조명으로 대체하기 위해).
 export const iblDiffuse = { value: 1 };
@@ -27,8 +31,10 @@ const withIbl = (m) => {
 const WARM = new THREE.Color('#ffd9a8');
 
 export class MaterialLib {
-  constructor({ cutout = false, grainScale = 1, ibl = null } = {}) {
+  constructor({ cutout = false, grainScale = 1, ibl = null, real = true } = {}) {
     this.cutout = cutout;
+    this.real = real; // 실물 재질 사진을 불러와 절차적 텍스처를 갈아 끼운다
+    this.realTex = []; this.pending = 0; this.onChange = null; this.disposed = false;
     this.ibl = ibl; // 다른 스테이지의 누적 렌더와 섞이지 않게 장면 전용 유니폼을 쓸 수 있다
     this.grainScale = grainScale;
     this.cache = new Map();
@@ -55,9 +61,35 @@ export class MaterialLib {
     return c;
   }
 
+  /**
+   * 재질 m 의 맵을 실물 사진으로 바꾼다(비동기). color 가 있으면 '무늬만' 맵에 그 색을 입히고,
+   * 없으면 사진 색을 그대로 쓴다. 불러오지 못하면 절차적 텍스처가 남는다.
+   */
+  _realize(m, id, { color = null, rot = false, rough = 0.6, normal = 1, gain = 1 } = {}) {
+    if (!this.real || !id) return m;
+    this.pending++;
+    const done = () => { this.pending--; };
+    realManifest().then((man) => {
+      const info = man && man.textures[id];
+      if (!info) return null;
+      return Promise.all([realTexture(`tex/${id}_d.webp`, true), realTexture(`tex/${id}_n.webp`, false), realTexture(`tex/${id}_r.webp`, false)]).then(([d, n, r]) => {
+        if (this.disposed) return;
+        const mk = (t) => { const c = t.clone(); c.wrapS = c.wrapT = THREE.RepeatWrapping; c.repeat.set(1 / (info.mm[0] * this.grainScale), 1 / (info.mm[1] * this.grainScale)); if (rot) c.rotation = Math.PI / 2; c.needsUpdate = true; this.realTex.push(c); return c; };
+        m.map = mk(d); m.normalMap = mk(n); m.roughnessMap = mk(r);
+        if (color) m.color.copy(color).multiplyScalar(2); else m.color.setScalar(gain);
+        m.roughness = Math.max(0.5, Math.min(3, rough / Math.max(0.05, info.rough)));
+        if (m.normalScale) m.normalScale.set(normal, normal);
+        m.needsUpdate = true;
+        if (this.onChange) this.onChange();
+      });
+    }).catch(() => {}).then(done);
+    return m;
+  }
+
   get(key) {
     if (this.cache.has(key)) return this.cache.get(key);
     const d = MATERIALS[key] || MATERIALS.white;
+    this._key = key;
     const m = this._make(d);
     if (this.ibl && m.onBeforeCompile) { const u = this.ibl; m.onBeforeCompile = (shader) => { shader.uniforms.uIblDiffuse = u; }; }
     m.name = key;
@@ -77,10 +109,13 @@ export class MaterialLib {
       case 'wood': {
         const t = woodTextures(d);
         const R = (k) => this._rep(t[k], WOOD_MM[0], WOOD_MM[1]);
-        return withIbl(new THREE.MeshPhysicalMaterial({
+        const m = withIbl(new THREE.MeshPhysicalMaterial({
           map: R('map'), roughnessMap: R('roughnessMap'), normalMap: R('normalMap'), normalScale: new THREE.Vector2(0.35, 0.35),
           roughness: 0.78, metalness: 0, clearcoat: 0.12, clearcoatRoughness: 0.5, vertexColors: false,
         }));
+        const base = new THREE.Color(d.c).lerp(new THREE.Color(d.c2), 0.3), dark = base.r + base.g + base.b < 0.16;
+        const [rid, rot] = dark ? ['black_oak_veneer', false] : WOOD_REAL[d.sp] || WOOD_REAL.oak;
+        return this._realize(m, rid, { color: base, rot, rough: 0.55, normal: 0.8 });
       }
       case 'paint':
         return withIbl(nz(new THREE.MeshPhysicalMaterial({ color: d.c, roughness: (d.rough ?? 0.42) + 0.12, metalness: 0, clearcoat: 0.22, clearcoatRoughness: 0.42 }), 0.1));
@@ -107,13 +142,14 @@ export class MaterialLib {
       case 'fabric': {
         const t = fabricTextures(!!d.fine), mm = d.fine ? 40 : FABRIC_MM;
         const col = new THREE.Color(d.c);
-        return withIbl(new THREE.MeshPhysicalMaterial({
+        const m = withIbl(new THREE.MeshPhysicalMaterial({
           color: d.c, map: this._rep(t.map, mm), normalMap: this._rep(t.normalMap, mm), normalScale: new THREE.Vector2(d.fine ? 0.3 : 0.65, d.fine ? 0.3 : 0.65),
           roughness: 0.96, metalness: 0, sheen: 0.7, sheenRoughness: 0.55, sheenColor: col.clone().lerp(new THREE.Color('#ffffff'), 0.45),
         }));
+        return this._realize(m, d.real || (d.fine ? 'cotton_jersey' : 'rough_linen'), { color: col, rough: 0.95, normal: d.fine ? 0.5 : 1 });
       }
       case 'leather':
-        return withIbl(nz(new THREE.MeshPhysicalMaterial({ color: d.c, roughness: 0.5, metalness: 0, clearcoat: 0.25, clearcoatRoughness: 0.5 }), 0.5));
+        return this._realize(withIbl(nz(new THREE.MeshPhysicalMaterial({ color: d.c, roughness: 0.5, metalness: 0, clearcoat: 0.25, clearcoatRoughness: 0.5 }), 0.5)), 'brown_leather', { color: new THREE.Color(d.c), rough: 0.5, normal: 1 });
       case 'mesh': {
         const t = fabricTextures(true);
         return withIbl(new THREE.MeshStandardMaterial({ color: d.c, map: this._rep(t.map, 30), normalMap: this._rep(t.normalMap, 30), roughness: 0.9, transparent: true, opacity: 0.9 }));
@@ -137,10 +173,10 @@ export class MaterialLib {
       case 'leaf':
         return withIbl(nz(new THREE.MeshPhysicalMaterial({ color: d.c, roughness: 0.46, metalness: 0, sheen: 0.5, sheenRoughness: 0.5, sheenColor: new THREE.Color(d.c).lerp(new THREE.Color('#ffffff'), 0.55) }), 0.18));
       case 'matte':
-        return withIbl(nz(new THREE.MeshStandardMaterial({ color: d.c, roughness: 0.95, metalness: 0 }), 0.22));
+        return this._realize(withIbl(nz(new THREE.MeshStandardMaterial({ color: d.c, roughness: 0.95, metalness: 0 }), 0.22)), d.c && /^wall-/.test(this._key || '') ? 'painted_plaster_wall' : null, { color: new THREE.Color(d.c), rough: 0.92, normal: 0.7 });
       case 'floor': {
         const t = floorTextures(d), gloss = d.style === 'tile' || d.style === 'check' ? 0.3 : d.style === 'concrete' ? 0.78 : 0.5;
-        return withIbl(new THREE.MeshStandardMaterial({ map: this._rep(t.map, t.mm[0], t.mm[1]), normalMap: this._rep(t.normalMap, t.mm[0], t.mm[1]), normalScale: new THREE.Vector2(0.55, 0.55), roughness: gloss, metalness: 0 }));
+        return this._realize(withIbl(new THREE.MeshStandardMaterial({ map: this._rep(t.map, t.mm[0], t.mm[1]), normalMap: this._rep(t.normalMap, t.mm[0], t.mm[1]), normalScale: new THREE.Vector2(0.55, 0.55), roughness: gloss, metalness: 0 })), d.real, { rough: 0.42, normal: 1, gain: d.gain || 1 });
       }
       default:
         return withIbl(new THREE.MeshStandardMaterial({ color: d.c || '#cccccc', roughness: 0.6 }));
@@ -148,6 +184,8 @@ export class MaterialLib {
   }
 
   dispose() {
+    this.disposed = true;
+    for (const t of this.realTex) t.dispose();
     for (const m of this.cache.values()) m.dispose();
     for (const t of this.reps.values()) t.dispose();
     this.cache.clear();

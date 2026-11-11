@@ -56,6 +56,23 @@ export class Kit {
     return this;
   }
 
+  /** 현재 프레임의 원점과 요. 실물 스캔 소품을 절차적 소품과 같은 자리에 놓을 때 쓴다. */
+  frame() {
+    let pos = [0, 0, 0], yaw = 0;
+    for (let i = this._frames.length - 1; i >= 0; i--) { const fr = this._frames[i]; pos = V.add(rotY(pos, fr.yaw), fr.origin); yaw += fr.yaw; }
+    return { pos, yaw };
+  }
+
+  /**
+   * start 번째 이후에 추가된 부품들을 실물 스캔 모델 id 로 바꿔 그릴 수 있다고 표시한다.
+   * 스캔 모델을 못 불러오면 그 부품들이 그대로 그려진다. h = 맞출 높이(mm).
+   */
+  real(id, start, h) {
+    const f = this.frame();
+    (this.reals || (this.reals = [])).push({ id, pos: f.pos, yaw: f.yaw, h });
+    for (let i = start; i < this.parts.length; i++) this.parts[i].real = this.reals.length - 1;
+  }
+
   _push(name, kind, geo, pos, o = {}) {
     const base = {
       id: '', name, kind, ...geo,

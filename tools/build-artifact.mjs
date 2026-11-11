@@ -14,7 +14,7 @@ fs.writeFileSync(path.join(root, 'dist/miniatyr.html'), `${head}\n<style>\n${css
 // 아티팩트에서는 three.js 를 허용된 CDN(jsDelivr, 같은 버전)에서 불러오고, 나머지 파일은 dist/ 에 복사해 함께 올린다.
 const CDN = 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js';
 const walk = (dir) => fs.readdirSync(path.join(root, dir), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(`${dir}/${e.name}`) : [`${dir}/${e.name}`]));
-const files = [...walk('src'), ...walk('assets/thumbs')];
+const files = [...walk('src'), ...walk('assets/thumbs'), ...walk('assets/real')];
 for (const f of files) {
   const out = path.join(root, 'dist', f);
   fs.mkdirSync(path.dirname(out), { recursive: true });
