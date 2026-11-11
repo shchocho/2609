@@ -213,8 +213,9 @@
   "messages": [
     {
       "role": "cue",
-      "text": "Copilot 창 입력란에 만들 앱을 설명한 글이 준비되어 있습니다.",
-      "action": "Copilot에 보내기"
+      "text": "만들 앱을 설명한 글이 준비되어 있습니다. 메인 화면의 만들기 단추로 시작합니다.",
+      "action": "만들기",
+      "target": "create"
     },
     {
       "role": "user",
@@ -307,6 +308,12 @@
           "say": "영업팀과 임원이 함께 볼 수 있게 게시해 주세요."
         }
       ]
+    },
+    {
+      "role": "cue",
+      "text": "공유 범위를 정했습니다. 화면 위쪽의 게시 단추로 엽니다.",
+      "action": "게시",
+      "target": "publish"
     },
     {
       "role": "tool",

@@ -17,6 +17,8 @@ interface Ui {
   groups: [string, string, string?][];
   /** 왼쪽 탐색 (둘째 항목이 현재 위치) */
   nav?: string[];
+  /** 만들기 전에 메인 화면에 뜨는 시작 화면의 [제목, 안내] */
+  create?: [string, string];
   /** 오른쪽 창 제목. 없으면 Office 의 Copilot 창 머리(모델 칩 · 편집 허용)를 쓴다 */
   pane?: string;
   head: string;
@@ -101,6 +103,7 @@ const UI: Record<string, Ui> = {
     tabs: ['에이전트', '개요', '지식', '도구', '채널', '분석'],
     groups: [['▷', '테스트'], ['', '게시', 'publish']],
     nav: ['홈', '에이전트', '흐름', '도구', '활동'],
+    create: ['새 에이전트 만들기', '어떤 일을 하는 에이전트인지 설명해 주세요.'],
     pane: '에이전트 테스트',
     head: '만든 에이전트와 바로 대화해 볼 수 있습니다.',
     input: '메시지를 입력하세요',
@@ -108,8 +111,10 @@ const UI: Record<string, Ui> = {
   },
   code: {
     app: 'Microsoft Copilot',
-    tabs: ['Home', 'Code', 'Autopilot'],
-    groups: [['👁', '미리보기'], ['🗄', '데이터'], ['🔒', '권한'], ['🚀', '게시']],
+    tabs: ['앱', '미리보기', '데이터', '권한'],
+    groups: [['', '공유'], ['', '게시', 'publish']],
+    nav: ['Home', 'Code', 'Autopilot'],
+    create: ['무엇을 만들까요?', '만들고 싶은 앱이나 자동화를 말로 설명해 주세요.'],
     pane: 'Copilot',
     head: '만들고 싶은 앱을 말로 설명해 보세요.',
     sub: '화면·데이터·권한 계획을 먼저 보여 드린 뒤 샌드박스에서 만듭니다.',
@@ -142,15 +147,17 @@ export function AppWindow({ s, st, vars, ids, streamRef, mark, ask, onSend, pick
   const view = doc?.deck && building ? { ...doc, deck: { slides: building.length ? building : [{ n: 1, head: '제목을 추가하려면 클릭' }] } } : doc;
   const slide = building ? Math.max(1, filterBy(building, ids).length) : st.slide;
   const slides = view?.deck ? view.deck.total ?? filterBy(view.deck.slides, ids).length : 1;
-  // Copilot Studio 는 에이전트를 만들기 전에 메인 화면의 만들기 화면부터 보인다
-  const creating = surface === 'studio' && writing === 0 && !!doc;
+  // Copilot Studio · Code 는 만들기 전에 메인 화면의 시작 화면부터 보인다 (만들기 단추를 누를 차례일 때)
+  const creating = !!ui.create && writing === 0 && !!doc && target === 'create';
+  // 화면의 단추를 누를 차례에는 입력란을 비워 둔다
+  const typed = target ? null : ask;
   const hot = (act?: string) => !!act && act === target;
-  const slashOpen = !!(pick && ask && (pickPhase === 'search' || pickPhase === 'pick'));
+  const slashOpen = !!(pick && typed && (pickPhase === 'search' || pickPhase === 'pick'));
   return (
     <div className="sc-shell is-office" data-app={surface}>
       <div className="sc-win">
         <span className="sc-win-name">
-          {!ui.pane && <span className="sc-save">자동 저장 ●</span>}{creating ? '새 에이전트' : doc ? artifactName(doc, ids) : s.title} · {ui.app}
+          {!ui.pane && <span className="sc-save">자동 저장 ●</span>}{creating ? '새로 만들기' : doc ? artifactName(doc, ids) : s.title} · {ui.app}
         </span>
         <span className="sc-win-search">⌕ 검색</span>
         <span className="sc-win-btns" aria-hidden="true"><i>─</i><i>▢</i><i>✕</i></span>
@@ -169,13 +176,11 @@ export function AppWindow({ s, st, vars, ids, streamRef, mark, ask, onSend, pick
         <div className={`sc-canvas sc-zone ${mark('canvas')}`}>
           {creating ? (
             <div className="st-create">
-              <b>새 에이전트 만들기</b>
-              <span>어떤 일을 하는 에이전트인지 설명해 주세요.</span>
-              <p>{s.workbench?.ask}</p>
-              <i>{doc?.blocks?.[0]?.meta?.[0]}</i>
-              {hot('create')
-                ? <button type="button" className="is-hunt" data-act="create" onClick={onAct}>만들기</button>
-                : <u>만들기</u>}
+              <b>{ui.create?.[0]}</b>
+              <span>{ui.create?.[1]}</span>
+              <p>{ask ?? s.workbench?.ask}</p>
+              {surface === 'studio' && <i>{doc?.blocks?.[0]?.meta?.[0]}</i>}
+              <button type="button" className="is-hunt" data-act="create" onClick={onAct}>만들기</button>
             </div>
           ) : view && (
             <ArtifactView
@@ -195,9 +200,9 @@ export function AppWindow({ s, st, vars, ids, streamRef, mark, ask, onSend, pick
           {pane.input && (
             <div className={`sc-composer is-pane sc-zone ${mark('composer')}`}>
               <b aria-hidden="true">＋</b>
-              <span className={ask ? 'is-filled' : undefined}>{ask && pick ? <PickText text={ask} pick={pick} phase={pickPhase} /> : ask ?? pane.input}</span>
+              <span className={typed ? 'is-filled' : undefined}>{typed && pick ? <PickText text={typed} pick={pick} phase={pickPhase} /> : typed ?? pane.input}</span>
               <i aria-hidden="true">🎤</i>
-              {onSend && <button type="button" className="sc-pane-send is-hunt" aria-label="보내기" onClick={onSend}>↑</button>}
+              {onSend && !target && <button type="button" className="sc-pane-send is-hunt" aria-label="보내기" onClick={onSend}>↑</button>}
               {slashOpen && pick && <SlashPopup pick={pick} active={pickPhase === 'pick'} onPick={pickPhase === 'search' ? onPickSelect : undefined} />}
             </div>
           )}

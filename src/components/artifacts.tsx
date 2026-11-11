@@ -392,7 +392,7 @@ function FlowView({ a, writing, vars, ids }: ViewProps) {
   );
 }
 
-/* ---------------- Copilot Studio 에이전트 개요 ---------------- */
+/* ---------------- Copilot Studio 에이전트 개요 · Copilot Code 앱 미리보기 ---------------- */
 /** 아직 채우지 않은 설정(only 깃발이 꺼져 있고 label 이 있는 section)은 빈 카드와 "+ 추가" 단추로 보인다 */
 function AgentView({ a, writing, vars, ids, act }: ViewProps) {
   const blocks = (a.blocks ?? []).filter(b => !b.not?.some(x => ids.includes(x)) && (b.label || !b.only || b.only.some(x => ids.includes(x))));
@@ -401,6 +401,10 @@ function AgentView({ a, writing, vars, ids, act }: ViewProps) {
       <div className="wb-wd-page">
         {blocks.slice(0, writing == null ? blocks.length : writing).map((b, i) => {
           const flag = b.only?.find(x => !ids.includes(x));
+          // 앱 미리보기의 단추: label 이 지금 누를 단추 id 이면 직접 누를 수 있다
+          if (b.kind === 'button' && b.label && act?.target === b.label) {
+            return <div key={i}><p className="wb-app-btn"><button type="button" className="is-hunt" data-act={b.label} onClick={act.go}>{b.text}</button></p></div>;
+          }
           if (!b.only || b.only.some(x => ids.includes(x)) || !flag) return <div key={i}><DocBlockView b={b} vars={vars} ids={ids} /></div>;
           return (
             <div key={i}>
@@ -428,7 +432,7 @@ export function ArtifactView(p: ViewProps) {
   if (a.kind === 'deck') return <DeckView {...p} />;
   if (a.kind === 'teams') return <TeamsView {...p} />;
   if (a.kind === 'flow') return <FlowView {...p} />;
-  if (a.app === 'studio') return <AgentView {...p} />;
+  if (a.app === 'studio' || a.app === 'code') return <AgentView {...p} />;
   if (a.kind === 'mail') return <MailView {...p} />;
   return <DocView {...p} />;
 }

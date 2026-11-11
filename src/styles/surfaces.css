@@ -243,7 +243,7 @@
 :is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-xl-chart i { background: var(--track); }
 :is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-xl-chart .is-warn i { background: #d13438; }
 .wb-app-btn { margin: 2px 0 0; text-align: right; }
-.wb-app-btn u { display: inline-block; padding: 7px 22px; font-size: 13px; font-weight: 600; text-decoration: none; color: #fff; background: var(--track, #0f7b6c); border-radius: 6px; }
+.wb-app-btn :is(u, button) { display: inline-block; padding: 7px 22px; font-size: 13px; font-weight: 600; text-decoration: none; color: #fff; background: var(--track, #0f7b6c); border-radius: 6px; }
 
 /* ---------- Copilot in Outlook · Teams · Forms ---------- */
 .sc-shell.is-office[data-app=outlook] { --track: var(--m365-outlook-bright); --track-ink: var(--m365-outlook-dark); }
@@ -265,15 +265,15 @@
 .sc-app-nav { display: grid; align-content: start; gap: 2px; padding: 10px 6px; font-size: 10.5px; color: #605e5c; background: #f5f4f2; border-right: 1px solid var(--sc-line, #e6e3df); }
 .sc-app-nav i { padding: 9px 2px; font-style: normal; text-align: center; border-radius: 6px; }
 .sc-app-nav i.on { font-weight: 600; color: var(--track-ink); background: color-mix(in srgb, var(--track) 12%, #fff); }
-.sc-shell.is-office[data-app=studio] .sc-office-body { grid-template-columns: 64px minmax(0, 1fr) clamp(300px, 26%, 400px); }
-.sc-shell.is-office[data-app=studio] .sc-ribbon { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 16px; }
-.sc-shell.is-office[data-app=studio] .sc-ribbon-groups { flex-wrap: nowrap; gap: 8px; }
-.sc-shell.is-office[data-app=studio] .sc-ribbon-groups > :is(span, button) { display: inline-flex; align-items: center; gap: 6px; min-width: 0; padding: 6px 16px; font: inherit; color: #1b1a19; background: #fff; border: 1px solid #c8c6c4; border-radius: 6px; }
-.sc-shell.is-office[data-app=studio] .sc-ribbon-groups > :last-child { color: #fff; background: var(--track); border-color: var(--track); }
-.sc-shell.is-office[data-app=studio] .sc-ribbon-groups > :last-child i { color: #fff; }
-.sc-shell.is-office[data-app=studio] .sc-ribbon-groups :is(b, i) { font-size: 12.5px; font-style: normal; color: inherit; }
-.sc-shell.is-office[data-app=studio] .sc-ribbon-groups b:empty { display: none; }
-.sc-shell.is-office[data-app=studio] .sc-ribbon-groups button { cursor: pointer; }
+.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-office-body { grid-template-columns: 64px minmax(0, 1fr) clamp(300px, 26%, 400px); }
+.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 16px; }
+.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups { flex-wrap: nowrap; gap: 8px; }
+.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups > :is(span, button) { display: inline-flex; align-items: center; gap: 6px; min-width: 0; padding: 6px 16px; font: inherit; color: #1b1a19; background: #fff; border: 1px solid #c8c6c4; border-radius: 6px; }
+.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups > :last-child { color: #fff; background: var(--track); border-color: var(--track); }
+.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups > :last-child i { color: #fff; }
+.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups :is(b, i) { font-size: 12.5px; font-style: normal; color: inherit; }
+.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups b:empty { display: none; }
+.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups button { cursor: pointer; }
 /* 아직 채우지 않은 설정 카드와 "+ 추가" 단추 */
 .wb-wd-sec.is-empty { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-style: dashed !important; background: #fdfdfc !important; box-shadow: none !important; }
 .wb-wd-sec.is-empty h4 { margin: 0; }
@@ -287,3 +287,9 @@ button.wb-add { cursor: pointer; }
 .st-create > i { padding: 2px 10px; font-size: 12px; font-style: normal; color: var(--track-ink); background: color-mix(in srgb, var(--track) 10%, #fff); border-radius: 999px; }
 .st-create > :is(button, u) { justify-self: end; padding: 8px 24px; font: inherit; font-size: 13.5px; font-weight: 600; text-decoration: none; color: #fff; background: var(--track); border: 0; border-radius: 6px; }
 .st-create > button { cursor: pointer; }
+
+/* 앱 미리보기 안의 누를 수 있는 단추, 만들기 직후의 빈 화면 */
+.wb-app-btn button { font-family: inherit; border: 0; cursor: pointer; }
+.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-canvas .wb-wd-page:empty { min-height: 120px; padding: 0; display: grid; place-items: center; }
+.sc-shell.is-office[data-app=studio] .sc-canvas .wb-wd-page:empty::before { content: "에이전트를 만드는 중입니다…"; font-size: 13px; color: #8a8886; }
+.sc-shell.is-office[data-app=code] .sc-canvas .wb-wd-page:empty::before { content: "계획을 확인하면 앱 미리보기가 여기에 나타납니다"; font-size: 13px; color: #8a8886; }

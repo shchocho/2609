@@ -100,7 +100,7 @@
           {
             "kind": "section",
             "not": [
-              "tried"
+              "typed"
             ],
             "title": "오늘의 점검 · 프레스 2라인",
             "table": {
@@ -137,7 +137,7 @@
           {
             "kind": "section",
             "only": [
-              "tried"
+              "typed"
             ],
             "title": "오늘의 점검 · 프레스 2라인",
             "table": {
@@ -177,7 +177,7 @@
               "photo"
             ],
             "not": [
-              "tried"
+              "typed"
             ],
             "label": "사진 첨부",
             "value": "이상에 체크하면 사진을 붙일 수 있습니다"
@@ -185,14 +185,15 @@
           {
             "kind": "field",
             "only": [
-              "tried"
+              "typed"
             ],
             "label": "사진 첨부",
             "value": "IMG_1111_베어링.jpg"
           },
           {
             "kind": "button",
-            "text": "점검 제출"
+            "text": "점검 제출",
+            "label": "try"
           },
           {
             "kind": "note",
@@ -208,8 +209,9 @@
   "messages": [
     {
       "role": "cue",
-      "text": "Copilot 창 입력란에 만들 앱을 설명한 글이 준비되어 있습니다.",
-      "action": "Copilot에 보내기"
+      "text": "만들 앱을 설명한 글이 준비되어 있습니다. 메인 화면의 만들기 단추로 시작합니다.",
+      "action": "만들기",
+      "target": "create"
     },
     {
       "role": "user",
@@ -291,8 +293,20 @@
     },
     {
       "role": "cue",
-      "text": "미리보기에서 베어링 진동을 ‘이상’으로 체크하고 사진을 붙여 제출해 봅니다.",
-      "action": "이상 체크해 보기"
+      "text": "미리보기에서 베어링 진동을 ‘이상’으로 체크하고 사진을 붙여 봅니다.",
+      "action": "체크해 보기"
+    },
+    {
+      "role": "tool",
+      "tool": "미리보기에 입력한 값을 받는 중",
+      "sets": "typed",
+      "delayMs": 700
+    },
+    {
+      "role": "cue",
+      "text": "이상 한 건과 사진을 넣었습니다. 앱의 점검 제출 단추를 눌러 봅니다.",
+      "action": "점검 제출",
+      "target": "try"
     },
     {
       "role": "tool",
