@@ -1,7 +1,7 @@
 // materials.js — 재질 표(MATERIALS)를 three.js PBR 재질로. 스튜디오 조명에 맞춘 값.
 
 import * as THREE from '../../vendor/three.module.min.js';
-import { woodTextures, fabricTextures, noiseTextures, galvTextures, pegboardTexture, WOOD_MM, FABRIC_MM, NOISE_MM, PEG_MM } from './textures.js';
+import { woodTextures, fabricTextures, noiseTextures, galvTextures, pegboardTexture, floorTextures, WOOD_MM, FABRIC_MM, NOISE_MM, PEG_MM } from './textures.js';
 import { MATERIALS } from '../data/materials.js';
 
 // IBL 확산광 세기를 유니폼으로 분리한다(누적 렌더에서 그림자 있는 돔 조명으로 대체하기 위해).
@@ -27,8 +27,9 @@ const withIbl = (m) => {
 const WARM = new THREE.Color('#ffd9a8');
 
 export class MaterialLib {
-  constructor({ cutout = false, grainScale = 1 } = {}) {
+  constructor({ cutout = false, grainScale = 1, ibl = null } = {}) {
     this.cutout = cutout;
+    this.ibl = ibl; // 다른 스테이지의 누적 렌더와 섞이지 않게 장면 전용 유니폼을 쓸 수 있다
     this.grainScale = grainScale;
     this.cache = new Map();
     this.reps = new Map();
@@ -58,6 +59,7 @@ export class MaterialLib {
     if (this.cache.has(key)) return this.cache.get(key);
     const d = MATERIALS[key] || MATERIALS.white;
     const m = this._make(d);
+    if (this.ibl && m.onBeforeCompile) { const u = this.ibl; m.onBeforeCompile = (shader) => { shader.uniforms.uIblDiffuse = u; }; }
     m.name = key;
     this.cache.set(key, m);
     return m;
@@ -131,7 +133,15 @@ export class MaterialLib {
       case 'pegboard':
         return withIbl(new THREE.MeshStandardMaterial({ map: this._rep(pegboardTexture(d.c), PEG_MM), roughness: 0.62 }));
       case 'emit':
-        return new THREE.MeshBasicMaterial({ color: new THREE.Color(d.c).multiplyScalar(1.6) });
+        return new THREE.MeshBasicMaterial({ color: new THREE.Color(d.c).multiplyScalar(d.k ?? 1.6) });
+      case 'leaf':
+        return withIbl(nz(new THREE.MeshPhysicalMaterial({ color: d.c, roughness: 0.46, metalness: 0, sheen: 0.5, sheenRoughness: 0.5, sheenColor: new THREE.Color(d.c).lerp(new THREE.Color('#ffffff'), 0.55) }), 0.18));
+      case 'matte':
+        return withIbl(nz(new THREE.MeshStandardMaterial({ color: d.c, roughness: 0.95, metalness: 0 }), 0.22));
+      case 'floor': {
+        const t = floorTextures(d), gloss = d.style === 'tile' || d.style === 'check' ? 0.3 : d.style === 'concrete' ? 0.78 : 0.5;
+        return withIbl(new THREE.MeshStandardMaterial({ map: this._rep(t.map, t.mm[0], t.mm[1]), normalMap: this._rep(t.normalMap, t.mm[0], t.mm[1]), normalScale: new THREE.Vector2(0.55, 0.55), roughness: gloss, metalness: 0 }));
+      }
       default:
         return withIbl(new THREE.MeshStandardMaterial({ color: d.c || '#cccccc', roughness: 0.6 }));
     }

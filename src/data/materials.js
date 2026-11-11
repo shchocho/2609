@@ -5,6 +5,7 @@ const wood = (c, c2, sp, extra) => ({ t: 'wood', c, c2, sp, ...extra });
 const paint = (c, rough = 0.42) => ({ t: 'paint', c, rough });
 const fab = (c, extra) => ({ t: 'fabric', c, ...extra });
 const pl = (c, rough = 0.38) => ({ t: 'plastic', c, rough });
+const matte = (c) => ({ t: 'matte', c });
 
 export const MATERIALS = {
   // 도장·포일
@@ -37,6 +38,21 @@ export const MATERIALS = {
   paper: { t: 'paper', c: '#f4eedf' }, shadewhite: { t: 'paper', c: '#f0ebe1' }, opal: { t: 'opal', c: '#fbf5e8' },
   // 기타
   pegboard: { t: 'pegboard', c: '#f0efea' }, screen: paint('#121315', 0.12), glow: { t: 'emit', c: '#ff5b3b' },
+  // ── 룸 세트·소품(도면·재단표에는 쓰이지 않는다)
+  leaf: { t: 'leaf', c: '#4d8748' }, leafdark: { t: 'leaf', c: '#2c643c' }, leaflight: { t: 'leaf', c: '#84a85a' }, leafgray: { t: 'leaf', c: '#7f9a86' },
+  terracotta: matte('#b96c45'), soil: matte('#35281f'), stone: matte('#b9b6ae'), cream: matte('#ebe4d4'), kraft: matte('#b99668'),
+  ceramic: paint('#ece7dc', 0.22), 'ceramic-blue': paint('#3f5d7d', 0.22), 'ceramic-black': paint('#27282a', 0.3), 'ceramic-sage': paint('#9fb39a', 0.25),
+  orange: paint('#de8a2c', 0.5), ochre: paint('#c98f3c', 0.55), rust: paint('#a9512f', 0.55), teal: paint('#2f6b6d', 0.5), plum: paint('#6c4458', 0.5), ink: paint('#1f2a36', 0.5),
+  basket: fab('#c3a06d'), jute: fab('#bfa57c'), linen: fab('#e3dccd', { fine: true }), 'fab-ochre': fab('#c9953e'), 'fab-sage': fab('#9fb096'), 'fab-terracotta': fab('#b9684a'),
+  'fab-navy': fab('#2c3f5c'), 'fab-cream': fab('#ebe5d6'), 'fab-blush': fab('#e0b9ae'), 'fab-teal': fab('#3d7477'), 'fab-charcoal': fab('#3a3c40'),
+  'wall-white': matte('#efebe2'), 'wall-greige': matte('#d3ccbd'), 'wall-sage': matte('#b4c2ab'), 'wall-blue': matte('#a9bdc9'), 'wall-blush': matte('#e4c3b3'),
+  'wall-mustard': matte('#dab75f'), 'wall-green': matte('#4b6758'), 'wall-charcoal': matte('#4a4e51'), 'wall-navy': matte('#34485f'), 'wall-terracotta': matte('#c98766'),
+  'wall-sky': matte('#c9dde6'), 'wall-yellow': matte('#f0dd9f'), 'wall-pink': matte('#eccfcc'), 'wall-mint': matte('#cfe3d6'),
+  'floor-oak': { t: 'floor', c: '#c9a36c', c2: '#a37c48', style: 'plank' }, 'floor-light': { t: 'floor', c: '#dfcba6', c2: '#c4aa7f', style: 'plank' },
+  'floor-walnut': { t: 'floor', c: '#8a6340', c2: '#5f4126', style: 'plank' }, 'floor-gray': { t: 'floor', c: '#b9b3a8', c2: '#9a948a', style: 'plank' },
+  'floor-parquet': { t: 'floor', c: '#c7a16b', c2: '#a17a47', style: 'parquet' }, 'floor-tile': { t: 'floor', c: '#dcd8cf', c2: '#b4afa5', style: 'tile' },
+  'floor-check': { t: 'floor', c: '#ece8df', c2: '#3c4044', style: 'check' }, 'floor-concrete': { t: 'floor', c: '#b7b6b1', c2: '#a3a29d', style: 'concrete' },
+  sky: { t: 'emit', c: '#dfeeff', k: 1.25 }, lampglow: { t: 'emit', c: '#ffe2b0', k: 1.5 },
 };
 
 /** 마감에 역할이 지정되지 않았을 때의 대체 순서. '=' 는 다른 역할을 따라간다는 뜻. */
@@ -68,5 +84,5 @@ export function materialOf(role, finish) {
 
 export const MATERIAL_NAMES = {
   wood: '원목·무늬목', paint: '도장', metal: '금속', coat: '분체 도장 금속', glass: '유리', mirror: '거울', fabric: '원단', leather: '가죽',
-  mesh: '망사', plastic: '플라스틱', paper: '종이', opal: '유백 유리', pegboard: '타공판', emit: '발광',
+  mesh: '망사', plastic: '플라스틱', paper: '종이', opal: '유백 유리', pegboard: '타공판', emit: '발광', leaf: '잎', matte: '무광 도장', floor: '바닥재',
 };

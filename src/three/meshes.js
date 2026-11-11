@@ -13,8 +13,8 @@ function hash(str) {
 }
 
 /** 렌더용 지오메트리(면취·고분할). UV는 부품 로컬 좌표의 mm. */
-export function partGeometry(p) {
-  const m = localMesh(p, 1);
+export function partGeometry(p, detail = 1) {
+  const m = localMesh(p, detail);
   const { tf, det } = orientFn(p);
   const nf = m.f.length, fn = m.f.map((f) => faceNormal(m.v, f));
   // 로컬 경계와 결 방향

@@ -400,16 +400,16 @@ export function localMesh(p, detail = 0) {
       break;
     }
     case 'cyl': {
-      m = meshLathe(cylProfile(p.r, p.r2 ?? p.r, p.len, detail ? (p.bevel ?? Math.min(1.2, p.r * 0.2)) : 0), detail ? (p.r > 60 ? 64 : 28) : (p.r > 60 ? 32 : 14));
+      m = meshLathe(cylProfile(p.r, p.r2 ?? p.r, p.len, detail ? (p.bevel ?? Math.min(1.2, p.r * 0.2)) : 0), detail ? (p.r > 60 ? 64 : 28) : p.lo ? (p.r > 200 ? 28 : 10) : (p.r > 60 ? 32 : 14));
       const fn = AXIS[p.axis || 'y'];
       if (fn !== AXIS.y) m.v = m.v.map(fn);
       break;
     }
     case 'sph':
-      m = meshLathe(sphereProfile(p.r, detail ? 20 : 12, p.sy ?? 1), detail ? 40 : 24);
+      m = meshLathe(sphereProfile(p.r, detail ? 20 : p.lo ? 6 : 12, p.sy ?? 1), detail ? 40 : p.lo ? 10 : 24);
       break;
     case 'lathe':
-      m = meshLathe(p.profile, detail ? 64 : 24, !!p.closed);
+      m = meshLathe(p.profile, detail ? 64 : p.lo ? 14 : 24, !!p.closed);
       break;
     case 'ext': {
       m = meshExtrude(p.pts, p.t, { bevel: detail ? (p.bevel ?? Math.min(1, p.t * 0.25)) : 0, wall: p.wall || 0 });
@@ -417,7 +417,7 @@ export function localMesh(p, detail = 0) {
       break;
     }
     case 'tube':
-      m = meshTube(p.path, p.r, { seg: detail ? 16 : 8, corner: p.corner || 0, cseg: detail ? 8 : 3, closed: !!p.closed });
+      m = meshTube(p.path, p.r, { seg: detail ? 16 : p.lo ? 5 : 8, corner: p.corner || 0, cseg: detail ? 8 : 3, closed: !!p.closed });
       break;
     default:
       throw new Error(`unknown part kind: ${p.kind}`);

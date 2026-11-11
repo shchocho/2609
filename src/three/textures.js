@@ -125,6 +125,76 @@ export function woodTextures(def) {
   return out;
 }
 
+// ---------------------------------------------------------------- floors (룸 세트 바닥재)
+export const FLOOR_MM = { plank: [2400, 1200], parquet: [1200, 1200], tile: [1200, 1200], check: [600, 600], concrete: [2000, 2000] };
+const floorCache = new Map();
+/** 마루·타일·콘크리트 바닥. 색 맵과 줄눈 요철 노멀맵을 캔버스 드로잉으로 만든다. */
+export function floorTextures(def) {
+  const key = `${def.style}|${def.c}|${def.c2}`;
+  if (floorCache.has(key)) return floorCache.get(key);
+  const style = FLOOR_MM[def.style] ? def.style : 'plank', mm = FLOOR_MM[style];
+  const W = 1024, H = Math.round((W * mm[1]) / mm[0]), px = W / mm[0];
+  const a = hex(def.c), b = hex(def.c2), { rnd, fbm } = makeNoise(def.c.charCodeAt(1) * 7 + def.c2.charCodeAt(2) + style.length);
+  const cv = canvas(W, H), g = cv.getContext('2d'), hv = canvas(W, H), hg = hv.getContext('2d');
+  const mix = (t, k = 1) => `rgb(${a.map((v, i) => Math.round(clamp((v + (b[i] - v) * t) * k, 0, 255))).join(',')})`;
+  hg.fillStyle = '#fff'; hg.fillRect(0, 0, W, H);
+  const groove = (x, y, w, h, lw = 1.4, tone = 0.42) => {
+    g.strokeStyle = `rgba(${b.map((v) => Math.round(v * tone)).join(',')},0.55)`; g.lineWidth = lw; g.strokeRect(x, y, w, h);
+    hg.strokeStyle = '#000'; hg.lineWidth = lw + 0.6; hg.strokeRect(x, y, w, h);
+  };
+  // 널 한 장: 바탕색 + 결 방향 줄무늬
+  const board = (x, y, w, h, along) => {
+    const tone = rnd(), k = 0.93 + rnd() * 0.12;
+    g.fillStyle = mix(0.12 + tone * 0.5, k); g.fillRect(x, y, w, h);
+    g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
+    const n = Math.round(((along ? h : w) * 0.9)), len = along ? w : h;
+    for (let i = 0; i < n; i++) {
+      const o = rnd() * (along ? h : w), s0 = rnd() * len, l = len * (0.25 + rnd() * 0.75), wob = (rnd() - 0.5) * 3;
+      g.strokeStyle = `rgba(${b.map((v) => Math.round(v * (0.75 + rnd() * 0.3))).join(',')},${0.05 + rnd() * 0.13})`; g.lineWidth = 0.6 + rnd() * 1.1;
+      g.beginPath();
+      if (along) { g.moveTo(x + s0, y + o); g.quadraticCurveTo(x + s0 + l / 2, y + o + wob, x + s0 + l, y + o); } else { g.moveTo(x + o, y + s0); g.quadraticCurveTo(x + o + wob, y + s0 + l / 2, x + o, y + s0 + l); }
+      g.stroke();
+    }
+    g.restore();
+    groove(x, y, w, h);
+  };
+  if (style === 'plank') {
+    const rows = 8, rh = H / rows;
+    for (let j = 0; j < rows; j++) {
+      // 거울 반복(MirroredRepeat)으로 이어 붙이므로 양 끝에서 널이 잘려도 이음매가 맞는다.
+      let x = -rnd() * W * 0.45;
+      while (x < W) { const l = W * (0.42 + rnd() * 0.3); board(x, j * rh, l, rh, true); x += l; }
+    }
+  } else if (style === 'parquet') {
+    const cells = 4, cs = W / cells, strips = 4, sw = cs / strips;
+    for (let j = 0; j < cells; j++) for (let i = 0; i < cells; i++) for (let k = 0; k < strips; k++) {
+      if ((i + j) % 2 === 0) board(i * cs, j * cs + k * sw, cs, sw, true); else board(i * cs + k * sw, j * cs, sw, cs, false);
+    }
+  } else if (style === 'tile' || style === 'check') {
+    const n = 2, ts = W / n;
+    for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+      const dark = style === 'check' && (i + j) % 2 === 1, k = 0.96 + rnd() * 0.06;
+      g.fillStyle = dark ? `rgb(${b.map((v) => Math.round(v * k)).join(',')})` : mix(rnd() * 0.12, k); g.fillRect(i * ts, j * ts, ts, ts);
+      // 은은한 얼룩
+      for (let q = 0; q < 26; q++) { g.fillStyle = `rgba(${(dark ? a : b).join(',')},${0.015 + rnd() * 0.03})`; g.beginPath(); g.ellipse(i * ts + rnd() * ts, j * ts + rnd() * ts, 20 + rnd() * 90, 14 + rnd() * 50, rnd() * 3.14, 0, 6.3); g.fill(); }
+      g.strokeStyle = style === 'check' ? 'rgba(60,60,60,0.5)' : 'rgba(150,146,138,0.9)'; g.lineWidth = Math.max(2, 4 * px); g.strokeRect(i * ts, j * ts, ts, ts);
+      hg.strokeStyle = '#000'; hg.lineWidth = Math.max(2.5, 5 * px); hg.strokeRect(i * ts, j * ts, ts, ts);
+    }
+  } else {
+    const img = g.createImageData(W, H), d = img.data;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const t = clamp(fbm(x * 0.006, y * 0.006, 4) * 0.8 + fbm(x * 0.05, y * 0.05, 2) * 0.35 - 0.1), q = (y * W + x) * 4;
+      d[q] = a[0] + (b[0] - a[0]) * t; d[q + 1] = a[1] + (b[1] - a[1]) * t; d[q + 2] = a[2] + (b[2] - a[2]) * t; d[q + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+  }
+  const hd = hg.getImageData(0, 0, W, H).data, h = new Float32Array(W * H);
+  for (let i = 0; i < W * H; i++) h[i] = hd[i * 4] / 255;
+  const out = { map: tex(cv, { srgb: true, mirror: true, aniso: 16 }), normalMap: tex(normalFromHeight(h, W, H, 1.1, false), { mirror: true, aniso: 16 }), mm };
+  floorCache.set(key, out);
+  return out;
+}
+
 // ---------------------------------------------------------------- fabric
 export const FABRIC_MM = 58;
 let fabricCache = null, fineFabricCache = null;

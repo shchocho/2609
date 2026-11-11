@@ -62,7 +62,7 @@ export function homePage(root, ctx) {
     h('p', { class: 'scrollcue' }, h('span', { html: icon('down') }), '스크롤하면 만드는 과정이 이어집니다'));
   const chapEls = [hero, ...CHAPTERS.map((c, i) => h('article', { class: 'chapter', dataset: { ch: String(i + 1) } },
     h('span', { class: 'eyebrow' }, `${c.n} — ${c.k}`), h('h2', {}, c.t), h('p', {}, c.d),
-    i === 3 ? h('a', { class: 'btn btn--tape', href: '#collection', onclick: (e) => { e.preventDefault(); document.getElementById('collection').scrollIntoView({ behavior: 'smooth' }); } }, '100가지 가구 고르기') : null))];
+    i === 3 ? h('div', { class: 'hero__cta', style: { marginTop: '0' } }, h('a', { class: 'btn btn--tape', href: '#collection', onclick: (e) => { e.preventDefault(); setView('room'); document.getElementById('collection').scrollIntoView({ behavior: 'smooth' }); } }, '3D 쇼룸 둘러보기'), h('a', { class: 'btn', href: '#collection', onclick: (e) => { e.preventDefault(); document.getElementById('collection').scrollIntoView({ behavior: 'smooth' }); } }, '목록으로 고르기')) : null))];
   const story = h('section', { class: 'story', 'aria-label': '만드는 과정' }, stageCol, h('div', { class: 'story__text wrap' }, chapEls));
 
   // ───── 컬렉션
@@ -73,9 +73,9 @@ export function homePage(root, ctx) {
   const q = h('input', { type: 'search', id: 'q', placeholder: '이름으로 찾기 (예: 빌리, KALLAX)', 'aria-label': '가구 이름으로 찾기', oninput: (e) => { f.q = e.target.value.trim().toLowerCase(); draw(); } });
   const sort = h('select', { id: 'sort', 'aria-label': '정렬', onchange: (e) => { f.sort = e.target.value; draw(); } },
     h('option', { value: 'no' }, '순번순'), h('option', { value: 'name' }, '이름순'), h('option', { value: 'easy' }, '쉬운 것부터'), h('option', { value: 'small' }, '작은 것부터'), h('option', { value: 'big' }, '큰 것부터'));
-  const views = h('div', { class: 'seg', role: 'group', 'aria-label': '보기 방식' },
-    h('button', { type: 'button', 'aria-pressed': 'true', onclick: (e) => { f.view = 'grid'; press(views, e.currentTarget); draw(); }, html: `${icon('grid')}<span class="sr">격자로 보기</span>` }),
-    h('button', { type: 'button', 'aria-pressed': 'false', onclick: (e) => { f.view = 'lineup'; press(views, e.currentTarget); draw(); }, html: `${icon('bars')}<span class="sr">실물 크기로 비교</span>` }));
+  const viewBtn = (id, ic, label) => h('button', { type: 'button', class: 'seg__ic', dataset: { v: id }, 'aria-pressed': String(f.view === id), onclick: () => setView(id), html: `${icon(ic)}<span>${label}</span>` });
+  const views = h('div', { class: 'seg', role: 'group', 'aria-label': '보기 방식' }, viewBtn('grid', 'grid', '격자'), viewBtn('lineup', 'bars', '크기 비교'), viewBtn('room', 'cube', '3D 쇼룸'));
+  function setView(id) { f.view = id; for (const b of views.children) b.setAttribute('aria-pressed', String(b.dataset.v === id)); draw(); }
   const coll = h('section', { class: 'sec wrap', id: 'collection' },
     h('div', { class: 'sec__head' }, h('div', {}, h('h2', {}, '컬렉션'), count), views),
     h('div', { class: 'filters' }, cats, h('label', { class: 'field' }, h('span', { html: icon('search') }), q), h('label', { class: 'field', style: { flex: '0 0 auto', maxWidth: '170px' } }, sort)),
@@ -99,6 +99,38 @@ export function homePage(root, ctx) {
           h('p', { class: 'card__type' }, `${it.ko} ${it.type}`),
           h('p', { class: 'card__dims' }, `${fmt(w / N, 1)} × ${fmt(d / N, 1)} × ${fmt(hh / N, 1)} mm · 1:${N}`))));
   }
+  // ───── 3D 쇼룸: 룸 세트 사이를 돌아다니며 고른다. 필터는 방을 다시 짓지 않고 핀으로 표시한다.
+  let room = null, roomUI = null, roomMatch = null, roomKey = '';
+  function openRoom() {
+    const host = h('div', { class: 'room__host' });
+    const prog = h('div', { class: 'hud hud--tl', role: 'status' }, h('span', { class: 'mono' }, '방 짓는 중…'));
+    const found = h('div', { class: 'hud hud--c', hidden: true });
+    const hint = h('div', { class: 'hud hud--bl' }, '끌어서 이동 · 휠로 확대 · Shift+끌기로 회전 · 가구를 누르면 열립니다');
+    const cardName = h('b', {}), cardType = h('span', {}), cardDims = h('span', { class: 'mono' }), cardGo = h('a', { class: 'btn btn--sm btn--tape', href: '#home' }, '워크벤치 열기');
+    const cardEl = h('div', { class: 'room__card', hidden: true }, h('div', {}, cardName, cardType, cardDims), cardGo);
+    const tools = h('div', { class: 'viewer__tools viewer__tools--tr' },
+      h('button', { type: 'button', class: 'btn btn--sm', onclick: () => room && room.reset() }, '처음 위치'),
+      h('button', { type: 'button', class: 'btn btn--sm btn--icon', 'aria-label': '전체 화면', title: '전체 화면', html: icon('expand'), onclick: () => { (document.fullscreenElement ? document.exitFullscreen() : grid.requestFullscreen && grid.requestFullscreen())?.catch?.(() => {}); } }));
+    grid.append(host, prog, found, hint, cardEl, tools);
+    roomUI = { found };
+    import('../three/showroom.js').then(({ Showroom }) => import('../three/stage.js').then(({ webglSupported }) => {
+      if (disposed || f.view !== 'room' || !host.isConnected) return;
+      if (!webglSupported()) { roomUI = null; grid.replaceChildren(h('p', { class: 'empty' }, '이 기기에서는 3D 쇼룸을 쓸 수 없습니다. 격자 보기를 이용해 주세요.')); return; }
+      room = new Showroom(host, {
+        dark: ctx.isDark(), lowPower: ctx.lowPower, match: roomMatch,
+        onOpen: (it) => { location.hash = `#item-${it.id}`; },
+        onProgress: (a, b) => { prog.firstChild.textContent = a >= b ? `방 16개 · 가구 ${b}개` : `가구 놓는 중 ${a}/${b}`; },
+        onFocus: (it, roomName) => {
+          cardEl.hidden = !it; if (!it) return;
+          cardName.textContent = it.name; cardType.textContent = `${it.ko} ${it.type} · ${roomName}`;
+          cardDims.textContent = `${fmt(it.dims[0] / N, 1)} × ${fmt(it.dims[1] / N, 1)} × ${fmt(it.dims[2] / N, 1)} mm · 1:${N}`;
+          cardGo.setAttribute('href', `#item-${it.id}`);
+        },
+      });
+      room.onFrame = (r) => { const a = r.anchor(); if (a) cardEl.style.transform = `translate(-50%, -100%) translate(${a.x}px, ${a.y}px)`; else if (!cardEl.hidden && r.hover < 0 && r.focus < 0) cardEl.hidden = true; };
+    })).catch(() => { roomUI = null; grid.replaceChildren(h('p', { class: 'empty' }, '3D 쇼룸을 불러오지 못했습니다. 격자 보기를 이용해 주세요.')); });
+  }
+  function closeRoom() { if (room) { room.dispose(); room = null; } roomUI = null; roomKey = ''; }
   function draw() {
     let list = CATALOG.filter((it) => (f.cat === 'all' || it.cat === f.cat) && (!f.q || searchText(it).includes(f.q)));
     const vol = (it) => it.dims[0] * it.dims[1] * it.dims[2];
@@ -107,6 +139,17 @@ export function homePage(root, ctx) {
     else if (f.sort === 'small') list = [...list].sort((a, b) => vol(a) - vol(b));
     else if (f.sort === 'big') list = [...list].sort((a, b) => vol(b) - vol(a));
     count.textContent = `${list.length}개 · 순번은 편집 큐레이션이며 판매 순위가 아닙니다`;
+    if (f.view === 'room') {
+      // 쇼룸은 늘 100개가 제자리에 있고, 필터에 맞는 가구에만 노란 핀을 꽂는다
+      roomMatch = list.length === CATALOG.length ? null : new Set(list.map((it) => it.id));
+      if (!roomUI) { grid.className = 'room'; grid.replaceChildren(); openRoom(); }
+      const key = roomMatch ? [...roomMatch].sort().join(',') : '';
+      if (room && key !== roomKey) room.setMatch(roomMatch);
+      roomKey = key;
+      if (roomUI) { roomUI.found.hidden = !roomMatch; roomUI.found.textContent = roomMatch ? (list.length ? `${list.length}개 찾음 · 노란 핀이 꽂힌 가구입니다` : '조건에 맞는 가구가 없습니다') : ''; }
+      return;
+    }
+    closeRoom();
     grid.className = f.view === 'grid' ? 'grid' : 'lineup';
     grid.replaceChildren();
     if (!list.length) { grid.append(h('p', { class: 'empty' }, '조건에 맞는 가구가 없습니다. 분류를 "전체"로 바꾸거나 다른 이름으로 찾아보세요.')); return; }
@@ -194,13 +237,14 @@ export function homePage(root, ctx) {
     calls();
     apply(true);
     requestAnimationFrame(() => { poster.style.opacity = '0'; });
-    ctx.onTheme = () => stage && stage.setTheme({ dark: ctx.isDark() });
+    ctx.onTheme = () => { if (stage) stage.setTheme({ dark: ctx.isDark() }); if (room) room.setTheme(ctx.isDark()); };
   }).catch(() => {});
 
   return () => {
     disposed = true; ctx.onTheme = null;
     window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll);
     cancelAnimationFrame(raf); offTilt(); offTilt2();
+    closeRoom();
     if (stage) stage.dispose();
   };
 }

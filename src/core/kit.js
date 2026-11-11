@@ -69,6 +69,8 @@ export class Kit {
     if (o.note) base.note = o.note;
     if (o.glow) base.glow = o.glow;
     if (o.inner) base.inner = true;
+    if (o.mat) base.mat = o.mat; // 소품: 마감표를 거치지 않고 재질 키를 직접 지정
+    if (o.lo) base.lo = true; // 소품: 멀리서 보는 저분할 메시에서 분할 수를 더 줄인다
     let list = [base];
     if (o.mx) list = list.concat(list.map((p) => mirror(p, 0)));
     if (o.mz) list = list.concat(list.map((p) => mirror(p, 2)));

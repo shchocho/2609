@@ -66,6 +66,25 @@ const SOFTBOXES = [
 ];
 const ROOM_L = 0.057;
 
+/** 소프트박스 스튜디오를 PMREM 환경맵으로 굽는다(렌더러마다 하나씩 필요). */
+export function studioEnv(renderer) {
+  const s = new THREE.Scene();
+  const mk = (w, h, color, k, pos) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(k), side: THREE.DoubleSide, toneMapped: false }));
+    m.position.set(pos[0], pos[1], pos[2]); m.lookAt(0, 1.5, 0); s.add(m);
+  };
+  s.add(new THREE.Mesh(new THREE.BoxGeometry(60, 36, 60), new THREE.MeshBasicMaterial({ color: new THREE.Color(ROOM_L, ROOM_L * 1.04, ROOM_L * 1.07), side: THREE.BackSide })));
+  for (const b of SOFTBOXES) mk(b.size[0], b.size[1], b.color, b.k, b.pos);
+  mk(40, 40, '#ffffff', 0.42, [0, -6, 0]); // 바닥 반사
+  const pm = new THREE.PMREMGenerator(renderer);
+  const rt = pm.fromScene(s, 0.02);
+  pm.dispose();
+  s.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); });
+  return rt;
+}
+export const ENV_LEVEL = ENV_INTENSITY;
+export const KEY_DIR = [-0.52, 0.62, 0.52];
+
 function halton(i, b) { let f = 1, r = 0; while (i > 0) { f /= b; r += f * (i % b); i = Math.floor(i / b); } return r; }
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
@@ -144,14 +163,6 @@ export class Stage {
 
   // ------------------------------------------------------------ setup
   _buildEnv() {
-    const s = new THREE.Scene();
-    const mk = (w, h, color, k, pos) => {
-      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(k), side: THREE.DoubleSide, toneMapped: false }));
-      m.position.set(pos[0], pos[1], pos[2]); m.lookAt(0, 1.5, 0); s.add(m);
-    };
-    s.add(new THREE.Mesh(new THREE.BoxGeometry(60, 36, 60), new THREE.MeshBasicMaterial({ color: new THREE.Color(ROOM_L, ROOM_L * 1.04, ROOM_L * 1.07), side: THREE.BackSide })));
-    for (const b of SOFTBOXES) mk(b.size[0], b.size[1], b.color, b.k, b.pos);
-    mk(40, 40, '#ffffff', 0.42, [0, -6, 0]); // 바닥 반사
     // 누적 렌더용 로브: 방향, 퍼짐각, 수직 입사 조도(E = 휘도 × 입체각)
     const lobes = SOFTBOXES.map((b) => {
       const p = new THREE.Vector3(b.pos[0], b.pos[1] - 1.5, b.pos[2]), d2 = p.lengthSq();
@@ -162,10 +173,7 @@ export class Stage {
     let acc = 0;
     for (const l of lobes) { acc += l.E / total; l.cum = acc; }
     this.lobes = lobes; this.lobeTotal = total;
-    const pm = new THREE.PMREMGenerator(this.renderer);
-    this.envRT = pm.fromScene(s, 0.02);
-    pm.dispose();
-    s.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); });
+    this.envRT = studioEnv(this.renderer);
     this.scene.environment = this.envRT.texture;
     this.scene.environmentIntensity = ENV_INTENSITY;
   }
