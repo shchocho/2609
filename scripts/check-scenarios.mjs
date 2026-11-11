@@ -11,7 +11,7 @@ const ROOT = fileURLToPath(new URL('../src/scenarios/', import.meta.url)); // .p
 const TRACKS = ['sales', 'hr', 'finance', 'procurement', 'ops', 'm365-apps', 'copilot-code', 'power-automate', 'copilot-studio'];
 const AGENTS = ['chat', 'cowork', 'office', 'flow', 'studio', 'code'];
 /** 앱 창에서 재생하는 agent 와 그 화면(surface) */
-const WINDOWS = { office: ['word', 'excel', 'powerpoint'], flow: ['cloudflow', 'deskflow'], studio: ['studio'], code: ['code'] };
+const WINDOWS = { office: ['word', 'excel', 'powerpoint', 'outlook', 'forms', 'teams'], flow: ['cloudflow', 'deskflow'], studio: ['studio'], code: ['code'] };
 const ROLES = new Set(['user', 'assistant', 'tool', 'note', 'cue', 'spot', 'approve', 'choice', 'hunt']);
 const HUNT_TARGETS = new Set(['model', 'effort', 'attach', 'new', 'mine', 'auto', 'custom']);
 const ZONES = { chat: ['rail', 'top', 'stream', 'actions', 'composer'], cowork: ['rail', 'stream', 'composer'], office: ['ribbon', 'canvas', 'pane', 'composer'] }; // 앱 창 화면(WINDOWS)은 모두 office 와 같은 영역을 쓴다

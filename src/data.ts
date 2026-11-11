@@ -52,7 +52,8 @@ export const isApp = (x: string): x is AppId => x in APPS;
 
 /** 화면에 보일 제품 이름 — Office 앱 안의 Copilot 은 "Copilot in Word" 처럼 앱 이름을 붙인다 */
 export const productName = (s: Scenario) =>
-  s.agent === 'office' && s.surface && isApp(s.surface) ? `Copilot in ${APPS[s.surface].name}` : AGENTS[s.agent].full;
+  // Forms 처럼 APPS 에 없는 앱은 화면 이름의 첫 글자를 대문자로 쓴다
+  s.agent === 'office' && s.surface ? `Copilot in ${isApp(s.surface) ? APPS[s.surface].name : s.surface[0].toUpperCase() + s.surface.slice(1)}` : AGENTS[s.agent].full;
 
 export const MODELS = [
   { v: '자동', d: '작업에 가장 적합한 모델' },

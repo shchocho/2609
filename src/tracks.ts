@@ -71,12 +71,12 @@ export const TRACKS: Track[] = [
   {
     id: 'm365-apps',
     group: 'product',
-    products: ['word', 'powerpoint', 'excel'],
+    products: ['word', 'powerpoint', 'excel', 'outlook', 'teams', 'forms'],
     name: 'Copilot in 앱',
     icon: '📝',
     color: '#185abd',
     textColor: '#124078',
-    about: 'Word·PowerPoint·Excel 안에서 초안, 발표자료, 데이터 분석을 맡깁니다.',
+    about: 'Word·Excel·PowerPoint·Outlook·Teams·Forms 안에서 바로 Copilot에 맡깁니다.',
   },
   {
     id: 'copilot-code',

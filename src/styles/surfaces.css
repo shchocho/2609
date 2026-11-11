@@ -222,25 +222,41 @@
 :is(.sc-shell.is-office, .desk-win.is-doc)[data-app=studio] .wb-wd-sec { margin: 0; padding: 14px 18px 16px; background: #fff; border: 1px solid #e1dfdd; border-radius: var(--borderRadiusXLarge); box-shadow: 0 1px 2px rgba(0, 0, 0, .05); }
 :is(.sc-shell.is-office, .desk-win.is-doc)[data-app=studio] .wb-wd-sec h4 { margin-top: 0; color: var(--track-ink); }
 /* 단계마다 새로 붙는 설정·화면 조각이 떠오르듯 나타난다 */
-.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-canvas .wb-wd-page > div { animation: sf-rise .35s ease both; }
+.sc-shell.is-office:is([data-app=studio], [data-app=code], [data-app=forms]) .sc-canvas .wb-wd-page > div { animation: sf-rise .35s ease both; }
 @keyframes sf-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .sc-shell.is-office .sc-canvas .wb-wd-page > div { animation: none; } }
 
 /* ---------- Copilot Code: 앱 미리보기 (문서 블록을 앱 화면처럼 보인다 — 체험 화면과 결과 화면 모두) ---------- */
 .sc-shell.is-office[data-app=code], .desk-win.is-doc[data-app=code] { --track: #0f7b6c; --track-ink: #0b5a4f; }
 .sc-shell.is-office[data-app=code] .sc-canvas { background: #eef1f0; }
-:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-wd { padding: 18px 22px 26px; background: #eef1f0; }
-:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-wd-page { max-width: 600px; padding: 0 20px 20px; display: grid; gap: 10px; line-height: 1.6; overflow: hidden; background: #fff; border: 1px solid #d6dbd9; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .08); }
-:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-wd-h1 { margin: 0 -20px; padding: 12px 20px; font-size: 16px; color: #fff; background: var(--track); border-bottom: 0; }
-:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-wd-meta { margin: 0 -20px; padding: 5px 20px; font-size: 11.5px; color: var(--track-ink); background: color-mix(in srgb, var(--track) 10%, #fff); }
-:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-wd-sec { margin: 4px 0 0; }
-:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-wd-sec h4 { margin: 0 0 4px; }
-:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-ol-f { margin: 0; padding: 0; display: grid; grid-template-columns: 84px minmax(0, 1fr); align-items: center; gap: 10px; border: 0; }
-:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-ol-f u { font-size: 12.5px; text-decoration: none; color: #605e5c; }
-:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-ol-f b { min-height: 32px; padding: 5px 10px; font-size: 13px; font-weight: 400; background: #fff; border: 1px solid #c8c6c4; border-radius: 6px; }
-:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-ct-note { margin: 0; padding: 8px 12px; font-size: 12.5px; color: var(--track-ink); background: color-mix(in srgb, var(--track) 10%, #fff); border: 0; border-radius: 6px; }
-:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-xl-chart { width: auto; margin: 0; box-shadow: none; border-color: #e1dfdd; border-radius: 8px; }
-:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-xl-chart i { background: var(--track); }
-:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=code] .wb-xl-chart .is-warn i { background: #d13438; }
+:is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-wd { padding: 18px 22px 26px; background: #eef1f0; }
+:is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-wd-page { max-width: 600px; padding: 0 20px 20px; display: grid; gap: 10px; line-height: 1.6; overflow: hidden; background: #fff; border: 1px solid #d6dbd9; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .08); }
+:is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-wd-h1 { margin: 0 -20px; padding: 12px 20px; font-size: 16px; color: #fff; background: var(--track); border-bottom: 0; }
+:is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-wd-meta { margin: 0 -20px; padding: 5px 20px; font-size: 11.5px; color: var(--track-ink); background: color-mix(in srgb, var(--track) 10%, #fff); }
+:is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-wd-sec { margin: 4px 0 0; }
+:is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-wd-sec h4 { margin: 0 0 4px; }
+:is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-ol-f { margin: 0; padding: 0; display: grid; grid-template-columns: 84px minmax(0, 1fr); align-items: center; gap: 10px; border: 0; }
+:is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-ol-f u { font-size: 12.5px; text-decoration: none; color: #605e5c; }
+:is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-ol-f b { min-height: 32px; padding: 5px 10px; font-size: 13px; font-weight: 400; background: #fff; border: 1px solid #c8c6c4; border-radius: 6px; }
+:is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-ct-note { margin: 0; padding: 8px 12px; font-size: 12.5px; color: var(--track-ink); background: color-mix(in srgb, var(--track) 10%, #fff); border: 0; border-radius: 6px; }
+:is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-xl-chart { width: auto; margin: 0; box-shadow: none; border-color: #e1dfdd; border-radius: 8px; }
+:is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-xl-chart i { background: var(--track); }
+:is(.sc-shell.is-office, .desk-win.is-doc):is([data-app=code], [data-app=forms]) .wb-xl-chart .is-warn i { background: #d13438; }
 .wb-app-btn { margin: 2px 0 0; text-align: right; }
 .wb-app-btn u { display: inline-block; padding: 7px 22px; font-size: 13px; font-weight: 600; text-decoration: none; color: #fff; background: var(--track, #0f7b6c); border-radius: 6px; }
+
+/* ---------- Copilot in Outlook · Teams · Forms ---------- */
+.sc-shell.is-office[data-app=outlook] { --track: var(--m365-outlook-bright); --track-ink: var(--m365-outlook-dark); }
+.sc-shell.is-office[data-app=outlook] .sc-canvas { background: #fff; }
+.sc-shell.is-office[data-app=teams] { --track: var(--m365-teams-bright); --track-ink: var(--m365-teams-dark); }
+.sc-shell.is-office[data-app=forms], .desk-win.is-doc[data-app=forms] { --track: #038387; --track-ink: #025e60; }
+.sc-shell.is-office[data-app=forms] .sc-canvas { background: #eef1f0; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=forms] .wb-wd-sec { padding: 10px 14px 12px; border: 1px solid #e1dfdd; border-radius: 8px; }
+:is(.sc-shell.is-office, .desk-win.is-doc)[data-app=forms] .wb-wd-sec ul { list-style: "○  "; }
+
+/* 제품별 보기: 열이 네 개 이상이면 제목과 글자를 줄여 옆 열과 겹치지 않게 한다 */
+.booth-product-board:has(> article:nth-child(4)) > article { padding-inline: clamp(8px, 1vw, 14px); }
+.booth-product-board:has(> article:nth-child(4)) header > h2 { font-size: min(3.4cqh, 1.7cqw); }
+.booth-product-board:has(> article:nth-child(4)) .booth-product-body > p { font-size: min(3cqh, 1.25cqw); }
+.booth-product-board:has(> article:nth-child(4)) li button { font-size: min(3cqh, 1.3cqw); padding: min(2.4cqh, 1.1cqw); }
+.booth-product-board:has(> article:nth-child(6)) header > h2 { font-size: min(3cqh, 1.42cqw); }

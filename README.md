@@ -41,13 +41,16 @@ Microsoft **Copilot Chat**과 **Copilot Cowork**가 실제 업무를 어떻게 �
 | | 설비 모니터링 SaaS 기술 문의 답변과 고객 안내 자료 준비 | Cowork |
 | | 차세대 진동 센서·예지보전 출시 보도자료 초안 | Chat |
 
-### 제품 기능 체험 (12편 · `docs/EXPANSION-PLAN.md`)
+### 제품 기능 체험 (15편 · `docs/EXPANSION-PLAN.md`)
 
 | 영역 | 시나리오 | 제품 |
 |---|---|---|
 | Copilot in 앱 | 회의 메모와 지난 제안서로 고객 제안서 초안 쓰기 | Copilot in Word |
 | | 회사 템플릿에서 Word 제안서로 10장 발표자료 만들기 | Copilot in PowerPoint |
 | | 분기 영업 실적 시트에서 원인 분석·수식 열·차트 만들기 | Copilot in Excel |
+| | 긴 메일 스레드 요약하고 답장 초안 쓰기 | Copilot in Outlook |
+| | 늦게 들어간 회의를 따라잡고 할 일 정리하기 | Copilot in Teams |
+| | 교육 만족도 설문을 말로 만들고 응답 요약하기 | Copilot in Forms |
 | Power Automate | 레거시 ERP에 발주서 입력하는 데스크톱 흐름(RPA) | 데스크톱 흐름 |
 | | 경비 증빙 메일을 승인과 Teams 알림까지 잇는 클라우드 흐름(DPA) | 클라우드 흐름 |
 | | 매일 아침 재고 보고: 클라우드 흐름이 데스크톱 흐름 호출 | 클라우드 + 데스크톱 흐름 |
@@ -99,7 +102,7 @@ Azure Static Web Apps를 쓸 때는 함께 들어 있는 `staticwebapp.config.js
 
 - **문구(제목, 안내, 푸터)**: `src/copy.ts`
 - **업무 영역(이름, 설명, 색)**: `src/tracks.ts`. 홈 카드 아이콘은 `src/components/Icons.tsx`
-- **앱 창 시나리오**: `"agent": "office"` 와 `"surface": "word" | "excel" | "powerpoint"`, `"agent": "flow"` 와 `"surface": "cloudflow" | "deskflow"`(Power Automate 흐름 디자이너), `"agent": "studio"` 와 `"surface": "studio"`(Copilot Studio 에이전트 화면 — 가운데는 `app: "studio"` 인 문서 결과물이 설정 카드로 보입니다), 또는 `"agent": "code"` 와 `"surface": "code"`(Microsoft Copilot 앱의 Code 탭 — 가운데는 `app: "code"` 인 문서 결과물이 앱 미리보기로 보이고, 블록 `field`·`button`·`chart` 가 입력란·단추·막대 차트가 됩니다)를 주면 Cowork 화면 대신 앱 창과 오른쪽 창에서 재생합니다. 흐름은 결과물 `kind: "flow"` 의 `flow.steps`(트리거·작업 카드)로 적고, `flow.run` 이 참이면 단계마다 결과(`state`, `note`)가 붙는 실행 기록이 됩니다. `flow.screen`(대상 프로그램의 메뉴·입력란·단추)과 단계의 `do`(화면 조작 목록)를 적으면, 흐름 옆에 그 프로그램 화면이 뜨고 커서가 움직이며 값이 입력되는 모습이 재생됩니다. 가운데 문서는 `workbench.artifacts` 중 그 앱의 결과물입니다(화면: `src/surfaces/AppWindow.tsx`, 스타일: `src/styles/surfaces.css`). 덱 슬라이드에 `only`/`not` 을 쓰면 선택에 따라 슬라이드가 들어가고 빠지며, 시트의 `charts` 는 표 아래에 막대 차트를 넣습니다.
+- **앱 창 시나리오**: `"agent": "office"` 와 `"surface": "word" | "excel" | "powerpoint" | "outlook" | "teams" | "forms"`, `"agent": "flow"` 와 `"surface": "cloudflow" | "deskflow"`(Power Automate 흐름 디자이너), `"agent": "studio"` 와 `"surface": "studio"`(Copilot Studio 에이전트 화면 — 가운데는 `app: "studio"` 인 문서 결과물이 설정 카드로 보입니다), 또는 `"agent": "code"` 와 `"surface": "code"`(Microsoft Copilot 앱의 Code 탭 — 가운데는 `app: "code"` 인 문서 결과물이 앱 미리보기로 보이고, 블록 `field`·`button`·`chart` 가 입력란·단추·막대 차트가 됩니다)를 주면 Cowork 화면 대신 앱 창과 오른쪽 창에서 재생합니다. 흐름은 결과물 `kind: "flow"` 의 `flow.steps`(트리거·작업 카드)로 적고, `flow.run` 이 참이면 단계마다 결과(`state`, `note`)가 붙는 실행 기록이 됩니다. `flow.screen`(대상 프로그램의 메뉴·입력란·단추)과 단계의 `do`(화면 조작 목록)를 적으면, 흐름 옆에 그 프로그램 화면이 뜨고 커서가 움직이며 값이 입력되는 모습이 재생됩니다. 가운데 문서는 `workbench.artifacts` 중 그 앱의 결과물입니다(화면: `src/surfaces/AppWindow.tsx`, 스타일: `src/styles/surfaces.css`). 덱 슬라이드에 `only`/`not` 을 쓰면 선택에 따라 슬라이드가 들어가고 빠지며, 시트의 `charts` 는 표 아래에 막대 차트를 넣습니다.
 - **시나리오**: `src/scenarios/<영역>/<id>.scenario.json`. 파일을 추가하면 목록에 자동으로 나타납니다. 고친 뒤 검사를 돌리세요.
 
 ```bash
@@ -124,6 +127,7 @@ npm run check:scenarios
 - `docs/LOCAL-HANDOFF.md`: 내 PC 의 Claude Code 로 이어서 작업하는 방법과 붙여 넣을 프롬프트
 - `docs/reference/`: 원본 부스 화면을 분석한 엔진·렌더링 명세(필요한 절만 찾아 읽기)
 - `scripts/e2e.cjs`: 시나리오 하나를 결과 화면까지 자동 진행하는 테스트(Playwright 필요)
+- `npm run e2e:all`: 개발 서버를 띄운 채 모든 시나리오를 차례로 돌려 통과 여부를 한 줄씩 보여 줍니다(`npm run e2e:all -- <영역>` 으로 한 영역만)
 
 ## 참고
 

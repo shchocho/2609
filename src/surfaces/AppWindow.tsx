@@ -48,6 +48,33 @@ const UI: Record<string, Ui> = {
     input: '만들거나 편집할 항목 설명',
     status: '',
   },
+  outlook: {
+    app: 'Outlook',
+    tabs: ['파일', '홈', '보기', '도움말'],
+    groups: [['✉', '새 메일'], ['🗑', '삭제'], ['↩', '회신'], ['⏩', '전달'], ['◈', 'Copilot']],
+    pane: 'Copilot',
+    head: '메일을 요약하거나 답장 초안을 써 드립니다.',
+    input: 'Copilot에게 물어보기',
+    status: '받은 편지함',
+  },
+  teams: {
+    app: 'Teams',
+    tabs: ['채팅', '요약', '녹취록', '파일'],
+    groups: [['💬', '채팅'], ['👥', '참가자'], ['✋', '손들기'], ['◈', 'Copilot']],
+    pane: 'Copilot',
+    head: '이 회의에 대해 물어보세요.',
+    input: '이 회의에 대해 질문하기',
+    status: '회의 · 녹취 켜짐',
+  },
+  forms: {
+    app: 'Forms',
+    tabs: ['내 양식', '질문', '응답', '설정'],
+    groups: [['👁', '미리 보기'], ['🎨', '스타일'], ['📤', '응답 수집'], ['◈', 'Copilot']],
+    pane: 'Copilot',
+    head: '만들 설문을 말로 설명해 보세요.',
+    input: '묻고 싶은 내용을 설명하세요',
+    status: '내 양식',
+  },
   cloudflow: {
     app: 'Power Automate',
     tabs: ['내 흐름', '클라우드 흐름 편집'],
@@ -114,7 +141,7 @@ export function AppWindow({ s, st, vars, ids, streamRef, mark, ask, onSend, pick
     <div className="sc-shell is-office" data-app={surface}>
       <div className="sc-win">
         <span className="sc-win-name">
-          {s.agent === 'office' && <span className="sc-save">자동 저장 ●</span>}{doc ? artifactName(doc, ids) : s.title} · {ui.app}
+          {!ui.pane && <span className="sc-save">자동 저장 ●</span>}{doc ? artifactName(doc, ids) : s.title} · {ui.app}
         </span>
         <span className="sc-win-search">⌕ 검색</span>
         <span className="sc-win-btns" aria-hidden="true"><i>─</i><i>▢</i><i>✕</i></span>
@@ -153,7 +180,7 @@ export function AppWindow({ s, st, vars, ids, streamRef, mark, ask, onSend, pick
       <div className="sc-status">
         <span>{surface === 'powerpoint' ? `슬라이드 ${slide}/${slides}` : ui.status}</span>
         <span>한국어</span>
-        {s.agent === 'office' && <span className="sc-status-end">─ ───●─── ＋ 77%</span>}
+        {!ui.pane && <span className="sc-status-end">─ ───●─── ＋ 77%</span>}
       </div>
     </div>
   );

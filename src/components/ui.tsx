@@ -80,6 +80,7 @@ const LETTER: Record<string, [string, string]> = {
   deskflow: ['▸', '#0066ff'],
   studio: ['✦', '#7a5cff'],
   code: ['◇', '#0f7b6c'],
+  forms: ['F', '#038387'],
   scout: ['S', 'var(--copilot-black, #242424)'],
 };
 
