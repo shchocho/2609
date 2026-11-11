@@ -208,6 +208,7 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
                 s={s} st={st} vars={vars} ids={ids} streamRef={streamRef} mark={mark}
                 ask={ask} onSend={ask ? onSend : undefined} pick={pick} pickPhase={pickPhase} onPickSelect={selectPick}
                 onSlide={n => setSt(x => ({ ...x, slide: n }))}
+                target={holdAt === null && !ask ? p.pending?.target : undefined} onAct={p.act}
               >
                 {stream}
               </AppWindow>
@@ -274,9 +275,11 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
                 </Tip>
               )}
               {holdAt === null && p.pending && pickDone && (
-                <Tip zone=".zone-composer">
+                <Tip zone={p.pending.target && !p.ask ? `[data-act="${p.pending.target}"]` : '.zone-composer'}>
                   <Bubble q={p.pending.text}>
-                    {p.ask ? <Hint><Key>{WE.send}</Key>을 눌러 보내 보세요.</Hint> : <CueButton onClick={p.act}>{p.pending.action}</CueButton>}
+                    {p.ask ? <Hint><Key>{WE.send}</Key>을 눌러 보내 보세요.</Hint>
+                      : p.pending.target ? <Hint>화면에서 <b>{p.pending.action}</b> 단추를 눌러 보세요.</Hint>
+                      : <CueButton onClick={p.act}>{p.pending.action}</CueButton>}
                   </Bubble>
                 </Tip>
               )}

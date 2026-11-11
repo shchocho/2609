@@ -69,6 +69,7 @@ fs.mkdirSync(OUT, { recursive: true });
       if (acted) await page.waitForTimeout(500);
     }
     // 3) 말풍선 버튼 (이어서 보기 · 다음 단계 · 결과 보기 · cue)
+    if (!acted) acted = await click('[data-act].is-hunt', 'act'); // 화면 안의 단추를 직접 누르는 단계
     if (!acted) acted = await click('.wb-tip .sc-cue-btn', 'cue-btn');
     // 4) 보내기
     if (!acted) acted = await click(".cw-send.is-hunt:not([disabled]), .composer .round-btn.send.is-hunt, .sc-pane-send.is-hunt", "send");

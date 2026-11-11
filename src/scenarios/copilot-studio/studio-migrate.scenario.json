@@ -4,7 +4,9 @@
   "order": 3,
   "agent": "studio",
   "surface": "studio",
-  "apps": ["teams"],
+  "apps": [
+    "teams"
+  ],
   "model": "자동",
   "title": "Standard 에이전트를 Microsoft Copilot harness로 옮기고 결과 비교",
   "summary": "토픽으로 만든 Standard 에이전트를 /migrate 로 Microsoft Copilot harness 에이전트로 옮기고, 같은 질문에 답이 어떻게 달라지는지 비교합니다.",
@@ -95,7 +97,10 @@
           {
             "kind": "head",
             "text": "IT 헬프데스크",
-            "meta": ["Standard 하네스", "게시됨 · Microsoft Teams"]
+            "meta": [
+              "Standard 하네스",
+              "게시됨 · Microsoft Teams"
+            ]
           },
           {
             "kind": "section",
@@ -114,11 +119,23 @@
             "kind": "section",
             "title": "토픽",
             "table": {
-              "head": ["토픽", "트리거 문구"],
+              "head": [
+                "토픽",
+                "트리거 문구"
+              ],
               "rows": [
-                ["비밀번호 재설정", "비밀번호를 잊어버렸어요 · 계정이 잠겼어요"],
-                ["장비 고장 접수", "노트북이 안 켜져요 · 모니터가 고장났어요"],
-                ["소프트웨어 설치 요청", "프로그램을 설치해 주세요 · 라이선스가 필요해요"]
+                [
+                  "비밀번호 재설정",
+                  "비밀번호를 잊어버렸어요 · 계정이 잠겼어요"
+                ],
+                [
+                  "장비 고장 접수",
+                  "노트북이 안 켜져요 · 모니터가 고장났어요"
+                ],
+                [
+                  "소프트웨어 설치 요청",
+                  "프로그램을 설치해 주세요 · 라이선스가 필요해요"
+                ]
               ]
             }
           }
@@ -134,15 +151,25 @@
         "blocks": [
           {
             "kind": "head",
-            "not": ["live"],
+            "not": [
+              "live"
+            ],
             "text": "IT 헬프데스크",
-            "meta": ["Microsoft Copilot harness", "초안 · 게시 전"]
+            "meta": [
+              "Microsoft Copilot harness",
+              "초안 · 게시 전"
+            ]
           },
           {
             "kind": "head",
-            "only": ["live"],
+            "only": [
+              "live"
+            ],
             "text": "IT 헬프데스크",
-            "meta": ["Microsoft Copilot harness", "게시됨 · Microsoft Teams"]
+            "meta": [
+              "Microsoft Copilot harness",
+              "게시됨 · Microsoft Teams"
+            ]
           },
           {
             "kind": "section",
@@ -167,9 +194,13 @@
           },
           {
             "kind": "section",
-            "only": ["live"],
+            "only": [
+              "live"
+            ],
             "title": "채널",
-            "items": ["**Microsoft Teams** — 게시됨"]
+            "items": [
+              "**Microsoft Teams** — 게시됨"
+            ]
           }
         ]
       }
@@ -248,27 +279,41 @@
     },
     {
       "role": "assistant",
-      "only": ["multi"],
+      "only": [
+        "multi"
+      ],
       "at": "오후 3:20",
       "text": "새 노트북 설정을 순서대로 안내하겠습니다.\n\n✅ **1. VPN 설정** — 안내서 2쪽의 접속 프로필을 설치합니다\n✅ **2. 사내 메신저 설치** — IT 지원 포털의 설치 요청 양식으로 신청합니다\n✅ **3. 보안 프로그램 등록** — IT 지원 포털의 등록 화면에서 기기를 등록합니다\n\n출처: VPN·계정 안내서, IT 지원 포털"
     },
     {
       "role": "assistant",
-      "only": ["reset"],
+      "only": [
+        "reset"
+      ],
       "at": "오후 3:20",
       "text": "비밀번호 재설정을 도와드리겠습니다.\n\n✅ 사번과 등록된 휴대전화 번호로 본인 확인을 합니다\n✅ 확인되면 재설정 링크를 회사 메일과 문자로 보냅니다\n\n사번을 알려 주세요."
     },
     {
       "role": "note",
-      "only": ["multi"],
+      "only": [
+        "multi"
+      ],
       "text": "Standard 에이전트는 한 가지만 답했고, 옮긴 에이전트는 세 가지를 나누어 순서대로 답했습니다.",
       "delayMs": 600
     },
     {
       "role": "note",
-      "only": ["reset"],
+      "only": [
+        "reset"
+      ],
       "text": "토픽에 있던 요청에는 Standard 에이전트와 같은 순서로 답했습니다. 나머지 토픽 두 개도 같은 방법으로 확인합니다.",
       "delayMs": 600
+    },
+    {
+      "role": "cue",
+      "text": "두 하네스의 답을 비교했습니다. 화면 위쪽의 게시 단추로 옮긴 에이전트를 엽니다.",
+      "action": "게시",
+      "target": "publish"
     },
     {
       "role": "approve",
@@ -276,9 +321,18 @@
       "kind": "채널",
       "line": "차이를 확인했으면 옮긴 에이전트를 게시합니다.",
       "rows": [
-        { "label": "채널", "value": "Microsoft Teams" },
-        { "label": "하네스", "value": "Microsoft Copilot harness" },
-        { "label": "대상", "value": "누리테크 구성원" }
+        {
+          "label": "채널",
+          "value": "Microsoft Teams"
+        },
+        {
+          "label": "하네스",
+          "value": "Microsoft Copilot harness"
+        },
+        {
+          "label": "대상",
+          "value": "누리테크 구성원"
+        }
       ],
       "go": "게시",
       "denied": "게시하지 않았습니다. 옮긴 에이전트는 초안으로 남아 있습니다."

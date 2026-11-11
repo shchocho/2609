@@ -4,7 +4,9 @@
   "order": 1,
   "agent": "studio",
   "surface": "studio",
-  "apps": ["teams"],
+  "apps": [
+    "teams"
+  ],
   "model": "자동",
   "title": "Standard 하네스로 IT 헬프데스크 에이전트 만들기",
   "summary": "지식 원본을 붙이고 토픽과 트리거 문구를 정해 IT 헬프데스크 에이전트를 만들고, 테스트한 뒤 Teams에 게시합니다.",
@@ -99,15 +101,25 @@
         "blocks": [
           {
             "kind": "head",
-            "not": ["live"],
+            "not": [
+              "live"
+            ],
             "text": "IT 헬프데스크",
-            "meta": ["Standard 하네스", "초안 · 게시 전"]
+            "meta": [
+              "Standard 하네스",
+              "초안 · 게시 전"
+            ]
           },
           {
             "kind": "head",
-            "only": ["live"],
+            "only": [
+              "live"
+            ],
             "text": "IT 헬프데스크",
-            "meta": ["Standard 하네스", "게시됨 · Microsoft Teams"]
+            "meta": [
+              "Standard 하네스",
+              "게시됨 · Microsoft Teams"
+            ]
           },
           {
             "kind": "section",
@@ -116,41 +128,65 @@
           },
           {
             "kind": "section",
-            "only": ["kb"],
+            "only": [
+              "kb"
+            ],
             "title": "지식",
             "items": [
               "**IT 지원 포털** — SharePoint 사이트",
               "**VPN·계정 안내서.pdf** — 파일"
-            ]
+            ],
+            "label": "지식 추가"
           },
           {
             "kind": "section",
-            "only": ["topics"],
+            "only": [
+              "topics"
+            ],
             "title": "토픽",
             "table": {
-              "head": ["토픽", "트리거 문구"],
+              "head": [
+                "토픽",
+                "트리거 문구"
+              ],
               "rows": [
-                ["비밀번호 재설정", "비밀번호를 잊어버렸어요 · 계정이 잠겼어요"],
-                ["장비 고장 접수", "노트북이 안 켜져요 · 모니터가 고장났어요"],
-                ["소프트웨어 설치 요청", "프로그램을 설치해 주세요 · 라이선스가 필요해요"]
+                [
+                  "비밀번호 재설정",
+                  "비밀번호를 잊어버렸어요 · 계정이 잠겼어요"
+                ],
+                [
+                  "장비 고장 접수",
+                  "노트북이 안 켜져요 · 모니터가 고장났어요"
+                ],
+                [
+                  "소프트웨어 설치 요청",
+                  "프로그램을 설치해 주세요 · 라이선스가 필요해요"
+                ]
               ]
-            }
+            },
+            "label": "토픽 추가"
           },
           {
             "kind": "section",
-            "only": ["live"],
+            "only": [
+              "live"
+            ],
             "title": "채널",
-            "items": ["**Microsoft Teams** — 게시됨"]
+            "items": [
+              "**Microsoft Teams** — 게시됨"
+            ]
           }
         ]
       }
-    }
+    },
+    "ask": "누리테크 구성원의 IT 문의에 답하는 헬프데스크 에이전트입니다. 안내서에 있는 내용만 답하고, 없으면 IT 지원 포털 접수를 안내합니다."
   },
   "messages": [
     {
       "role": "cue",
-      "text": "IT 지원팀에는 같은 질문이 매일 들어옵니다. Standard 하네스로 헬프데스크 에이전트를 만들어 봅니다.",
-      "action": "에이전트 만들기"
+      "text": "IT 지원팀에는 같은 질문이 매일 들어옵니다. 만들 에이전트를 설명한 글이 준비되어 있습니다. Standard 하네스로 만들어 봅니다.",
+      "action": "만들기",
+      "target": "create"
     },
     {
       "role": "tool",
@@ -160,8 +196,9 @@
     },
     {
       "role": "cue",
-      "text": "에이전트가 답의 근거로 삼을 자료를 붙입니다.",
-      "action": "지식 원본 추가"
+      "text": "에이전트가 만들어졌습니다. 답의 근거로 삼을 자료부터 붙입니다.",
+      "action": "지식 추가",
+      "target": "kb"
     },
     {
       "role": "tool",
@@ -172,7 +209,8 @@
     {
       "role": "cue",
       "text": "자주 오는 요청은 토픽으로 대화 순서를 직접 정해 둡니다.",
-      "action": "토픽 추가"
+      "action": "토픽 추가",
+      "target": "topics"
     },
     {
       "role": "tool",
@@ -185,9 +223,18 @@
       "plain": true,
       "text": "Standard 하네스에서, 사용자의 말을 듣고 어떤 토픽을 시작할지 정하는 것은 무엇일까요?",
       "options": [
-        { "at": "canvas", "label": "트리거 문구" },
-        { "at": "pane", "label": "테스트 창" },
-        { "at": "ribbon", "label": "게시 단추" }
+        {
+          "at": "canvas",
+          "label": "트리거 문구"
+        },
+        {
+          "at": "pane",
+          "label": "테스트 창"
+        },
+        {
+          "at": "ribbon",
+          "label": "게시 단추"
+        }
       ],
       "answer": 0,
       "does": "맞아요. 토픽마다 적어 둔 트리거 문구와 비슷한 말이 들어오면 그 토픽이 시작됩니다."
@@ -233,14 +280,29 @@
       "text": "안내서에서 찾은 내용입니다.\n\n✅ 오류 809는 공유기나 방화벽이 VPN 연결을 막을 때 나타납니다\n✅ 공유기 설정에서 **VPN 통과(IPsec)** 를 켠 뒤 다시 연결해 보세요\n✅ 그래도 안 되면 IT 지원 포털에서 원격 지원을 신청할 수 있습니다\n\n출처: VPN·계정 안내서 3쪽"
     },
     {
+      "role": "cue",
+      "text": "테스트를 마쳤습니다. 화면 위쪽의 게시 단추로 구성원에게 엽니다.",
+      "action": "게시",
+      "target": "publish"
+    },
+    {
       "role": "approve",
       "what": "에이전트 게시",
       "kind": "채널",
       "line": "게시하면 구성원이 아래 채널에서 에이전트와 대화할 수 있습니다.",
       "rows": [
-        { "label": "채널", "value": "Microsoft Teams" },
-        { "label": "대상", "value": "누리테크 구성원" },
-        { "label": "하네스", "value": "Standard" }
+        {
+          "label": "채널",
+          "value": "Microsoft Teams"
+        },
+        {
+          "label": "대상",
+          "value": "누리테크 구성원"
+        },
+        {
+          "label": "하네스",
+          "value": "Standard"
+        }
       ],
       "go": "게시",
       "denied": "게시하지 않았습니다. 에이전트는 초안으로 남아 있습니다."

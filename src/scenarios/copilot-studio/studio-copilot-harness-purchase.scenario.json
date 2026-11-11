@@ -88,7 +88,10 @@
           {
             "kind": "head",
             "text": "구매 요청 처리",
-            "meta": ["Microsoft Copilot harness", "초안 · 게시 전"]
+            "meta": [
+              "Microsoft Copilot harness",
+              "초안 · 게시 전"
+            ]
           },
           {
             "kind": "section",
@@ -97,62 +100,87 @@
           },
           {
             "kind": "section",
-            "only": ["tools"],
+            "only": [
+              "skills"
+            ],
             "title": "스킬",
             "items": [
               "**견적 비교 기준** — 운송비와 설치비를 더한 총액으로 비교",
               "**납기 확인** — 요청 납기와 견적 납기를 대조"
-            ]
+            ],
+            "label": "스킬 추가"
           },
           {
             "kind": "section",
-            "only": ["tools"],
+            "only": [
+              "tools"
+            ],
             "title": "도구",
             "items": [
               "**MCP 서버 · 누리ERP 구매** — 견적 조회, 발주 등록",
               "**워크플로 · 결재 상신** — 구매 품의를 결재선에 올리기"
-            ]
+            ],
+            "label": "도구 추가"
           },
           {
             "kind": "section",
-            "only": ["hooks"],
+            "only": [
+              "hooks"
+            ],
             "title": "훅",
             "items": [
               "**도구 실행 전** — 500만원 이상 발주 등록은 사람 승인을 받는다",
               "**응답 후** — 처리 내역을 감사 로그에 남긴다"
-            ]
+            ],
+            "label": "훅 추가"
           }
         ]
       }
-    }
+    },
+    "ask": "구매 요청이 오면 품목과 수량, 납기를 확인합니다. 받은 견적을 같은 기준으로 비교해 총액과 납기를 모두 맞추는 곳을 고릅니다. 발주는 초안으로 등록하고 구매 품의 결재를 올립니다. 견적이 3건보다 적거나 납기를 맞추는 곳이 없으면 등록하지 말고 요청자에게 되묻습니다."
   },
   "messages": [
     {
       "role": "cue",
-      "text": "Microsoft Copilot harness(구 GitHub Copilot harness)에서는 대화 순서를 그리는 대신, 에이전트가 할 일을 글로 적습니다.",
-      "action": "지침 적기"
+      "text": "Microsoft Copilot harness(구 GitHub Copilot harness)에서는 대화 순서를 그리는 대신, 에이전트가 할 일을 글로 적습니다. 적어 둔 지침으로 에이전트를 만듭니다.",
+      "action": "만들기",
+      "target": "create"
     },
     {
       "role": "tool",
-      "tool": "지침을 저장하는 중",
+      "tool": "지침으로 에이전트를 만드는 중",
       "opens": "agent",
       "delayMs": 700
     },
     {
       "role": "cue",
-      "text": "지침만으로는 ERP를 볼 수 없습니다. 일하는 방법(스킬)과 손발이 될 도구를 붙입니다.",
-      "action": "스킬·도구 추가"
+      "text": "지침만으로는 어떤 기준으로 비교할지 모릅니다. 일하는 방법을 스킬로 붙입니다.",
+      "action": "스킬 추가",
+      "target": "skills"
     },
     {
       "role": "tool",
-      "tool": "스킬 2개와 도구 2개를 연결하는 중",
+      "tool": "스킬 2개를 연결하는 중",
+      "sets": "skills",
+      "delayMs": 900
+    },
+    {
+      "role": "cue",
+      "text": "ERP를 보고 결재를 올리려면 손발이 될 도구가 필요합니다.",
+      "action": "도구 추가",
+      "target": "tools"
+    },
+    {
+      "role": "tool",
+      "tool": "MCP 서버와 워크플로 도구를 연결하는 중",
       "sets": "tools",
       "delayMs": 900
     },
     {
       "role": "cue",
       "text": "도구가 실행되기 전후에 반드시 거칠 규칙은 훅으로 답니다.",
-      "action": "훅 추가"
+      "action": "훅 추가",
+      "target": "hooks"
     },
     {
       "role": "tool",
@@ -191,10 +219,22 @@
       "kind": "MCP 도구 실행",
       "line": "훅 규칙에 따라 실행 전에 확인합니다. 500만원 이상 발주입니다.",
       "rows": [
-        { "label": "도구", "value": "누리ERP 구매 · 발주 등록" },
-        { "label": "거래처", "value": "B사" },
-        { "label": "금액", "value": "5,880,000원 · 검사용 지그 12세트" },
-        { "label": "상태", "value": "초안으로 등록 · 결재 전" }
+        {
+          "label": "도구",
+          "value": "누리ERP 구매 · 발주 등록"
+        },
+        {
+          "label": "거래처",
+          "value": "B사"
+        },
+        {
+          "label": "금액",
+          "value": "5,880,000원 · 검사용 지그 12세트"
+        },
+        {
+          "label": "상태",
+          "value": "초안으로 등록 · 결재 전"
+        }
       ],
       "go": "실행 허용",
       "denied": "허용하지 않았습니다. 발주는 등록되지 않았습니다."

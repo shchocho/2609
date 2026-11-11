@@ -13,7 +13,10 @@ import { PickText, SlashPopup, type Mark, type PickPhase } from '../components/c
 interface Ui {
   app: string;
   tabs: string[];
-  groups: [string, string][];
+  /** [그림, 이름, 누를 수 있게 할 때의 단추 id] */
+  groups: [string, string, string?][];
+  /** 왼쪽 탐색 (둘째 항목이 현재 위치) */
+  nav?: string[];
   /** 오른쪽 창 제목. 없으면 Office 의 Copilot 창 머리(모델 칩 · 편집 허용)를 쓴다 */
   pane?: string;
   head: string;
@@ -96,7 +99,8 @@ const UI: Record<string, Ui> = {
   studio: {
     app: 'Copilot Studio',
     tabs: ['에이전트', '개요', '지식', '도구', '채널', '분석'],
-    groups: [['💾', '저장'], ['🧪', '테스트'], ['🚀', '게시'], ['⚙', '설정']],
+    groups: [['▷', '테스트'], ['', '게시', 'publish']],
+    nav: ['홈', '에이전트', '흐름', '도구', '활동'],
     pane: '에이전트 테스트',
     head: '만든 에이전트와 바로 대화해 볼 수 있습니다.',
     input: '메시지를 입력하세요',
@@ -114,10 +118,12 @@ const UI: Record<string, Ui> = {
   },
 };
 
-export function AppWindow({ s, st, vars, ids, streamRef, mark, ask, onSend, pick, pickPhase, onPickSelect, onSlide, children }: {
+export function AppWindow({ s, st, vars, ids, streamRef, mark, ask, onSend, pick, pickPhase, onPickSelect, onSlide, target, onAct, children }: {
   s: Scenario; st: PlayState; vars: Vars; ids: string[]; streamRef: RefObject<HTMLDivElement | null>; mark: Mark;
   ask: string | null; onSend?: () => void; pick?: Pick; pickPhase: PickPhase; onPickSelect: () => void;
   onSlide: (n: number) => void; children: ReactNode;
+  /** 화면에서 직접 눌러야 할 단추 id(cue.target)와 눌렀을 때 할 일 */
+  target?: string; onAct: () => void;
 }) {
   // 가운데 문서: 이 화면에 올릴 수 있는 결과물 중 가장 최근에 연 것, 아직 없으면 맨 앞의 것.
   // Office 는 그 앱의 파일만, Power Automate 는 흐름이면 종류(클라우드·데스크톱)에 따라 창이 바뀐다
@@ -136,12 +142,15 @@ export function AppWindow({ s, st, vars, ids, streamRef, mark, ask, onSend, pick
   const view = doc?.deck && building ? { ...doc, deck: { slides: building.length ? building : [{ n: 1, head: '제목을 추가하려면 클릭' }] } } : doc;
   const slide = building ? Math.max(1, filterBy(building, ids).length) : st.slide;
   const slides = view?.deck ? view.deck.total ?? filterBy(view.deck.slides, ids).length : 1;
+  // Copilot Studio 는 에이전트를 만들기 전에 메인 화면의 만들기 화면부터 보인다
+  const creating = surface === 'studio' && writing === 0 && !!doc;
+  const hot = (act?: string) => !!act && act === target;
   const slashOpen = !!(pick && ask && (pickPhase === 'search' || pickPhase === 'pick'));
   return (
     <div className="sc-shell is-office" data-app={surface}>
       <div className="sc-win">
         <span className="sc-win-name">
-          {!ui.pane && <span className="sc-save">자동 저장 ●</span>}{doc ? artifactName(doc, ids) : s.title} · {ui.app}
+          {!ui.pane && <span className="sc-save">자동 저장 ●</span>}{creating ? '새 에이전트' : doc ? artifactName(doc, ids) : s.title} · {ui.app}
         </span>
         <span className="sc-win-search">⌕ 검색</span>
         <span className="sc-win-btns" aria-hidden="true"><i>─</i><i>▢</i><i>✕</i></span>
@@ -149,14 +158,31 @@ export function AppWindow({ s, st, vars, ids, streamRef, mark, ask, onSend, pick
       <div className={`sc-ribbon sc-zone ${mark('ribbon')}`}>
         <span className="sc-ribbon-tabs">{ui.tabs.map((t, i) => <i key={t} className={i === 1 ? 'on' : undefined}>{t}</i>)}</span>
         <span className="sc-ribbon-groups">
-          {ui.groups.map(([ico, name]) => (
-            <span key={name} className={name === 'Copilot' ? 'is-copilot' : undefined}><b aria-hidden="true">{ico}</b><i>{name}</i></span>
+          {ui.groups.map(([ico, name, act]) => (hot(act)
+            ? <button key={name} type="button" className="is-hunt" data-act={act} onClick={onAct}><b aria-hidden="true">{ico}</b><i>{name}</i></button>
+            : <span key={name} className={name === 'Copilot' ? 'is-copilot' : undefined}><b aria-hidden="true">{ico}</b><i>{name}</i></span>
           ))}
         </span>
       </div>
       <div className="sc-office-body">
+        {ui.nav && <nav className="sc-app-nav" aria-hidden="true">{ui.nav.map((n, i) => <i key={n} className={i === 1 ? 'on' : undefined}>{n}</i>)}</nav>}
         <div className={`sc-canvas sc-zone ${mark('canvas')}`}>
-          {view && <ArtifactView a={view} writing={writing} vars={vars} ids={ids} slide={slide} moved={st.moved} over={st.over} onSlide={onSlide} />}
+          {creating ? (
+            <div className="st-create">
+              <b>새 에이전트 만들기</b>
+              <span>어떤 일을 하는 에이전트인지 설명해 주세요.</span>
+              <p>{s.workbench?.ask}</p>
+              <i>{doc?.blocks?.[0]?.meta?.[0]}</i>
+              {hot('create')
+                ? <button type="button" className="is-hunt" data-act="create" onClick={onAct}>만들기</button>
+                : <u>만들기</u>}
+            </div>
+          ) : view && (
+            <ArtifactView
+              a={view} writing={writing} vars={vars} ids={ids} slide={slide} moved={st.moved} over={st.over} onSlide={onSlide}
+              act={{ target, go: onAct }}
+            />
+          )}
         </div>
         <div className={`sc-pane sc-zone ${mark('pane')}`} data-pane={s.surface}>
           {pane.pane

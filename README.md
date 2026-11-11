@@ -102,7 +102,7 @@ Azure Static Web Apps를 쓸 때는 함께 들어 있는 `staticwebapp.config.js
 
 - **문구(제목, 안내, 푸터)**: `src/copy.ts`
 - **업무 영역(이름, 설명, 색)**: `src/tracks.ts`. 홈 카드 아이콘은 `src/components/Icons.tsx`
-- **앱 창 시나리오**: `"agent": "office"` 와 `"surface": "word" | "excel" | "powerpoint" | "outlook" | "teams" | "forms"`, `"agent": "flow"` 와 `"surface": "cloudflow" | "deskflow"`(Power Automate 흐름 디자이너), `"agent": "studio"` 와 `"surface": "studio"`(Copilot Studio 에이전트 화면 — 가운데는 `app: "studio"` 인 문서 결과물이 설정 카드로 보입니다), 또는 `"agent": "code"` 와 `"surface": "code"`(Microsoft Copilot 앱의 Code 탭 — 가운데는 `app: "code"` 인 문서 결과물이 앱 미리보기로 보이고, 블록 `field`·`button`·`chart` 가 입력란·단추·막대 차트가 됩니다)를 주면 Cowork 화면 대신 앱 창과 오른쪽 창에서 재생합니다. 흐름은 결과물 `kind: "flow"` 의 `flow.steps`(트리거·작업 카드)로 적고, `flow.run` 이 참이면 단계마다 결과(`state`, `note`)가 붙는 실행 기록이 됩니다. `flow.screen`(대상 프로그램의 메뉴·입력란·단추)과 단계의 `do`(화면 조작 목록)를 적으면, 흐름 옆에 그 프로그램 화면이 뜨고 커서가 움직이며 값이 입력되는 모습이 재생됩니다. 가운데 문서는 `workbench.artifacts` 중 그 앱의 결과물입니다(화면: `src/surfaces/AppWindow.tsx`, 스타일: `src/styles/surfaces.css`). 덱 슬라이드에 `only`/`not` 을 쓰면 선택에 따라 슬라이드가 들어가고 빠지며, 시트의 `charts` 는 표 아래에 막대 차트를 넣습니다.
+- **앱 창 시나리오**: `"agent": "office"` 와 `"surface": "word" | "excel" | "powerpoint" | "outlook" | "teams" | "forms"`, `"agent": "flow"` 와 `"surface": "cloudflow" | "deskflow"`(Power Automate 흐름 디자이너), `"agent": "studio"` 와 `"surface": "studio"`(Copilot Studio 에이전트 화면 — 처음에는 `workbench.ask` 를 담은 만들기 화면이 뜨고, 그 뒤 `app: "studio"` 인 문서 결과물이 설정 카드로 보입니다. `only` 깃발과 `label` 이 있는 section 은 채우기 전까지 빈 카드와 "+ 추가" 단추로 나옵니다), 또는 `"agent": "code"` 와 `"surface": "code"`(Microsoft Copilot 앱의 Code 탭 — 가운데는 `app: "code"` 인 문서 결과물이 앱 미리보기로 보이고, 블록 `field`·`button`·`chart` 가 입력란·단추·막대 차트가 됩니다)를 주면 Cowork 화면 대신 앱 창과 오른쪽 창에서 재생합니다. 흐름은 결과물 `kind: "flow"` 의 `flow.steps`(트리거·작업 카드)로 적고, `flow.run` 이 참이면 단계마다 결과(`state`, `note`)가 붙는 실행 기록이 됩니다. `flow.screen`(대상 프로그램의 메뉴·입력란·단추)과 단계의 `do`(화면 조작 목록)를 적으면, 흐름 옆에 그 프로그램 화면이 뜨고 커서가 움직이며 값이 입력되는 모습이 재생됩니다. 가운데 문서는 `workbench.artifacts` 중 그 앱의 결과물입니다(화면: `src/surfaces/AppWindow.tsx`, 스타일: `src/styles/surfaces.css`). 덱 슬라이드에 `only`/`not` 을 쓰면 선택에 따라 슬라이드가 들어가고 빠지며, 시트의 `charts` 는 표 아래에 막대 차트를 넣습니다.
 - **시나리오**: `src/scenarios/<영역>/<id>.scenario.json`. 파일을 추가하면 목록에 자동으로 나타납니다. 고친 뒤 검사를 돌리세요.
 
 ```bash
@@ -115,7 +115,7 @@ npm run check:scenarios
 - `overview`: 흐름 화면의 단계 카드.
 - `workbench`: Cowork 시나리오의 작업 이름(`task`)과 결과물(`artifacts`: 엑셀 `sheet`, 워드 `doc`, 메일 `mail`, PPT `deck`, Teams `teams`).
 - `messages`: 체험 화면에서 순서대로 재생되는 대화.
-  - `cue` 입력창 안내 → 다음 `user` 메시지가 입력창에 미리 채워짐
+  - `cue` 입력창 안내 → 다음 `user` 메시지가 입력창에 미리 채워짐. 앱 창 시나리오에서 `target` 을 주면 말풍선 버튼 대신 화면 안의 그 단추(`create` 만들기 · `publish` 게시 · 설정 카드의 깃발 이름)를 직접 누르게 합니다
   - `assistant` 답변(`files` 로 결과물 카드, `sources` 로 출처, `images` 로 생성 이미지)
   - `tool` 작업 단계(`opens`·`shows` 열기, `writes` 한 줄씩 작성, 앱 창 시나리오에서는 `sets` 로 깃발을 켜 `only`/`not` 이 걸린 블록을 단계마다 나타나게 함)
   - `approve` 실행 전 권한 확인, `choice` 기준 고르기(`only`/`not` 으로 선택별 내용 분기), `hunt` 기능 찾기 퀴즈, `spot` 화면 영역 찾기 퀴즈

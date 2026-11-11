@@ -260,3 +260,30 @@
 .booth-product-board:has(> article:nth-child(4)) .booth-product-body > p { font-size: min(3cqh, 1.25cqw); }
 .booth-product-board:has(> article:nth-child(4)) li button { font-size: min(3cqh, 1.3cqw); padding: min(2.4cqh, 1.1cqw); }
 .booth-product-board:has(> article:nth-child(6)) header > h2 { font-size: min(3cqh, 1.42cqw); }
+
+/* ---------- Copilot Studio: 왼쪽 탐색 · 위쪽 한 줄(탭 + 테스트·게시) · 메인 화면에서 직접 만들기 ---------- */
+.sc-app-nav { display: grid; align-content: start; gap: 2px; padding: 10px 6px; font-size: 10.5px; color: #605e5c; background: #f5f4f2; border-right: 1px solid var(--sc-line, #e6e3df); }
+.sc-app-nav i { padding: 9px 2px; font-style: normal; text-align: center; border-radius: 6px; }
+.sc-app-nav i.on { font-weight: 600; color: var(--track-ink); background: color-mix(in srgb, var(--track) 12%, #fff); }
+.sc-shell.is-office[data-app=studio] .sc-office-body { grid-template-columns: 64px minmax(0, 1fr) clamp(300px, 26%, 400px); }
+.sc-shell.is-office[data-app=studio] .sc-ribbon { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 16px; }
+.sc-shell.is-office[data-app=studio] .sc-ribbon-groups { flex-wrap: nowrap; gap: 8px; }
+.sc-shell.is-office[data-app=studio] .sc-ribbon-groups > :is(span, button) { display: inline-flex; align-items: center; gap: 6px; min-width: 0; padding: 6px 16px; font: inherit; color: #1b1a19; background: #fff; border: 1px solid #c8c6c4; border-radius: 6px; }
+.sc-shell.is-office[data-app=studio] .sc-ribbon-groups > :last-child { color: #fff; background: var(--track); border-color: var(--track); }
+.sc-shell.is-office[data-app=studio] .sc-ribbon-groups > :last-child i { color: #fff; }
+.sc-shell.is-office[data-app=studio] .sc-ribbon-groups :is(b, i) { font-size: 12.5px; font-style: normal; color: inherit; }
+.sc-shell.is-office[data-app=studio] .sc-ribbon-groups b:empty { display: none; }
+.sc-shell.is-office[data-app=studio] .sc-ribbon-groups button { cursor: pointer; }
+/* 아직 채우지 않은 설정 카드와 "+ 추가" 단추 */
+.wb-wd-sec.is-empty { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-style: dashed !important; background: #fdfdfc !important; box-shadow: none !important; }
+.wb-wd-sec.is-empty h4 { margin: 0; }
+.wb-add { flex: none; padding: 6px 14px; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--track-ink, #5c3d8a); background: #fff; border: 1px solid currentColor; border-radius: 999px; }
+button.wb-add { cursor: pointer; }
+/* 에이전트를 만들기 전의 메인 화면 */
+.st-create { width: min(560px, calc(100% - 48px)); margin: 48px auto; padding: 26px 28px; display: grid; gap: 10px; justify-items: start; font-family: var(--desk-font); background: #fff; border: 1px solid #e1dfdd; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .08); }
+.st-create > b { font-size: 19px; }
+.st-create > span { font-size: 13px; color: #605e5c; }
+.st-create > p { width: 100%; margin: 4px 0; padding: 12px 14px; font-size: 14px; line-height: 1.7; background: #faf9f8; border: 1px solid #c8c6c4; border-radius: 8px; }
+.st-create > i { padding: 2px 10px; font-size: 12px; font-style: normal; color: var(--track-ink); background: color-mix(in srgb, var(--track) 10%, #fff); border-radius: 999px; }
+.st-create > :is(button, u) { justify-self: end; padding: 8px 24px; font: inherit; font-size: 13.5px; font-weight: 600; text-decoration: none; color: #fff; background: var(--track); border: 0; border-radius: 6px; }
+.st-create > button { cursor: pointer; }

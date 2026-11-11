@@ -14,6 +14,8 @@ export interface ViewProps {
   over?: boolean;
   progressive?: boolean;
   onSlide?: (n: number) => void;
+  /** 화면 안의 단추를 직접 누르게 할 때: 지금 눌러야 할 단추 id 와 눌렀을 때 할 일 */
+  act?: { target?: string; go: () => void };
 }
 
 const colName = (i: number) => {
@@ -390,6 +392,32 @@ function FlowView({ a, writing, vars, ids }: ViewProps) {
   );
 }
 
+/* ---------------- Copilot Studio 에이전트 개요 ---------------- */
+/** 아직 채우지 않은 설정(only 깃발이 꺼져 있고 label 이 있는 section)은 빈 카드와 "+ 추가" 단추로 보인다 */
+function AgentView({ a, writing, vars, ids, act }: ViewProps) {
+  const blocks = (a.blocks ?? []).filter(b => !b.not?.some(x => ids.includes(x)) && (b.label || !b.only || b.only.some(x => ids.includes(x))));
+  return (
+    <div className="wb-wd">
+      <div className="wb-wd-page">
+        {blocks.slice(0, writing == null ? blocks.length : writing).map((b, i) => {
+          const flag = b.only?.find(x => !ids.includes(x));
+          if (!b.only || b.only.some(x => ids.includes(x)) || !flag) return <div key={i}><DocBlockView b={b} vars={vars} ids={ids} /></div>;
+          return (
+            <div key={i}>
+              <section className="wb-wd-sec is-empty">
+                <h4>{b.title}</h4>
+                {act?.target === flag
+                  ? <button type="button" className="wb-add is-hunt" data-act={flag} onClick={act.go}>＋ {b.label}</button>
+                  : <span className="wb-add">＋ {b.label}</span>}
+              </section>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /** 결과물 종류별 뷰어 선택 */
 export function ArtifactView(p: ViewProps) {
   const { a } = p;
@@ -400,6 +428,7 @@ export function ArtifactView(p: ViewProps) {
   if (a.kind === 'deck') return <DeckView {...p} />;
   if (a.kind === 'teams') return <TeamsView {...p} />;
   if (a.kind === 'flow') return <FlowView {...p} />;
+  if (a.app === 'studio') return <AgentView {...p} />;
   if (a.kind === 'mail') return <MailView {...p} />;
   return <DocView {...p} />;
 }

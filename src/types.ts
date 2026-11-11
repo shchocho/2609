@@ -130,7 +130,8 @@ export interface ChoiceOption {
 }
 export interface HuntMenuItem { name: string; desc?: string; wrong?: boolean; files?: { name: string; app: string }[] }
 
-export interface MsgCue extends Filterable { role: 'cue'; text: string; action: string }
+/** target: 말풍선 버튼 대신 화면에서 직접 누를 단추의 id (data-act). 앱 창 화면에서만 쓴다 */
+export interface MsgCue extends Filterable { role: 'cue'; text: string; action: string; target?: string }
 export interface MsgUser extends Filterable { role: 'user'; text: string; at?: string; pick?: Pick }
 export interface MsgAssistant extends Filterable {
   role: 'assistant'; text: string; at?: string; sources?: Source[]; files?: string[]; images?: ImageRef[]; over?: boolean;
