@@ -10,7 +10,7 @@ const it = getItem(q.get('id') || 'billy');
 const N = Number(q.get('n') || 12);
 const model = buildModel(it, { N, variant: q.get('v') || undefined });
 const fin = it.finishes[Number(q.get('f') || 0)];
-const stage = new Stage(document.getElementById('host'), { cutout: q.has('cutout'), maxDpr: Number(q.get('dpr') || 1), interactive: true });
+const stage = new Stage(document.getElementById('host'), { cutout: q.has('cutout'), maxDpr: Number(q.get('dpr') || 1), interactive: true, scene: q.has('room') ? 'room' : 'studio' });
 stage.setTheme({ dark: q.has('dark') });
 if (q.has('mini')) { stage.mini = true; stage.N = N; }
 stage.setModel(model, fin);

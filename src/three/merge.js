@@ -40,6 +40,7 @@ export function mergedGroup(parts, lib, { detail = 0, finish = null, cast = true
     mesh.castShadow = cast && !NO_SHADOW.has(t) && !(mat.transmission > 0);
     mesh.receiveShadow = receive;
     if (mat.transparent) mesh.renderOrder = 2;
+    mesh.userData.libMat = true; // 재질은 MaterialLib 소유: 그룹을 지울 때 재질까지 지우지 않는다
     group.add(mesh);
   }
   return group;

@@ -4,6 +4,7 @@
 
 import { Kit, buildModel } from '../core/kit.js';
 import { getItem } from './catalog.js';
+import { materialOf } from './materials.js';
 import * as PR from '../builders/props.js';
 
 export const WALL_T = 60, WALL_H = 2400, FLOOR_T = 40;
@@ -433,4 +434,99 @@ export function checkLayout() {
     }
   }
   return { issues, count: seen.size };
+}
+
+// ───────────────────────────────────────────── 가구 하나를 위한 방(워크벤치의 '룸' 배경)
+const lum = (hex) => { const v = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+const GAP_BY_CAT = { shelf: GAP, storage: GAP, sofa: GAP, bed: GAP, desk: GAP, table: 900, chair: 760, kids: 420, light: 320 };
+const ROOM_RULE = {
+  poang: { gap: 420 }, strandmon: { gap: 380 }, ekero: { gap: 360 }, ekenaset: { gap: 380 }, raskog: { gap: 240 }, 'bekvam-cart': { gap: GAP }, trofast: { gap: GAP }, duktig: { gap: GAP },
+  kura: { gap: GAP }, sniglar: { gap: GAP }, 'lack-side': { gap: 480 }, gladom: { gap: 480 }, isfjorden: { gap: 90 }, mulig: { gap: 60 },
+  fado: { lift: 760 }, lampan: { lift: 760 }, arstid: { lift: 760 }, moppe: { lift: 740 }, 'lack-shelf': { lift: 1350, gap: 0, hung: true }, skadis: { lift: 1090, gap: 0, hung: true },
+};
+const WALLS_FOR_LIGHT = ['wall-sage', 'wall-blue', 'wall-blush', 'wall-greige', 'wall-mint', 'wall-terracotta', 'wall-green'];
+const WALLS_FOR_DARK = ['wall-white', 'wall-greige', 'wall-white', 'wall-sky'];
+const FLOORS = ['floor-oak', 'floor-light', 'floor-parquet', 'floor-oak', 'floor-gray'];
+
+/**
+ * 가구 하나를 놓고 찍는 방 한 귀퉁이(뒷벽 + 왼쪽 벽). 모델 좌표계의 부품을 돌려준다.
+ * { floor, walls: [{ name, part, decor }], base, planes: { xl, zb }, lift }
+ * 탁상 조명처럼 작은 것은 콘솔 위에, 벽선반·페그보드는 벽에 걸린 높이로 방을 내려 맞춘다(lift).
+ */
+export function itemRoom(item, model, { finish = null, seed = 0 } = {}) {
+  const bb = model.bbox, rule = ROOM_RULE[item.id] || {}, gap = rule.gap ?? GAP_BY_CAT[item.cat] ?? 300, lift = rule.lift || 0;
+  const w0 = bb.max[0] - bb.min[0], d0 = bb.max[2] - bb.min[2], h0 = bb.max[1], cx0 = (bb.min[0] + bb.max[0]) / 2;
+  const R = PR.rng(PR.hashStr(item.id) * 7 + seed * 131 + 5), fin = finish || item.finishes[0];
+  // 벽 색: 밝은 가구는 색 있는 벽, 어두운 가구·원목은 밝은 벽
+  const mainRole = item.cat === 'sofa' ? 'fabric' : 'body', main = materialOf(fin.map && fin.map[mainRole] ? mainRole : Object.keys(fin.map || { body: 1 })[0], fin);
+  const light = lum(main.c || '#ffffff') > 0.6;
+  const wallBack = pick(R, light ? WALLS_FOR_LIGHT : WALLS_FOR_DARK), floorMat = pick(R, FLOORS);
+  const Lw = Math.max(1050, Math.min(1700, 900 + w0 * 0.25)), xl = bb.min[0] - Lw, zb = bb.min[2] - gap;
+  const W = Lw + w0 + 7000, D = gap + d0 + 6000, H = Math.max(2700, Math.min(3900, h0 + lift + 1700));
+  const r = new Room({ id: `item-${item.id}`, name: item.name, w: W, d: D, H, floor: floorMat, walls: { back: wallBack, left: 'wall-white', right: 'wall-white' } });
+  const X = (x) => x - xl, Z = (z) => z - zb, ix0 = X(bb.min[0]), ix1 = X(bb.max[0]), iz0 = Z(bb.min[2]), iz1 = Z(bb.max[2]), icx = X(cx0);
+  const kind = item.cat, tall = h0 + lift >= 1300, soft = kind === 'sofa' || kind === 'bed';
+  const frames = pick(R, ['black', 'oak', 'white', 'brass']), rugA = pick(R, ['fab-natural', 'fab-cream', 'jute', 'fab-gray']), accent = pick(R, PR.ACCENTS);
+  // 창과 커튼: 왼쪽 벽
+  r.window('left', Math.max(1500, iz1 + 700), { w: 1300, h: 1400, sill: 850, curtain: pick(R, ['linen', 'linen', 'fab-cream', 'fab-blush']) });
+  // 왼쪽 구석의 큰 화분
+  r.plant(ix0 - Lw * 0.52, Math.max(380, iz0 + 300), pick(R, ['rubber', 'monstera', 'snake', 'rubber']), 1 + R() * 0.1, pick(R, ['terracotta', 'ceramic', 'basket', 'ceramic-black']));
+  // 벽 그림: 낮은 가구는 위에, 키 큰 가구는 오른쪽 벽면에
+  if (!rule.hung) {
+    if (!tall) {
+      const cy = Math.max(1480, lift + h0 + 520), n = w0 > 1500 ? 3 : w0 > 800 ? 2 : 1, fw = n === 1 ? 480 : 440, fh = fw * 1.36;
+      r.art('back', icx, cy, Array.from({ length: n }, (_, i) => [(i - (n - 1) / 2) * (fw + 150), 0, fw, fh]), frames);
+    } else r.art('back', ix1 + 780, 1520, [[0, 120, 440, 600], [0, -420, 440, 360]], frames);
+  }
+  // 종류별 바닥 소품
+  if (kind === 'sofa') {
+    r.rug(icx, iz1 + 420, w0 + 800, 2000, pick(R, ['border', 'stripe', 'border']), rugA, accent);
+    r.lamp(ix1 + 430, iz0 + 330, { h: 1500 });
+    r.pouf(ix1 - 180, iz1 + 900, accent);
+  } else if (kind === 'bed') {
+    r.rug(icx, iz1 - 250, w0 + 1000, 1600, 'border', rugA, 'fab-cream');
+    r.lamp(ix1 + 420, iz0 + 320, { h: 1450 });
+    r.basket(ix1 + 520, iz1 - 500, accent);
+  } else if (kind === 'table' || kind === 'chair' || kind === 'kids') {
+    if (gap > 100) r.rug(icx, (iz0 + iz1) / 2, w0 + 1300, d0 + 1200, w0 < 700 ? 'round' : 'border', rugA, 'fab-cream');
+    r.plant(ix1 + 900, 420, pick(R, ['snake', 'rubber']), 0.95, 'ceramic');
+    if (kind === 'kids') { r.deco(ix1 + 420, iz1 + 300, 0, (k, RR) => PR.blocks(k, { R: RR, n: 6, s: 52 })); r.deco(ix0 - 300, iz1 + 420, 0, (k) => PR.teddy(k, { s: 1.3, mat: 'fab-ochre' })); }
+  } else if (kind === 'desk') {
+    r.rug(icx, iz1 + 380, Math.max(1500, w0 + 300), 1200, 'border', rugA, 'fab-cream');
+    r.basket(ix1 + 420, iz0 + 320, accent);
+  } else if (kind === 'light') {
+    if (!lift) r.rug(icx + 500, iz1 + 500, 1900, 1400, 'border', rugA, 'fab-cream');
+  } else {
+    // 수납·선반: 오른쪽에 바구니나 작은 화분
+    if (R() < 0.5) r.basket(ix1 + 460, iz0 + 330, accent); else r.plant(ix1 + 480, iz0 + 330, 'snake', 0.9, 'ceramic');
+  }
+  // 콘솔(탁상 소품용)·벽걸이 아래 가구
+  if (lift && !rule.hung) {
+    r.onWall('back', icx, 0, (k, RR) => {
+      const cw = 1500, cd = 420;
+      k.box('콘솔 상판', [cw, 36, cd], [0, lift - 18, cd / 2 + GAP], P('oak', { lo: false }));
+      k.box('콘솔 몸통', [cw - 60, lift - 36 - 120, cd - 40], [0, 120 + (lift - 156) / 2, cd / 2 + GAP], P('white', { lo: false }));
+      for (const sx of [-1, 1]) for (const sz of [-1, 1]) k.box('콘솔 다리', [40, 120, 40], [sx * (cw / 2 - 60), 60, cd / 2 + GAP + sz * (cd / 2 - 50)], P('oak', { lo: false }));
+      k.at([-cw * 0.32, lift, cd / 2 + GAP], 12, () => PR.bookStack(k, { R: RR, n: 3 }));
+      k.at([cw * 0.3, lift, cd / 2 + GAP - 30], -6, () => PR.standFrame(k, { w: 170, h: 230, R: RR, frameMat: frames }));
+      k.at([cw * 0.42, lift, cd / 2 + GAP + 40], 0, () => PR.plant(k, { kind: 'cactus', s: 0.9, potMat: 'ceramic', R: RR }));
+    });
+  } else if (rule.hung) {
+    r.onWall('back', icx, 0, (k, RR) => {
+      const cw = Math.max(1300, w0 + 300), cd = 520, top = 740;
+      k.box('책상 상판', [cw, 34, cd], [0, top - 17, cd / 2 + GAP], P('oak', { lo: false }));
+      for (const sx of [-1, 1]) k.box('책상 옆판', [30, top - 34, cd - 30], [sx * (cw / 2 - 15), (top - 34) / 2, cd / 2 + GAP], P('white', { lo: false }));
+      k.at([-cw * 0.1, top, cd / 2 + GAP + 40], 4, () => PR.laptop(k));
+      k.at([cw * 0.3, top, cd / 2 + GAP], 30, () => PR.mug(k, { mat: 'ceramic' }));
+      k.at([-cw * 0.36, top, cd / 2 + GAP - 60], 0, () => PR.plant(k, { kind: 'bush', s: 0.55, potMat: 'terracotta', R: RR }));
+    });
+  }
+  const shell = r.shell();
+  const move = (parts) => { for (const p of parts) { p.pos[0] += xl; p.pos[1] -= lift; p.pos[2] += zb; } return parts; };
+  move([shell.floor, shell.walls.back, shell.walls.left]);
+  return {
+    floor: shell.floor, lift, H, planes: { xl, zb },
+    walls: [{ name: 'back', part: shell.walls.back, decor: move(r.k.back.parts) }, { name: 'left', part: shell.walls.left, decor: move(r.k.left.parts) }],
+    base: move(r.k.base.parts),
+  };
 }

@@ -7,6 +7,9 @@ import { MaterialLib, patchShaderChunks, iblDiffuse, withIbl } from './materials
 import { partGeometry, edgeGeometry, draftGeometry } from './meshes.js';
 import { cuttingMatTexture, rulerTexture, MAT_MM } from './textures.js';
 import { materialKey } from '../data/materials.js';
+import { mergedGroup } from './merge.js';
+import { itemRoom } from '../data/rooms.js';
+import { styleModel } from '../core/styling.js';
 
 const D2R = Math.PI / 180;
 const FS_VERT = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }';
@@ -103,6 +106,8 @@ export class Stage {
     this.onSelect = opts.onSelect || null;
     this.onFrame = opts.onFrame || null;
     this.interactive = opts.interactive !== false;
+    this.sceneKind = opts.scene === 'room' ? 'room' : 'studio'; // 배경: 스튜디오(호리존) | 룸(벽·바닥·소품)
+    this.roomWalls = []; this.styling = null; this.roomPlanes = null;
 
     const r = (this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, premultipliedAlpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: !!opts.preserve }));
     this.dpr = Math.min(opts.pixelRatio ?? window.devicePixelRatio ?? 1, opts.maxDpr ?? 2);
@@ -330,6 +335,23 @@ export class Stage {
       const glass = mat.transmission > 0 || (mat.transparent && mat.opacity < 0.6);
       mesh.castShadow = !glass && p.role !== 'opal' && p.role !== 'paper' && p.role !== 'shade';
     }
+    if (this.roomOn) this._layoutSet(); // 벽 색과 쿠션 색은 마감을 따라간다
+    this.shadowDirty = true;
+    this.invalidate();
+  }
+
+  /** 룸 배경이 실제로 켜져 있는가(컷아웃·미니어처 보기에서는 쓰지 않는다). */
+  get roomOn() { return !this.cutout && !this.mini && this.sceneKind === 'room' && !!this.model; }
+
+  /** 룸을 지금 그리는가: 분해·조립 중에는 부품이 벽을 뚫지 않게 스튜디오 배경으로 돌아간다. */
+  get roomShown() { return this.roomOn && this.explode < 0.02 && this.explodeGoal < 0.02 && this.step == null; }
+
+  /** 배경을 바꾼다: 'studio' = 무한 호리존, 'room' = 벽·바닥·소품이 있는 방 한 귀퉁이. */
+  setScene(kind) {
+    this.sceneKind = kind === 'room' ? 'room' : 'studio';
+    if (!this.model) return;
+    this._layoutSet();
+    this.fit(false, true);
     this.shadowDirty = true;
     this.invalidate();
   }
@@ -403,7 +425,9 @@ export class Stage {
     const asp = this.camera.aspect || 1, half = (this.fov * D2R) / 2;
     const hfov = Math.atan(Math.tan(half) * asp);
     const ext = 1 + this.explodeGoal * 0.75;
-    const dist = (this.R * ext * (this.fitScale ?? 1.12)) / Math.sin(Math.min(half, hfov));
+    // 룸 배경에서는 주변이 보이게 조금 물러서고, 아주 작은 가구는 놓인 자리(콘솔·벽)까지 담는다
+    const room = this.roomOn, Rf = room ? Math.max(this.R, 560) : this.R;
+    const dist = (Rf * ext * (this.fitScale ?? (room ? 1.34 : 1.12))) / Math.sin(Math.min(half, hfov));
     this.goal.dist = dist;
     this.goal.target.copy(this.center);
     if (!keepAngles && instant) { this.goal.theta = this.cam.theta; this.goal.phi = this.cam.phi; }
@@ -447,9 +471,10 @@ export class Stage {
 
   _layoutSet() {
     for (const o of [...this.props.children]) {
-      o.traverse((c) => { if (c.geometry) c.geometry.dispose(); for (const m of [].concat(c.material || [])) m.dispose(); });
+      o.traverse((c) => { if (c.geometry) c.geometry.dispose(); if (!c.userData.libMat) for (const m of [].concat(c.material || [])) m.dispose(); });
       this.props.remove(o);
     }
+    this.roomWalls = []; this.styling = null; this.roomPlanes = null;
     const R = this.R;
     if (this.cutout) {
       this.ground.scale.set(R * 14, R * 14, 1);
@@ -457,6 +482,12 @@ export class Stage {
       const fr = Math.hypot(this.bbMax.x - this.bbMin.x, this.bbMax.z - this.bbMin.z) / 2;
       this.fade.c.value.set(this.center.x, this.center.z);
       this.fade.r.value = fr * 1.5 + (this.bbMax.y - this.bbMin.y) * 0.35;
+      return;
+    }
+    if (this.roomOn) {
+      this._buildRoom();
+      // 분해·조립 때 돌아갈 스튜디오 호리존도 이 모델 크기에 맞춰 둔다
+      this.ground.scale.setScalar(R); this.ground.position.set(this.center.x, 0, this.center.z);
       return;
     }
     let floorY = 0;
@@ -489,6 +520,23 @@ export class Stage {
     }
     this.ground.scale.setScalar(R * (this.mini ? 1.5 : 1));
     this.ground.position.set(this.center.x, floorY, this.center.z);
+  }
+
+  /** 룸 배경: 바닥·벽(그림자를 받기만 함)·방 소품·가구 스타일링 소품. */
+  _buildRoom() {
+    const item = this.model.item, spec = itemRoom(item, this.model, { finish: this.finish });
+    const add = (parts, cast) => { const g = mergedGroup(parts, this.lib, { detail: 1, cast }); this.props.add(g); return g; };
+    add([spec.floor], false);
+    for (const w of spec.walls) {
+      const g = new THREE.Group();
+      g.add(mergedGroup([w.part], this.lib, { detail: 1, cast: false }), mergedGroup(w.decor, this.lib, { detail: 1 }));
+      this.props.add(g);
+      this.roomWalls.push({ name: w.name, group: g });
+    }
+    add(spec.base, true);
+    const sp = styleModel(item, this.model, { finish: this.finish });
+    if (sp.length) this.styling = add(sp, true);
+    this.roomPlanes = spec.planes;
   }
 
   _applyVisibility() {
@@ -749,7 +797,7 @@ export class Stage {
         const u = 0.08 + 0.92 * halton(i, 7), ph = halton(i, 11) * Math.PI * 2, sr = Math.sqrt(1 - u * u);
         dd.set(Math.cos(ph) * sr, u, Math.sin(ph) * sr);
       }
-      fitShadow(this.dome, dd.normalize(), 1.5);
+      fitShadow(this.dome, dd.normalize(), this.roomShown ? 2.4 : 1.5);
       this.dome.color.copy(lobe.color);
       this.dome.intensity = total * (this.domeGain ?? 1);
       this.head.intensity = 0;
@@ -762,7 +810,7 @@ export class Stage {
       iblDiffuse.value = 1;
       this.key.shadow.radius = 3.4;
     }
-    fitShadow(this.key, kd, 1.6);
+    fitShadow(this.key, kd, this.roomShown ? 2.6 : 1.6);
   }
 
   _renderScene(target, jitter, i) {
@@ -778,7 +826,13 @@ export class Stage {
       }
     } else this._viewOffset(0, 0);
     if (jitter || this.shadowDirty) { this._lights(jitter, i); r.shadowMap.needsUpdate = true; this.shadowDirty = jitter; }
-    this.root.visible = true; this.lineRoot.visible = false; this.ground.visible = true; this.props.visible = true;
+    const room = this.roomShown;
+    this.root.visible = true; this.lineRoot.visible = false; this.ground.visible = !room; this.props.visible = room || !this.roomOn;
+    if (room) {
+      // 카메라가 벽 뒤로 가면 그 벽은 감춘다
+      const cp = this.camera.position;
+      for (const w of this.roomWalls) w.group.visible = w.name === 'back' ? cp.z > this.roomPlanes.zb : cp.x > this.roomPlanes.xl;
+    }
     this.dimLines.visible = this.dimsOn;
     if (this.cutout) { this.scene.background = null; r.setClearColor(0x000000, 0); }
     else { r.setClearColor(new THREE.Color(this.theme.dark ? '#1b1f1d' : '#dfe2df'), 1); }
@@ -805,7 +859,7 @@ export class Stage {
     r.clear();
     r.render(this.scene, this.camera);
     r.setRenderTarget(null);
-    this.root.visible = true; this.lineRoot.visible = false; this.ground.visible = true; this.props.visible = true;
+    this.root.visible = true; this.lineRoot.visible = false; this.ground.visible = !this.roomShown; this.props.visible = this.roomShown || !this.roomOn;
   }
 
   _present() {

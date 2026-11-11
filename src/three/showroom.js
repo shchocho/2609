@@ -69,7 +69,7 @@ export class Showroom {
     // 카메라: 처음에는 맨 앞 열(거실)을 조금 위에서 내려다본다.
     const front = this.rooms.filter((q) => q.def.row === 0), fz = front[0].def.z;
     this.maxDist = Math.max(this.W, this.D) * 1.12; this.minDist = 2400;
-    this.home = { theta: 12 * D2R, phi: 54 * D2R, dist: 17000, x: -400, z: fz + 2100 };
+    this.home = { theta: 12 * D2R, phi: 54 * D2R, dist: 17000, x: -400, z: fz + 700 };
     this.goal = { ...this.home };
     this.cam = { theta: -16 * D2R, phi: 34 * D2R, dist: this.home.dist * 1.7, x: this.home.x, z: this.home.z };
 
@@ -91,6 +91,8 @@ export class Showroom {
     this._ro = new ResizeObserver(() => this.resize()); this._ro.observe(host);
     this._io = new IntersectionObserver((e) => { this.visible = e[0].isIntersecting; if (this.visible) this.invalidate(); }); this._io.observe(host);
     this.resize();
+    // 움직임 줄이기 설정이면 처음의 카메라 진입 연출을 건너뛴다
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) Object.assign(this.cam, this.goal);
     if (opts.match) this.setMatch(opts.match, false);
   }
 

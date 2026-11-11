@@ -105,7 +105,8 @@ export function homePage(root, ctx) {
     const host = h('div', { class: 'room__host' });
     const prog = h('div', { class: 'hud hud--tl', role: 'status' }, h('span', { class: 'mono' }, '방 짓는 중…'));
     const found = h('div', { class: 'hud hud--c', hidden: true });
-    const hint = h('div', { class: 'hud hud--bl' }, '끌어서 이동 · 휠로 확대 · Shift+끌기로 회전 · 가구를 누르면 열립니다');
+    const touch = window.matchMedia('(pointer: coarse)').matches;
+    const hint = h('div', { class: 'hud hud--bl' }, touch ? '끌어서 이동 · 두 손가락으로 확대·회전 · 가구를 한 번 눌러 고르고, 다시 누르면 열립니다' : '끌어서 이동 · 휠로 확대 · Shift+끌기로 회전 · 가구를 누르면 열립니다 · 방 이름표를 누르면 그 방으로');
     const cardName = h('b', {}), cardType = h('span', {}), cardDims = h('span', { class: 'mono' }), cardGo = h('a', { class: 'btn btn--sm btn--tape', href: '#home' }, '워크벤치 열기');
     const cardEl = h('div', { class: 'room__card', hidden: true }, h('div', {}, cardName, cardType, cardDims), cardGo);
     const tools = h('div', { class: 'viewer__tools viewer__tools--tr' },
