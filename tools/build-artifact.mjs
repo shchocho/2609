@@ -15,11 +15,13 @@ fs.writeFileSync(path.join(root, 'dist/miniatyr.html'), `${head}\n<style>\n${css
 const CDN = 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js';
 const walk = (dir) => fs.readdirSync(path.join(root, dir), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(`${dir}/${e.name}`) : [`${dir}/${e.name}`]));
 const files = [...walk('src'), ...walk('assets/thumbs'), ...walk('assets/real')];
+// 아티팩트는 .bin 을 내려 주지 않는다. 스캔 모델의 정점 데이터는 받아 주는 이진 형식 이름(.wasm)으로 올리고 로더의 경로도 맞춘다.
+const served = (f) => f.replace(/\.bin$/, '.wasm');
 for (const f of files) {
-  const out = path.join(root, 'dist', f);
+  const out = path.join(root, 'dist', served(f));
   fs.mkdirSync(path.dirname(out), { recursive: true });
-  if (f.endsWith('.js')) fs.writeFileSync(out, fs.readFileSync(path.join(root, f), 'utf8').replace(/'(?:\.\.\/)+vendor\/three\.module\.min\.js'/g, `'${CDN}'`));
+  if (f.endsWith('.js')) fs.writeFileSync(out, fs.readFileSync(path.join(root, f), 'utf8').replace(/'(?:\.\.\/)+vendor\/three\.module\.min\.js'/g, `'${CDN}'`).replace('${BASE}${id}.bin', '${BASE}${id}.wasm'));
   else fs.copyFileSync(path.join(root, f), out);
 }
-fs.writeFileSync(path.join(root, 'dist/files.json'), JSON.stringify(files.map((p) => ({ path: p }))));
+fs.writeFileSync(path.join(root, 'dist/files.json'), JSON.stringify(files.map((p) => ({ path: served(p) }))));
 console.log('artifact page', fs.statSync(path.join(root, 'dist/miniatyr.html')).size, 'bytes;', files.length, 'files');
