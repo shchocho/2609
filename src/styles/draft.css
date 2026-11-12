@@ -20,6 +20,10 @@
 
 [data-look="draft"] [data-track=procurement] { --track: var(--track-procurement); --track-ink: var(--track-procurement-ink); }
 [data-look="draft"] [data-track=ops] { --track: var(--track-ops); --track-ink: var(--track-ops-ink); }
+[data-look="draft"] [data-track=m365-apps] { --track: var(--track-m365-apps); --track-ink: var(--track-m365-apps-ink); }
+[data-look="draft"] [data-track=copilot-code] { --track: var(--track-copilot-code); --track-ink: var(--track-copilot-code-ink); }
+[data-look="draft"] [data-track=power-automate] { --track: var(--track-power-automate); --track-ink: var(--track-power-automate-ink); }
+[data-look="draft"] [data-track=copilot-studio] { --track: var(--track-copilot-studio); --track-ink: var(--track-copilot-studio-ink); }
 
 /* 배경: 홈 · 흐름/결과 화면 */
 [data-look="draft"] .booth-home:before {

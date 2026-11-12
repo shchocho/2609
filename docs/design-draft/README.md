@@ -17,7 +17,7 @@
 | 흐름·결과 화면 배경 | `src/assets/gradient/sky-02.jpg` | CSS 그라데이션 + SVG 노이즈 | 같음 |
 | 업무 영역 목록 상단 그래픽 | `public/brand/signiture/copilot-signature.png` | 영역 색으로 칠한 둥근 카드 그래픽 | 같음 |
 | 의미 아이콘 30종(상황·흐름·요약) | `src/components/semanticIcons.ts` | Fluent UI System Icons(MIT 라이선스, 이미 쓰는 패키지)로 전부 교체 | 원본 아이콘 파일 삭제 |
-| 상황 화면 그림 | `src/play/sceneArt.ts` (24종 중 15종 사용) | **3종** 새로 그림: 견적 비교, 지원서 정리, 납기 지연 (`src/play/sceneArtDraft.ts`) | 나머지 12종 새로 그리기. 안 쓰는 9종은 확장 작업 때 필요한 것만 새로 그리기 |
+| 상황 화면 그림 | `src/play/sceneArt.ts` (24종, 확장 영역까지 모두 사용 중) | **3종** 새로 그림: 견적 비교, 지원서 정리, 납기 지연 (`src/play/sceneArtDraft.ts`) | 나머지 21종 새로 그리기 |
 | 포스터 시나리오 이미지 6장 | `public/graphic/event-poster/*` | 6장 모두 새로 그림 (`public/draft/poster/`, 원본 SVG는 `poster-src/`) | 시나리오 경로를 새 파일로 바꾸고 원본 삭제 |
 
 시안 이미지는 모두 이 저장소에서 코드(SVG·CSS)로 새로 만든 것이라, 외부 이미지나 생성형 이미지 저작권 문제가 없습니다. 포스터는 시나리오 문구(1번 손이 모이는 구도와 연한 주황 #FAD4AC, 2번 밤하늘 전구 #171A5D, 브랜드 적용본은 앰버·네이비, 티셔츠는 3색)에 맞춰 그렸습니다.
