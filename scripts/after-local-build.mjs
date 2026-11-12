@@ -13,4 +13,9 @@ const text = `Copilot Cowork 체험 사이트 — 로컬 확인용
 폴더 안의 파일(logo, brand, graphic 등)은 index.html 과 같은 위치에 그대로 두어야 합니다.
 `;
 writeFileSync(new URL('../dist-local/사용방법.txt', import.meta.url), text.replace(/\n/g, '\r\n'));
+// 이미지 시안 보기(?look=draft)로 여는 바로가기
+writeFileSync(
+  new URL('../dist-local/시안 보기.html', import.meta.url),
+  '<!doctype html><meta charset="utf-8"><title>이미지 시안 보기</title><script>location.replace("index.html?look=draft#/")</script><a href="index.html?look=draft#/">이미지 시안 열기</a>\n',
+);
 console.log('✓ dist-local/ 준비 완료 — index.html 을 더블클릭해 여세요');

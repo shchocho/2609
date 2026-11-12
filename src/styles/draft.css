@@ -1,0 +1,173 @@
+/*
+ * 이미지 시안(?look=draft) 전용 스타일. :root[data-look="draft"] 안에서만 적용되므로 기본 화면에는 영향이 없습니다.
+ * 배경은 원본의 그라데이션 이미지 대신 CSS 그라데이션과 SVG 노이즈로 만듭니다.
+ */
+:root[data-look="draft"] {
+  --draft-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.09'/%3E%3C/svg%3E");
+  --draft-sky:
+    radial-gradient(60% 70% at 8% 12%, #e4d9ff 0%, transparent 60%),
+    radial-gradient(55% 65% at 88% 6%, #9fd0ff 0%, transparent 62%),
+    radial-gradient(50% 60% at 78% 92%, #c4f0df 0%, transparent 64%),
+    radial-gradient(45% 55% at 18% 96%, #b9d7ff 0%, transparent 62%),
+    radial-gradient(40% 40% at 50% 46%, #fff4ea 0%, transparent 70%),
+    linear-gradient(160deg, #eef3ff 0%, #e6efff 48%, #eaf6f3 100%);
+  --draft-stage:
+    radial-gradient(80% 95% at 100% 0%, #6fb9ff 0%, transparent 64%),
+    radial-gradient(70% 85% at 34% 0%, #ace0ff 0%, transparent 62%),
+    radial-gradient(50% 70% at 0% 0%, #ddd3ff 0%, transparent 62%),
+    radial-gradient(40% 55% at 100% 72%, #bdeedb 0%, transparent 66%);
+}
+
+[data-look="draft"] [data-track=procurement] { --track: var(--track-procurement); --track-ink: var(--track-procurement-ink); }
+[data-look="draft"] [data-track=ops] { --track: var(--track-ops); --track-ink: var(--track-ops-ink); }
+
+/* 배경: 홈 · 흐름/결과 화면 */
+[data-look="draft"] .booth-home:before {
+  background: var(--draft-grain), var(--draft-sky);
+  background-size: 220px 220px, auto, auto, auto, auto, auto, auto;
+}
+[data-look="draft"] .sc-stage-sky {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--sc-canvas) 6%, transparent) 0%, color-mix(in srgb, var(--sc-canvas) 56%, transparent) 42%, color-mix(in srgb, var(--sc-canvas) 88%, transparent) 74%, var(--sc-canvas) 96%),
+    var(--draft-grain), var(--draft-stage), var(--sc-canvas);
+  background-size: auto, 220px 220px, auto, auto, auto, auto, auto;
+}
+
+/* 대기 화면 그래픽 */
+[data-look="draft"] .booth-attract { background: #f6f8f3; }
+.draft-hero {
+  overflow: hidden;
+  background:
+    radial-gradient(34% 44% at 18% 22%, rgba(214, 196, 255, .55) 0%, transparent 70%),
+    radial-gradient(34% 44% at 84% 18%, rgba(140, 200, 255, .5) 0%, transparent 70%),
+    radial-gradient(30% 40% at 26% 72%, rgba(255, 207, 178, .5) 0%, transparent 70%),
+    radial-gradient(32% 42% at 78% 70%, rgba(176, 236, 210, .55) 0%, transparent 70%);
+}
+.draft-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--draft-grain);
+  background-size: 220px 220px;
+  pointer-events: none;
+}
+.dh-links { position: absolute; inset: 0; width: 100%; height: 100%; }
+.dh-links path {
+  fill: none;
+  stroke: #9aa9c4;
+  stroke-width: 1.4;
+  stroke-dasharray: 2 7;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  opacity: .55;
+  animation: dh-flow 2.4s linear infinite;
+}
+@keyframes dh-flow { to { stroke-dashoffset: -18; } }
+
+.dh-card {
+  position: absolute;
+  width: 18%;
+  aspect-ratio: 4 / 3;
+  padding: 1.2%;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .74);
+  border: 1px solid rgba(255, 255, 255, .9);
+  box-shadow: 0 24px 48px -20px rgba(40, 60, 110, .28), 0 2px 6px rgba(40, 60, 110, .06);
+  backdrop-filter: blur(10px);
+  transform: rotate(var(--r, 0deg));
+  animation: dh-float 7s ease-in-out var(--d, 0s) infinite;
+  display: flex;
+  flex-direction: column;
+  gap: 8%;
+}
+@keyframes dh-float {
+  0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50% { transform: translateY(-14px) rotate(calc(var(--r, 0deg) * .6)); }
+}
+.dh-badge {
+  position: absolute;
+  top: -18px;
+  left: -18px;
+  width: 52px;
+  height: 52px;
+  filter: drop-shadow(0 6px 10px rgba(30, 40, 80, .18));
+}
+.dh-head { padding-left: 30px; display: flex; gap: 6%; align-items: center; height: 10%; }
+.dh-head b { width: 34%; height: 100%; border-radius: 99px; background: var(--c, #8aa0c4); }
+.dh-head s { width: 20%; height: 70%; border-radius: 99px; background: #e3e9f3; }
+
+.dh-card.is-sheet { --c: var(--m365-excel-bright); width: 21%; }
+.dh-grid { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.dh-grid em { border-radius: 6px; background: #eef2f7; }
+.dh-grid em.on { background: color-mix(in srgb, var(--m365-excel-bright) 55%, #fff); }
+
+.dh-card.is-doc { --c: var(--m365-word-bright); width: 15%; aspect-ratio: 3 / 4; }
+.dh-lines { flex: 1; display: grid; align-content: start; gap: 9%; }
+.dh-lines s { height: 7px; border-radius: 99px; background: #e3e9f3; }
+.dh-lines s:nth-child(2) { width: 82%; }
+.dh-lines s:nth-child(3) { background: color-mix(in srgb, var(--m365-word-light) 70%, #fff); }
+.dh-lines s:nth-child(5) { width: 60%; }
+
+.dh-card.is-slide { width: 19%; aspect-ratio: 16 / 10; }
+.dh-bars { flex: 1; display: flex; align-items: end; gap: 9%; padding: 4% 8% 0; border-bottom: 3px solid #e3e9f3; }
+.dh-bars s { flex: 1; border-radius: 8px 8px 0 0; background: linear-gradient(180deg, var(--m365-powerpoint-bright), color-mix(in srgb, var(--m365-powerpoint-light) 80%, #fff)); }
+.dh-bars s:nth-child(odd) { opacity: .55; }
+
+.dh-card.is-mail { width: 18%; aspect-ratio: 16 / 9; justify-content: center; }
+.dh-mail { display: flex; gap: 6%; align-items: center; }
+.dh-mail i { width: 30px; height: 30px; flex: none; border-radius: 50%; background: color-mix(in srgb, var(--m365-outlook-bright) 40%, #fff); }
+.dh-mail > span { flex: 1; display: grid; gap: 6px; }
+.dh-mail s { height: 7px; border-radius: 99px; background: #e3e9f3; }
+.dh-mail s:last-child { width: 64%; }
+
+.dh-card.is-chat { width: 13%; aspect-ratio: 1; justify-content: center; gap: 7%; }
+.dh-bubble { height: 18%; width: 78%; border-radius: 14px 14px 14px 4px; background: color-mix(in srgb, var(--m365-teams-light) 60%, #fff); }
+.dh-bubble.is-me { align-self: end; width: 62%; border-radius: 14px 14px 4px 14px; background: color-mix(in srgb, var(--m365-teams-bright) 55%, #fff); }
+.dh-bubble.is-short { width: 46%; }
+
+.dh-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 11%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+}
+.dh-core img { position: relative; width: 62%; filter: drop-shadow(0 12px 22px rgba(60, 80, 160, .25)); }
+.dh-glow { position: absolute; inset: -30%; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, .95) 0%, rgba(255, 255, 255, .5) 42%, transparent 70%); }
+.dh-orbit {
+  position: absolute;
+  inset: -22%;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(120, 140, 190, .45);
+  animation: dh-spin 40s linear infinite;
+}
+@keyframes dh-spin { to { transform: rotate(360deg); } }
+.dh-spark {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  filter: drop-shadow(0 0 6px rgba(120, 150, 255, .7));
+  animation: dh-twinkle 3.2s ease-in-out infinite;
+}
+.dh-spark.is-a { top: -14%; right: -10%; }
+.dh-spark.is-b { bottom: -6%; left: -18%; width: 11px; height: 11px; animation-delay: -1.2s; }
+.dh-spark.is-c { top: 10%; left: -26%; width: 8px; height: 8px; animation-delay: -2.1s; }
+@keyframes dh-twinkle { 0%, 100% { opacity: .35; transform: scale(.7); } 50% { opacity: 1; transform: scale(1.1); } }
+
+/* 목록 화면 상단 그래픽 */
+.draft-track-art { opacity: .9; height: 118%; }
+
+/* 장면 그림 시안의 움직임 */
+.ild-bob { animation: ild-bob 3.6s ease-in-out 1.4s infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes ild-bob { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-10px, 6px); } }
+.ild-roll { animation: ild-roll 4.2s ease-in-out 1.2s infinite; }
+@keyframes ild-roll { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-26px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dh-card, .dh-orbit, .dh-spark, .dh-links path, .ild-bob, .ild-roll { animation: none; }
+}

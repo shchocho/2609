@@ -4,8 +4,10 @@ import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import './styles/reference.css';
 import './styles/overrides.css';
 import './styles/surfaces.css';
+import './styles/draft.css';
 import { App } from './App';
 import { applyTrackColors } from './tracks';
+import { DRAFT } from './look';
 
 /** 브랜드 색 변수 */
 const BRAND: Record<string, string> = {
@@ -23,6 +25,7 @@ const PRODUCT: Record<string, [string, string, string]> = {
   onenote: ['#DE4AFF', '#FFA5F0', '#530066'],
 };
 const root = document.documentElement;
+if (DRAFT) root.dataset.look = 'draft';
 for (const [k, v] of Object.entries(BRAND)) root.style.setProperty(k, v);
 for (const [app, [bright, light, dark]] of Object.entries(PRODUCT)) {
   root.style.setProperty(`--m365-${app}-bright`, bright);

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { go, HASH_HOME } from '../router';
 import { COPY } from '../copy';
+import { DRAFT } from '../look';
+import { DraftHero } from './DraftArt';
 
 const HERO = {
   landscape: 'brand/hero/copilot-hero-light-16x9.png',
@@ -27,7 +29,9 @@ export function Attract({ limited = false }: { limited?: boolean }) {
       data-brand-theme="m365-combined"
       onClick={limited ? undefined : () => go(HASH_HOME)}
     >
-      {limited ? (
+      {DRAFT ? (
+        <DraftHero />
+      ) : limited ? (
         <img className="booth-attract-art" src={HERO.landscape} alt="" />
       ) : (
         <video
