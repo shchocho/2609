@@ -1,6 +1,6 @@
 {
   "id": "press-release-draft",
-  "track": "ops",
+  "track": "copilot-chat",
   "order": 3,
   "agent": "chat",
   "apps": [

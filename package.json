@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Copilot Cowork · Copilot Chat 체험(시연) 사이트 — 공용 버전",
+  "description": "Teams · Copilot 교육용 실습 사이트 — 고객사(사랑의교회) 버전",
   "scripts": {
     "dev": "vite",
     "build": "node scripts/check-scenarios.mjs && tsc -b && vite build",

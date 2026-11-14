@@ -7,9 +7,9 @@ import { COPY } from '../copy';
 const GROUPS = [
   { title: COPY.groupWork, tracks: TRACKS.filter(t => !t.group) },
   { title: COPY.groupProduct, tracks: TRACKS.filter(t => t.group === 'product') },
-];
+].filter(g => g.tracks.length);
 
-/** 홈(#/start) — 업무 영역 · 제품 기능 체험(트랙) 선택 */
+/** 홈(#/start) — 실습 영역(트랙) 선택 */
 export function Home() {
   const counts = countByTrack();
   return (

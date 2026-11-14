@@ -87,7 +87,7 @@ export function TrackList({ track }: { track: string }) {
         </div>
       )}
       {expanded ? (
-        <section id="product-view" className="booth-product-guide" aria-label="제품별 체험">
+        <section id="product-view" className="booth-product-guide" aria-label="제품별 실습">
           <div className="booth-product-board">
             {(t?.products ?? ['chat', 'cowork']).map(id => {
               const p = PRODUCTS[id];
@@ -179,15 +179,15 @@ export function TrackList({ track }: { track: string }) {
                           </dl>
                         )}
                       </span>
-                      {s ? <span className="booth-orbit-cta booth-orbit-detail">체험해보기</span>
-                         : <span className="booth-orbit-soon booth-orbit-detail">다음 행사에서 공개합니다</span>}
+                      {s ? <span className="booth-orbit-cta booth-orbit-detail">실습해보기</span>
+                         : <span className="booth-orbit-soon booth-orbit-detail">준비 중입니다</span>}
                     </span>
                   </button>
                 </li>
               );
             })}
           </ul>
-          <nav className="booth-orbit-nav" aria-label="체험 탐색">
+          <nav className="booth-orbit-nav" aria-label="실습 탐색">
             <div className="booth-orbit-pager">
               <button type="button" aria-label="이전 시나리오" onClick={() => step(-1)}><ChevronLeftRegular /></button>
               <ol className="booth-orbit-dots">

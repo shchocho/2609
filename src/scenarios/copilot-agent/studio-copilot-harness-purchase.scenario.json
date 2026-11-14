@@ -1,6 +1,6 @@
 {
   "id": "studio-copilot-harness-purchase",
-  "track": "copilot-studio",
+  "track": "copilot-agent",
   "order": 2,
   "agent": "studio",
   "surface": "studio",

@@ -1,4 +1,8 @@
-# Copilot Cowork 체험 사이트 (공용 버전)
+# Teams · Copilot 실습 사이트 (고객사 교육용: 사랑의교회)
+
+> 이 브랜치(`customer/sarang`)는 공용 체험 사이트(`claude/busy-wright-7wa9ee`)에서 갈라져 나온 **고객사 교육용 실습 사이트**입니다.
+> 영역은 Teams 기본 · Copilot Chat · Copilot in 앱 · Copilot 에이전트 · Copilot Code 5개이고, 진행 상황과 남은 단계는 `docs/customer-sarang/PLAN.md` 에 있습니다.
+> 아래 설명 가운데 화면 흐름·엔진·시나리오 JSON 구조는 공용 버전과 같습니다.
 
 Microsoft **Copilot Chat**과 **Copilot Cowork**가 실제 업무를 어떻게 처리하는지 클릭으로 따라가 보는 시연(체험) 사이트입니다.
 대학(POSTECH) 행사용으로 만들어진 *Copilot Scenario Player* 부스 화면과 같은 구성·같은 UI를, 특정 기관이 아닌 **일반 기업용**으로 다시 만든 버전입니다.

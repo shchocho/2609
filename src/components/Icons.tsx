@@ -1,7 +1,6 @@
 import { SEMANTIC_ICONS } from './semanticIcons';
 import {
-  MegaphoneLoudFilled, PeopleFilled, MoneyFilled, ScalesFilled, HandshakeFilled, BriefcaseFilled,
-  AppsFilled, CodeFilled, FlowFilled, BotFilled,
+  PeopleTeamFilled, ChatSparkleFilled, AppsFilled, CodeFilled, BotFilled,
 } from '@fluentui/react-icons';
 import {
   Box24Regular, Briefcase24Regular, DataBarVertical24Regular, Megaphone24Regular, People24Regular, Code24Regular,
@@ -38,16 +37,11 @@ export function SemIcon({ name, className }: { name?: string; className?: string
 
 /** 홈 화면 트랙 카드 아이콘 (Fluent 채움 아이콘) */
 const TRACK_ICONS: Record<string, JSX.Element> = {
-  sales: <MegaphoneLoudFilled />,
-  hr: <PeopleFilled />,
-  finance: <MoneyFilled />,
-  procurement: <ScalesFilled />,
-  ops: <HandshakeFilled />,
-  dev: <BriefcaseFilled />,
+  'teams-basics': <PeopleTeamFilled />,
+  'copilot-chat': <ChatSparkleFilled />,
   'm365-apps': <AppsFilled />,
+  'copilot-agent': <BotFilled />,
   'copilot-code': <CodeFilled />,
-  'power-automate': <FlowFilled />,
-  'copilot-studio': <BotFilled />,
 };
 export function TrackIcon({ id, fallback }: { id: string; fallback?: string }) {
   return TRACK_ICONS[id] ?? <span>{fallback}</span>;

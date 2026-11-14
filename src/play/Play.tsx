@@ -1,4 +1,4 @@
-/** 시나리오 재생 화면: 상황 → 흐름 → 체험 → 결과 */
+/** 시나리오 재생 화면: 상황 → 흐름 → 실습 → 결과 */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ArrowCounterclockwiseRegular, ArrowLeftRegular, ArrowPreviousRegular, HomeRegular, NextRegular,
@@ -18,7 +18,7 @@ import { Cowork } from './Cowork';
 import { AppWindow } from '../surfaces/AppWindow';
 import { DoneStage, OverviewStage, PainStage, SceneStage } from './Stages';
 
-const LABEL: Record<string, string> = { pain: '상황', overview: '흐름', demo: '체험', done: '결과' };
+const LABEL: Record<string, string> = { pain: '상황', overview: '흐름', demo: '실습', done: '결과' };
 const SPOT_HOLD = 2600, REWIND_MS = 1600;
 const NO_MESSAGES: Message[] = [];
 

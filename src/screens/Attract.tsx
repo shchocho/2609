@@ -50,7 +50,7 @@ export function Attract({ limited = false }: { limited?: boolean }) {
         <div className="booth-attract-say">
           <img className="booth-limited-logo" src="logo/copilot/copilot-horiz-black.png" alt="Copilot" />
           <h1>더 큰 화면에서<br />접속해 주세요</h1>
-          <p>PC나 태블릿에서 체험해 주세요.<br />창을 작게 열었다면 크기를 늘려 주세요.</p>
+          <p>PC나 태블릿에서 실습해 주세요.<br />창을 작게 열었다면 크기를 늘려 주세요.</p>
         </div>
       ) : (
         <div className="booth-attract-say">
@@ -61,7 +61,7 @@ export function Attract({ limited = false }: { limited?: boolean }) {
             </span>{' '}
             함께라면, <span>{COPY.tagline}</span>
           </h1>
-          <button type="button" className="booth-cta">체험해보기</button>
+          <button type="button" className="booth-cta">실습 시작하기</button>
         </div>
       )}
     </main>

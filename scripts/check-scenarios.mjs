@@ -8,7 +8,7 @@ import { join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('../src/scenarios/', import.meta.url)); // .pathname 은 Windows 에서 경로가 깨짐
-const TRACKS = ['sales', 'hr', 'finance', 'procurement', 'ops', 'm365-apps', 'copilot-code', 'power-automate', 'copilot-studio'];
+const TRACKS = ['teams-basics', 'copilot-chat', 'm365-apps', 'copilot-agent', 'copilot-code'];
 const AGENTS = ['chat', 'cowork', 'office', 'flow', 'studio', 'code'];
 /** 앱 창에서 재생하는 agent 와 그 화면(surface) */
 const WINDOWS = { office: ['word', 'excel', 'powerpoint', 'outlook', 'forms', 'teams'], flow: ['cloudflow', 'deskflow'], studio: ['studio'], code: ['code'] };

@@ -1,0 +1,16 @@
+/* 고객사(사랑의교회) 교육용 실습 사이트 전용 스타일 — reference.css 는 고치지 않고 여기에만 더합니다. */
+
+/* ---------- 영역 색 ---------- */
+[data-track=teams-basics] { --track: var(--track-teams-basics); --track-ink: var(--track-teams-basics-ink); }
+[data-track=copilot-chat] { --track: var(--track-copilot-chat); --track-ink: var(--track-copilot-chat-ink); }
+[data-track=m365-apps] { --track: var(--track-m365-apps); --track-ink: var(--track-m365-apps-ink); }
+[data-track=copilot-agent] { --track: var(--track-copilot-agent); --track-ink: var(--track-copilot-agent-ink); }
+[data-track=copilot-code] { --track: var(--track-copilot-code); --track-ink: var(--track-copilot-code-ink); }
+
+/* ---------- 홈: 영역 5개를 한 줄로 (두 줄 배치용으로 줄였던 카드를 다시 키운다) ---------- */
+:root[data-orient=landscape] .booth-track-groups { margin-top: 34px; }
+:root[data-orient=landscape] .booth-track-groups h2 { margin-bottom: 14px; }
+:root[data-orient=landscape] .booth-track-groups .booth-track-grid {
+  gap: 20px;
+  grid-template-columns: repeat(var(--cols, 5), minmax(0, 232px));
+}

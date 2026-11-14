@@ -1,6 +1,6 @@
 {
   "id": "studio-standard-helpdesk",
-  "track": "copilot-studio",
+  "track": "copilot-agent",
   "order": 1,
   "agent": "studio",
   "surface": "studio",

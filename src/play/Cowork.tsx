@@ -234,7 +234,7 @@ export function Cowork({ active, s, p, st, setSt, onDone }: {
     if (review) return;
     const h = p.hunt;
     if (!h || st.hunted) {
-      setToast(value ? { text: `‘${value}’ 으로 바꿨습니다`, tone: '' } : { text: '체험 화면에서는 이 기능이 동작하지 않습니다', tone: '' });
+      setToast(value ? { text: `‘${value}’ 으로 바꿨습니다`, tone: '' } : { text: '실습 화면에서는 이 기능이 동작하지 않습니다', tone: '' });
       return;
     }
     if (target !== h.target) { setToast({ text: h.wrong?.[target] ?? '이번에 찾을 곳은 여기가 아닙니다', tone: 'is-warn' }); return; }
@@ -367,7 +367,7 @@ export function Cowork({ active, s, p, st, setSt, onDone }: {
                       const to = ATTACH_TO[it.id];
                       if (to && attachFiles.length > 0) { setMenu(to); return; }
                       setMenu(null);
-                      if (!st.hunted) setToast({ text: '체험 화면에서는 이 기능이 동작하지 않습니다', tone: '' });
+                      if (!st.hunted) setToast({ text: '실습 화면에서는 이 기능이 동작하지 않습니다', tone: '' });
                     }}
                   >
                     <span className="wb-menu-ico" aria-hidden="true">{it.icon}</span>
