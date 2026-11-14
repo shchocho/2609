@@ -87,7 +87,18 @@
   - 채널에 올리기(채널 → Shared → 끌어다 놓기 또는 Upload): https://support.microsoft.com/en-us/teams/files/collaborate-on-files-in-microsoft-teams
   - 새로 만들기 → 폴더·Word·Excel·PowerPoint: https://support.microsoft.com/ko-kr/teams/teams-channels/add-content-and-notes-to-a-team-in-microsoft-teams
   - 저장 위치(SharePoint): https://support.microsoft.com/en-us/teams/files/file-storage-in-microsoft-teams
-  - **문서만으로 확정하지 못한 표기**(실제 테넌트 화면에서 확인 필요, 글자는 시나리오 JSON 과 `src/surfaces/TeamsApp.tsx` 에서 고침): ① 채널·채팅의 파일 탭 이름 — 한국어 문서는 "공유", 영어는 "Shared", 예전 화면은 "파일". ② 새 모임의 마지막 단추 — 문서는 "저장", 참석자가 있으면 "보내기"로 보일 수 있음. ③ 왼쪽 앱 바의 일정 이름("일정"/"캘린더")과 새 팀 창의 제목.
+  - **실제 화면에서 확인한 표기 (2026-11-14, 한국어 Teams 데스크톱 앱, 교육 주관 쪽 테넌트)** — 문서와 다른 곳은 실제 화면을 따랐습니다. 화면은 `src/surfaces/TeamsApp.tsx`, 문구는 시나리오 JSON 에 있습니다.
+    - 앱 바: 활동 · 채팅 · Teams · 일정 · OneDrive · 통화 · 앱. 팀과 채널은 채팅이 아니라 **Teams** 에 모여 있음. 검색란은 "검색하거나 Copilot에게 질문하기(Ctrl+E)".
+    - 채팅: 목록 위 연필 아이콘이 **새 메시지**(Ctrl+N), 그 옆 화살표가 새 항목. 새 메시지 창의 받는 사람 줄은 **"대상:"**, 오른쪽 끝 화살표를 누르면 그 위에 **"그룹 이름:"** 칸이 생김. 입력란은 "메시지를 입력하세요.". 대화 위 탭은 **채팅 · 공유**.
+    - 일정: 새 모임 단추는 **"신규"**. 창 제목은 **"새 이벤트"**, 칸은 **"제목 추가" · "필수 참석자 초대"**, 날짜·시간 줄에 **"스케줄러"**, 토글은 **"Microsoft Teams 모임"**, 마지막 단추는 **"저장"**.
+    - 팀: Teams 목록의 새 항목 메뉴(새 메시지 · 새 채널 · 팀 참가 · **새 팀** · 새 섹션) → 창 제목 **"팀 만들기"**, 칸은 "팀 이름 *" · "설명" · "팀 유형"(비공개) · "첫 번째 채널 이름 *", 단추는 취소 · 만들기.
+    - 채널: 탭은 **게시물 · 공유**, 글 쓰는 단추는 "채널에 게시". 공유 탭 오른쪽의 **"만들기 또는 업로드"** 한 단추 안에 폴더 · 파일 업로드 · 폴더 업로드 · Word 문서 · Excel 통합 문서 · PowerPoint 프레젠테이션이 있음. 열 이름은 이름 · 수정된 날짜 · 수정한 사람.
+    - 고객사 테넌트는 설정(채팅과 채널을 합쳐 보기 등)에 따라 앱 바와 새 항목 메뉴가 다를 수 있습니다.
+- **Word · Excel · PowerPoint 화면 (2026-11-14, 한국어 데스크톱 앱에서 확인)**: `src/surfaces/OfficeChrome.tsx` 와 `src/styles/office-real.css` 에 옮겼습니다.
+  - 제목 표시줄(자동 저장 · 파일 이름 - 앱 · 검색), 탭 이름, 홈 탭의 그룹 이름(Word: 클립보드 · 글꼴 · 단락 · 스타일 · 편집 · 음성 · 편집기 · 추가 기능 / Excel: 클립보드 · 글꼴 · 맞춤 · 표시 형식 · 스타일 · 셀 · 편집 · 추가 기능 / PowerPoint: 클립보드 · 슬라이드 · 글꼴 · 단락 · 그리기 · 편집 · 음성 · 추가 기능 · Copilot), 오른쪽 단추(메모 · 편집 · 공유), 상태 표시줄.
+  - **Copilot 은 리본이 아니라 문서 오른쪽 아래의 둥근 Copilot 단추로 엽니다.** Copilot 창은 위쪽에 모델("자동") · 닫기, 아래쪽에 "편집 허용", 입력란("Copilot으로 편집"), "M365 Copilot(프리미엄)" 순서입니다. 빈 Word 문서의 창 제목은 "무엇을 만드시겠습니까?" 였습니다.
+  - 리본의 추가 기능(ChatGPT 등)과 민감도 레이블처럼 테넌트마다 다른 것은 넣지 않았습니다.
+  - **확인하지 못한 화면**: Outlook · Forms · Teams 회의의 Copilot 화면, Copilot Studio, Code 탭은 실제 화면과 대조하지 못했습니다(이전 구성 그대로). Excel · PowerPoint 의 Copilot 창 안쪽 문구도 Word 와 같은 틀이라는 것만 확인했습니다.
 - **Copilot 에이전트**: 고객사 답이 없어 기본값(Copilot Studio 안내 에이전트 1편 + Cowork 1편)으로 만들었습니다. 2026-11-14 확인.
   - 지식 원본(공개 웹사이트 · 올린 문서 · SharePoint · Dataverse · 커넥터): https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-copilot-studio
   - 토픽(토픽 추가 → 처음부터. 클래식 오케스트레이션은 트리거 문구 5~10개, 생성형 오케스트레이션은 토픽 설명으로 고름): https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-create-edit-topics
@@ -133,7 +144,7 @@
 ### 고객사에 확인할 것
 
 1. 위 표의 기본값 8가지가 맞는지.
-2. 실제 테넌트의 Teams 화면 표기 3가지("제품 사실 확인"의 ①②③). 한국어 지원 문서와 실제 화면이 다를 수 있습니다.
+2. 고객사 테넌트의 Teams 화면이 위 "실제 화면에서 확인한 표기"와 같은지(특히 앱 바에 Teams 가 따로 있는지). 교육 주관 쪽 테넌트에서 확인한 것이라 설정에 따라 다를 수 있습니다.
 3. 쓰는 용어(부서·사역팀·소그룹 이름)와 등장인물 이름. 지금은 일반 용어와 가상 이름(김하늘, 박소망, 이은혜, 최믿음 등)입니다.
 4. "나만의 에이전트 생성"이 Copilot Studio인지 Copilot 앱의 Agent Builder인지.
 5. Microsoft 365 Copilot, Copilot Studio, Copilot Code, Cowork을 교육 환경에서 실제로 쓸 수 있는지. 못 쓰는 영역은 "시뮬레이션만"이라고 안내해야 합니다.

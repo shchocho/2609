@@ -9,6 +9,8 @@ import type { Artifact, Pick, PlayState, Scenario, Vars } from '../types';
 import { artifactName, filterBy } from '../engine/text';
 import { ArtifactView } from '../components/artifacts';
 import { PickText, SlashPopup, type Mark, type PickPhase } from '../components/chrome';
+import { MicRegular, NavigationRegular, ShieldCheckmarkRegular } from '@fluentui/react-icons';
+import { OfficeRibbon, OfficeStatus, OfficeTitle, REAL } from './OfficeChrome';
 
 interface Ui {
   app: string;
@@ -123,8 +125,10 @@ const UI: Record<string, Ui> = {
   },
 };
 
-export function AppWindow({ s, st, vars, ids, streamRef, mark, ask, onSend, pick, pickPhase, onPickSelect, onSlide, target, onAct, children }: {
+export function AppWindow({ s, st, vars, ids, shown, streamRef, mark, ask, onSend, pick, pickPhase, onPickSelect, onSlide, target, onAct, children }: {
   s: Scenario; st: PlayState; vars: Vars; ids: string[]; streamRef: RefObject<HTMLDivElement | null>; mark: Mark;
+  /** 지금까지 재생한 메시지 수 — Copilot 단추(target 'copilot')를 누르기 전에는 Copilot 창을 닫아 둔다 */
+  shown: number;
   ask: string | null; onSend?: () => void; pick?: Pick; pickPhase: PickPhase; onPickSelect: () => void;
   onSlide: (n: number) => void; children: ReactNode;
   /** 화면에서 직접 눌러야 할 단추 id(cue.target)와 눌렀을 때 할 일 */
@@ -153,25 +157,44 @@ export function AppWindow({ s, st, vars, ids, streamRef, mark, ask, onSend, pick
   const typed = target ? null : ask;
   const hot = (act?: string) => !!act && act === target;
   const slashOpen = !!(pick && typed && (pickPhase === 'search' || pickPhase === 'pick'));
+  // Word · Excel · PowerPoint 는 실제 데스크톱 앱의 제목 표시줄 · 리본을 쓴다. Copilot 창은 문서 오른쪽 아래의 Copilot 단추로 연다
+  const real = REAL[surface];
+  const copilotAt = s.messages.findIndex(m => m.role === 'cue' && m.target === 'copilot');
+  const paneOpen = copilotAt < 0 || shown > copilotAt;
+  const name = creating ? '새로 만들기' : doc ? artifactName(doc, ids) : s.title;
   return (
-    <div className="sc-shell is-office" data-app={surface}>
-      <div className="sc-win">
-        <span className="sc-win-name">
-          {!ui.pane && <span className="sc-save">자동 저장 ●</span>}{creating ? '새로 만들기' : doc ? artifactName(doc, ids) : s.title} · {ui.app}
-        </span>
-        <span className="sc-win-search">⌕ 검색</span>
-        <span className="sc-win-btns" aria-hidden="true"><i>─</i><i>▢</i><i>✕</i></span>
-      </div>
-      <div className={`sc-ribbon sc-zone ${mark('ribbon')}`}>
-        <span className="sc-ribbon-tabs">{ui.tabs.map((t, i) => <i key={t} className={i === 1 ? 'on' : undefined}>{t}</i>)}</span>
-        <span className="sc-ribbon-groups">
-          {ui.groups.map(([ico, name, act]) => (hot(act)
-            ? <button key={name} type="button" className="is-hunt" data-act={act} onClick={onAct}><b aria-hidden="true">{ico}</b><i>{name}</i></button>
-            : <span key={name} className={name === 'Copilot' ? 'is-copilot' : undefined}><b aria-hidden="true">{ico}</b><i>{name}</i></span>
-          ))}
-        </span>
-      </div>
-      <div className="sc-office-body">
+    <div className="sc-shell is-office" data-app={surface} data-real={real ? '' : undefined}>
+      {real ? <OfficeTitle r={real} surface={surface} name={name} me="나" /> : (
+        <div className="sc-win">
+          <span className="sc-win-name">
+            {!ui.pane && <span className="sc-save">자동 저장 ●</span>}{name} · {ui.app}
+          </span>
+          <span className="sc-win-search">⌕ 검색</span>
+          <span className="sc-win-btns" aria-hidden="true"><i>─</i><i>▢</i><i>✕</i></span>
+        </div>
+      )}
+      {real ? (
+        <OfficeRibbon
+          r={real} className={`sc-zone ${mark('ribbon')}`}
+          extra={surface === 'excel' ? <div className="or-fx" aria-hidden="true"><i>A1</i><b>fx</b><span /></div> : undefined}
+        />
+      ) : (
+        <div className={`sc-ribbon sc-zone ${mark('ribbon')}`}>
+          <span className="sc-ribbon-tabs">{ui.tabs.map((t, i) => <i key={t} className={i === 1 ? 'on' : undefined}>{t}</i>)}</span>
+          <span className="sc-ribbon-groups">
+            {ui.groups.map(([ico, name, act]) => (hot(act)
+              ? <button key={name} type="button" className="is-hunt" data-act={act} onClick={onAct}><b aria-hidden="true">{ico}</b><i>{name}</i></button>
+              : <span key={name} className={name === 'Copilot' ? 'is-copilot' : undefined}><b aria-hidden="true">{ico}</b><i>{name}</i></span>
+            ))}
+          </span>
+        </div>
+      )}
+      <div className={`sc-office-body${paneOpen ? '' : ' is-paneless'}`}>
+        {real && !paneOpen && (
+          <button type="button" className={`or-fab${hot('copilot') ? ' is-hunt' : ''}`} aria-label="Copilot" {...(hot('copilot') ? { 'data-act': 'copilot', onClick: onAct } : { tabIndex: -1 })}>
+            <img src="logo/copilot/copilot.png" alt="" />
+          </button>
+        )}
         {ui.nav && <nav className="sc-app-nav" aria-hidden="true">{ui.nav.map((n, i) => <i key={n} className={i === 1 ? 'on' : undefined}>{n}</i>)}</nav>}
         <div className={`sc-canvas sc-zone ${mark('canvas')}`}>
           {creating ? (
@@ -189,30 +212,38 @@ export function AppWindow({ s, st, vars, ids, streamRef, mark, ask, onSend, pick
             />
           )}
         </div>
+        {paneOpen && (
         <div className={`sc-pane sc-zone ${mark('pane')}`} data-pane={s.surface}>
-          {pane.pane
-            ? <span className="sc-pane-top"><b>{pane.pane}</b><i>✕</i></span>
-            : <span className="sc-pane-top"><i>≡</i><i>⛨</i><i className="sc-chip">{vars.model} ⌄</i><i>⋯</i><i>✕</i></span>}
+          {real
+            ? <span className="sc-pane-top or-pane-top"><i><NavigationRegular /></i><i className="sc-chip">{vars.model} ⌄</i><em /><i className="or-shield"><ShieldCheckmarkRegular /></i><i>⋯</i><i>✕</i></span>
+            : pane.pane
+              ? <span className="sc-pane-top"><b>{pane.pane}</b><i>✕</i></span>
+              : <span className="sc-pane-top"><i>≡</i><i>⛨</i><i className="sc-chip">{vars.model} ⌄</i><i>⋯</i><i>✕</i></span>}
           <b className="sc-pane-head">{pane.head}</b>
           {pane.sub && <span className="sc-pane-sub">{pane.sub}</span>}
-          {!pane.pane && <i className="sc-pane-allow">편집 허용 ⌄</i>}
+          {!pane.pane && !real && <i className="sc-pane-allow">편집 허용 ⌄</i>}
           <div className="sc-stream-in" ref={streamRef}>{children}</div>
+          {real && <i className="or-allow">편집 허용 ⌄</i>}
           {pane.input && (
             <div className={`sc-composer is-pane sc-zone ${mark('composer')}`}>
               <b aria-hidden="true">＋</b>
               <span className={typed ? 'is-filled' : undefined}>{typed && pick ? <PickText text={typed} pick={pick} phase={pickPhase} /> : typed ?? pane.input}</span>
-              <i aria-hidden="true">🎤</i>
+              <i aria-hidden="true">{real ? <MicRegular /> : '🎤'}</i>
               {onSend && !target && <button type="button" className="sc-pane-send is-hunt" aria-label="보내기" onClick={onSend}>↑</button>}
               {slashOpen && pick && <SlashPopup pick={pick} active={pickPhase === 'pick'} onPick={pickPhase === 'search' ? onPickSelect : undefined} />}
             </div>
           )}
+          {real && <small className="or-pane-foot">M365 Copilot(프리미엄) ⓘ</small>}
         </div>
+        )}
       </div>
-      <div className="sc-status">
-        <span>{surface === 'powerpoint' ? `슬라이드 ${slide}/${slides}` : ui.status}</span>
-        <span>한국어</span>
-        {!ui.pane && <span className="sc-status-end">─ ───●─── ＋ 77%</span>}
-      </div>
+      {real ? <OfficeStatus r={real} lead={surface === 'powerpoint' ? `슬라이드 ${slide}/${slides}` : undefined} /> : (
+        <div className="sc-status">
+          <span>{surface === 'powerpoint' ? `슬라이드 ${slide}/${slides}` : ui.status}</span>
+          <span>한국어</span>
+          {!ui.pane && <span className="sc-status-end">─ ───●─── ＋ 77%</span>}
+        </div>
+      )}
     </div>
   );
 }

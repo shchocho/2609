@@ -208,7 +208,7 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
               <TeamsApp s={s} shown={p.shown} mark={mark} target={holdAt === null ? p.pending?.target : undefined} onAct={p.act} ask={ask} />
             ) : office ? (
               <AppWindow
-                s={s} st={st} vars={vars} ids={ids} streamRef={streamRef} mark={mark}
+                s={s} st={st} vars={vars} ids={ids} shown={p.shown} streamRef={streamRef} mark={mark}
                 ask={ask} onSend={ask ? onSend : undefined} pick={pick} pickPhase={pickPhase} onPickSelect={selectPick}
                 onSlide={n => setSt(x => ({ ...x, slide: n }))}
                 target={holdAt === null ? p.pending?.target : undefined} onAct={p.act}
