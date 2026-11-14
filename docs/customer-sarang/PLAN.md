@@ -88,8 +88,12 @@
   - 새로 만들기 → 폴더·Word·Excel·PowerPoint: https://support.microsoft.com/ko-kr/teams/teams-channels/add-content-and-notes-to-a-team-in-microsoft-teams
   - 저장 위치(SharePoint): https://support.microsoft.com/en-us/teams/files/file-storage-in-microsoft-teams
   - **문서만으로 확정하지 못한 표기**(실제 테넌트 화면에서 확인 필요, 글자는 시나리오 JSON 과 `src/surfaces/TeamsApp.tsx` 에서 고침): ① 채널·채팅의 파일 탭 이름 — 한국어 문서는 "공유", 영어는 "Shared", 예전 화면은 "파일". ② 새 모임의 마지막 단추 — 문서는 "저장", 참석자가 있으면 "보내기"로 보일 수 있음. ③ 왼쪽 앱 바의 일정 이름("일정"/"캘린더")과 새 팀 창의 제목.
-- **Copilot 에이전트**: 고객사 답에 맞춰 5단계를 시작할 때 확인하고 주소를 적습니다.
-  - (확인한 주소 적기)
+- **Copilot 에이전트**: 고객사 답이 없어 기본값(Copilot Studio 안내 에이전트 1편 + Cowork 1편)으로 만들었습니다. 2026-11-14 확인.
+  - 지식 원본(공개 웹사이트 · 올린 문서 · SharePoint · Dataverse · 커넥터): https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-copilot-studio
+  - 토픽(토픽 추가 → 처음부터. 클래식 오케스트레이션은 트리거 문구 5~10개, 생성형 오케스트레이션은 토픽 설명으로 고름): https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-create-edit-topics
+  - Teams에 열기(먼저 게시 → 채널 → "Microsoft 365 and Microsoft Teams" → 채널 추가): https://learn.microsoft.com/en-us/microsoft-copilot-studio/publication-add-bot-to-microsoft-teams
+  - 대안(Copilot 앱 안의 Agent Builder, 지침과 지식만 넣는 간단한 에이전트. 쓸 수 있는 범위는 테넌트 라이선스에 따름): https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/agent-builder
+  - 화면의 "Standard 하네스"·"Copilot Cowork" 표기는 `docs/EXPANSION-PLAN.md` 의 제품 사실 확인을 그대로 따릅니다. 고객사 교육 자료의 "나만의 에이전트 생성"이 Agent Builder를 뜻하면 `agent-newcomer` 의 "실제로 해 보기" 순서를 그에 맞게 바꿔야 합니다.
 
 ## 작업 순서 (단계 하나 = 세션 하나, 끝날 때마다 커밋)
 
@@ -97,7 +101,7 @@
 - [x] 2. **Teams 기본 실습 화면 + 3편**: Teams 앱 모양의 화면(채팅 목록, 일정, 팀·채널, 파일 탭)을 `src/surfaces/` 에 추가. 화면 찾기(spot)와 단추 안내(cue)로 순서대로 눌러 보게 함. 결과 화면 "실제로 해 보기" 카드(`practice`) 추가.
 - [x] 3. **Copilot Chat 3편**: 교회 업무로 다시 쓰기. 포스터 이미지는 새로 그림.
 - [x] 4. **Copilot in 앱 6편**: 교회 업무로 다시 쓰기.
-- [ ] 5. **Copilot 에이전트 2~3편**: 고객사 답에 맞춰 다시 쓰기.
+- [x] 5. **Copilot 에이전트 2~3편**: 고객사 답에 맞춰 다시 쓰기.
 - [ ] 6. **Copilot Code 2~3편**: 교회 업무로 다시 쓰기.
 - [ ] 7. **전체 점검**: 모든 시나리오 e2e, 1600×900·1371×768 스크린샷, `npm run build:local` 더블클릭 폴더, (선택) 배포.
 
