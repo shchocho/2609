@@ -16,7 +16,9 @@ const ROLES = new Set(['user', 'assistant', 'tool', 'note', 'cue', 'spot', 'appr
 const HUNT_TARGETS = new Set(['model', 'effort', 'attach', 'new', 'mine', 'auto', 'custom']);
 const ZONES = { chat: ['rail', 'top', 'stream', 'actions', 'composer'], cowork: ['rail', 'stream', 'composer'], office: ['ribbon', 'canvas', 'pane', 'composer'], teams: ['rail', 'list', 'header', 'main', 'composer'] }; // 앱 창 화면(WINDOWS)은 모두 office 와 같은 영역을 쓴다
 const ICONS = new Set(['box', 'briefcase', 'chart', 'megaphone', 'people', 'code', 'clock', 'calx', 'scales', 'split', 'docsearch', 'calc', 'target', 'mail', 'share', 'checkdoc', 'factory', 'coin', 'network', 'alert', 'bolt', 'sliders', 'link', 'check', 'send', 'truck', 'refresh', 'gauge', 'shield']);
-const BANNED = (process.env.BANNED ?? 'POSTECH,포스텍').split(',').filter(Boolean);
+/** 상황 그림 이름 (src/play/sceneArtSarang.ts) */
+const ARTS = ['chat', 'calendar', 'files', 'doc', 'chart', 'mail', 'slides', 'form', 'poster', 'agent', 'app'].map(k => `sr-${k}`);
+const BANNED = (process.env.BANNED ?? 'POSTECH,포스텍,누리테크').split(',').filter(Boolean);
 
 let problems = 0;
 const ids = new Set();
@@ -89,6 +91,7 @@ for (const track of readdirSync(ROOT)) {
       }
     }
     for (const it of [...(s.scene?.points ?? []), ...(s.recap ?? [])]) if (it.icon && !ICONS.has(it.icon)) err(file, `아이콘 "${it.icon}" 은 없습니다`);
+    if (s.scene?.art && !ARTS.includes(s.scene.art)) err(file, `scene.art "${s.scene.art}" 그림은 없습니다 (${ARTS.join(' · ')})`);
     if (s.quiz && (s.quiz.length !== 3 || s.quiz.some(q => q.answer < 0 || q.answer >= q.options.length))) err(file, 'quiz 는 3문항, answer 는 보기 범위 안이어야 합니다');
     const text = JSON.stringify(s);
     for (const w of BANNED) if (text.includes(w)) err(file, `금지어 "${w}" 가 남아 있습니다`);

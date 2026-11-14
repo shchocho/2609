@@ -1,13 +1,7 @@
 import { useEffect, useState } from 'react';
 import { go, HASH_HOME } from '../router';
 import { COPY } from '../copy';
-import { DRAFT } from '../look';
 import { DraftHero } from './DraftArt';
-
-const HERO = {
-  landscape: 'brand/hero/copilot-hero-light-16x9.png',
-  motion: 'brand/hero/copilot-hero-motion-light-16x9.mp4',
-};
 
 function usePortrait() {
   const [p, setP] = useState(() => window.matchMedia('(orientation: portrait)').matches);
@@ -29,23 +23,7 @@ export function Attract({ limited = false }: { limited?: boolean }) {
       data-brand-theme="m365-combined"
       onClick={limited ? undefined : () => go(HASH_HOME)}
     >
-      {DRAFT ? (
-        <DraftHero />
-      ) : limited ? (
-        <img className="booth-attract-art" src={HERO.landscape} alt="" />
-      ) : (
-        <video
-          key={HERO.motion}
-          className="booth-attract-art"
-          src={HERO.motion}
-          poster={HERO.landscape}
-          autoPlay
-          muted
-          loop
-          playsInline
-          aria-hidden="true"
-        />
-      )}
+      <DraftHero />
       {limited ? (
         <div className="booth-attract-say">
           <img className="booth-limited-logo" src="logo/copilot/copilot-horiz-black.png" alt="Copilot" />

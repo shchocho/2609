@@ -22,7 +22,8 @@ import {
 import type { Scenario, TeamsLab } from '../types';
 import type { Mark } from '../components/chrome';
 
-interface Ctx { has: (f: string) => boolean; target?: string; onAct: () => void }
+/** 화면 조각들이 함께 쓰는 것: 깃발 확인 · 누를 차례인 단추 · 영역 표시 */
+interface Ctx { has: (f: string) => boolean; target?: string; onAct: () => void; mark: Mark }
 
 /** 누를 차례인 단추만 살아 있고(is-hunt), 나머지는 모양만 있다 */
 function B({ c, act, className = '', label, children }: { c: Ctx; act?: string; className?: string; label?: string; children?: ReactNode }) {
@@ -40,6 +41,7 @@ const Empty = ({ children }: { children: ReactNode }) => <div className="tl-empt
 function Field({ c, act, filled, hint, children }: { c: Ctx; act: string; filled: boolean; hint: string; children: ReactNode }) {
   return filled ? <span className="tl-inp is-filled">{children}</span> : <B c={c} act={act} className="tl-inp">{hint}</B>;
 }
+const Chips = ({ names }: { names: string[] }) => <>{names.map(p => <em key={p} className="tl-chip">{p}</em>)}</>;
 
 const RAIL: [string, string, ReactNode, ReactNode][] = [
   ['activity', '활동', <AlertRegular />, <AlertRegular />],
@@ -51,134 +53,96 @@ const RAIL: [string, string, ReactNode, ReactNode][] = [
 ];
 const HOURS = [9, 10, 11, 12, 13, 14, 15, 16];
 
-export function TeamsApp({ s, shown, mark, target, onAct, ask }: {
-  s: Scenario; shown: number; mark: Mark; target?: string; onAct: () => void; ask: string | null;
-}) {
-  const t = s.teams as TeamsLab; // check-scenarios 가 teams 시나리오의 teams 항목을 보장한다
-  const flags = s.messages.slice(0, shown).flatMap(m => (m.role === 'tool' && m.sets ? [m.sets] : []));
-  const c: Ctx = { has: f => flags.includes(f), target, onAct };
-  const { has } = c;
-  const g = t.group, ev = t.event, tm = t.team;
-  const app = t.mode === 'chat' ? (has('chat') ? 'chat' : 'activity') : t.mode === 'calendar' ? (has('calendar') ? 'calendar' : 'chat') : 'chat';
-  const chats = t.chats ?? [];
-  const groupMade = t.mode === 'chat' && has('sent');
-  const teamMade = t.mode === 'files' && has('created');
-
-  /* ---------- 가운데 목록 ---------- */
-  const list = app === 'activity' ? (
+/* ---------- 채팅: 새 그룹 채팅 만들기 ---------- */
+function ChatView({ c, g, sent, typed }: { c: Ctx; g: NonNullable<TeamsLab['group']>; sent?: string; typed: string | null }) {
+  const { has, mark } = c;
+  if (!has('chat')) return <Empty>왼쪽 앱 바에서 <b>채팅</b>을 열면 대화 목록이 보입니다.</Empty>;
+  if (!has('new')) return <Empty>대화를 고르거나, 목록 위의 <b>새 채팅</b>으로 대화를 시작하세요.</Empty>;
+  return (
     <>
-      <div className="tl-list-head"><b>활동</b><span><i><FilterRegular /></i><i><MoreHorizontalRegular /></i></span></div>
-      <p className="tl-list-note">새 알림이 없습니다.</p>
-    </>
-  ) : (
-    <>
-      <div className="tl-list-head">
-        <b>채팅</b>
-        <span>
-          <i><FilterRegular /></i>
-          <B c={c} act={t.mode === 'chat' ? 'new' : undefined} className="tl-ico" label="새 채팅"><ComposeRegular /></B>
-          <B c={c} act={t.mode === 'files' ? 'menu' : undefined} className="tl-ico is-caret" label="새 항목"><ChevronDownRegular /></B>
-        </span>
-        {t.mode === 'files' && has('menu') && !has('dialog') && (
-          <div className="tl-menu" role="menu">
-            <span><ComposeRegular />새 채팅</span>
-            <span><AddRegular />새 채널</span>
-            <B c={c} act="team" className="tl-menu-row"><AddRegular />새 팀</B>
-          </div>
-        )}
-      </div>
-      {teamMade && tm && (
-        <>
-          <u>팀 및 채널</u>
-          <span className="tl-row"><Av name={tm.name} team /><span><b>{tm.name}</b></span></span>
-          <span className="tl-row is-sub is-on"><span><b>{tm.channel}</b></span></span>
-        </>
+      {has('sent') ? (
+        <header className={`tl-head sc-zone ${mark('header')}`}>
+          <Av name={g.name} team /><b>{g.name}</b>
+          <span className="tl-tabs"><i className="on">채팅</i><i>공유</i><i>＋</i></span>
+          <span className="tl-head-end"><i><VideoRegular /></i><i className="tl-people"><PeopleAddRegular />{g.people.length + 1}</i><i><MoreHorizontalRegular /></i></span>
+        </header>
+      ) : (
+        <header className={`tl-head is-new sc-zone ${mark('header')}`}>
+          {has('expand') && (
+            <label className="tl-to"><span>그룹 이름:</span>
+              <Field c={c} act="name" filled={has('named')} hint="그룹 이름 입력">{g.name}</Field>
+            </label>
+          )}
+          <label className="tl-to"><span>받는 사람:</span>
+            <Field c={c} act="to" filled={has('people')} hint="이름, 메일 또는 태그 입력"><Chips names={g.people} /></Field>
+            {!has('expand') && <B c={c} act="expand" className="tl-ico" label="그룹 이름 추가"><ChevronDownRegular /></B>}
+          </label>
+        </header>
       )}
-      <u>채팅</u>
-      {groupMade && g && <span className="tl-row is-on"><Av name={g.name} team /><span><b>{g.name}</b><em>나: {s.messages.find(m => m.role === 'user')?.text.slice(0, 18)}…</em></span></span>}
-      {chats.map(x => <span key={x.name} className="tl-row"><Av name={x.name} /><span><b>{x.name}</b><em>{x.sub}</em></span></span>)}
+      <div className="tl-thread">
+        {has('sent') && <div className="tl-msg is-me"><small>방금</small><p>{sent}</p></div>}
+        {has('reply') && g.reply && <div className="tl-msg"><Av name={g.reply.from} /><div><small>{g.reply.from} · 방금</small><p>{g.reply.text}</p></div></div>}
+      </div>
+      <div className={`tl-compose sc-zone ${mark('composer')}`}>
+        <span className={typed ? 'is-filled' : undefined}>{typed ?? '메시지 입력'}</span>
+        <i><EmojiRegular /></i><i><AttachRegular /></i>
+        <B c={c} act="send" className="tl-send" label="보내기"><SendRegular /></B>
+      </div>
     </>
   );
+}
 
-  /* ---------- 오른쪽 본문 ---------- */
-  let main: ReactNode;
-  if (t.mode === 'chat' && g) {
-    const typed = target === 'send' ? ask : null;
-    main = !has('chat') ? <Empty>왼쪽 앱 바에서 <b>채팅</b>을 열면 대화 목록이 보입니다.</Empty>
-      : !has('new') ? <Empty>대화를 고르거나, 목록 위의 <b>새 채팅</b>으로 대화를 시작하세요.</Empty>
-      : (
-        <>
-          {has('sent') ? (
-            <header className={`tl-head sc-zone ${mark('header')}`}>
-              <Av name={g.name} team /><b>{g.name}</b>
-              <span className="tl-tabs"><i className="on">채팅</i><i>공유</i><i>＋</i></span>
-              <span className="tl-head-end"><i><VideoRegular /></i><i className="tl-people"><PeopleAddRegular />{g.people.length + 1}</i><i><MoreHorizontalRegular /></i></span>
-            </header>
-          ) : (
-            <header className={`tl-head is-new sc-zone ${mark('header')}`}>
-              {has('expand') && (
-                <label className="tl-to"><span>그룹 이름:</span>
-                  <Field c={c} act="name" filled={has('named')} hint="그룹 이름 입력">{g.name}</Field>
-                </label>
-              )}
-              <label className="tl-to"><span>받는 사람:</span>
-                <Field c={c} act="to" filled={has('people')} hint="이름, 메일 또는 태그 입력">{g.people.map(p => <em key={p} className="tl-chip">{p}</em>)}</Field>
-                {!has('expand') && <B c={c} act="expand" className="tl-ico" label="그룹 이름 추가"><ChevronDownRegular /></B>}
-              </label>
-            </header>
-          )}
-          <div className="tl-thread">
-            {has('sent') && <div className="tl-msg is-me"><small>방금</small><p>{s.messages.find(m => m.role === 'user')?.text}</p></div>}
-            {has('reply') && g.reply && <div className="tl-msg"><Av name={g.reply.from} /><div><small>{g.reply.from} · 방금</small><p>{g.reply.text}</p></div></div>}
-          </div>
-          <div className={`tl-compose sc-zone ${mark('composer')}`}>
-            <span className={typed ? 'is-filled' : undefined}>{typed ?? '메시지 입력'}</span>
-            <i><EmojiRegular /></i><i><AttachRegular /></i>
-            <B c={c} act="send" className="tl-send" label="보내기"><SendRegular /></B>
-          </div>
-        </>
-      );
-  } else if (t.mode === 'calendar' && ev && t.week) {
-    const events = [...(t.week.events ?? []), ...(has('saved') ? [{ day: ev.day, hour: ev.hour, title: ev.title, isNew: true }] : [])];
-    main = !has('calendar') ? <Empty>왼쪽 앱 바에서 <b>일정</b>을 열면 이번 주 일정이 보입니다.</Empty>
-      : has('new') && !has('saved') ? (
-        <>
-          <header className={`tl-head sc-zone ${mark('header')}`}>
-            <b>새 이벤트</b>
-            <span className="tl-head-end"><i className="tl-ghost">스케줄러</i><B c={c} act="save" className="tl-primary">저장</B></span>
-          </header>
-          <div className="tl-form">
-            <label><span>제목</span><Field c={c} act="title" filled={has('titled')} hint="제목 추가">{ev.title}</Field></label>
-            <label><span>필수 참석자</span><Field c={c} act="people" filled={has('people')} hint="필수 참석자 추가">{ev.people.map(p => <em key={p} className="tl-chip">{p}</em>)}</Field></label>
-            <label><span>날짜·시간</span><span className="tl-inp is-filled">{ev.when}</span></label>
-            <label><span>Teams 모임</span>
-              <B c={c} act="online" className={`tl-toggle${has('online') ? ' is-on' : ''}`} label="Teams 모임"><i /></B>
-              <small>{has('online') ? '켜짐 — 초대에 온라인 참가 링크가 들어갑니다' : '꺼짐'}</small>
-            </label>
-            <label><span>설명</span><span className="tl-inp is-area">이 모임에 대한 설명 입력</span></label>
-          </div>
-        </>
-      ) : (
-        <>
-          <header className={`tl-head sc-zone ${mark('header')}`}>
-            <b>일정</b><small>{t.week.label}</small>
-            <span className="tl-head-end"><i className="tl-ghost">지금 모임 시작</i><B c={c} act="new" className="tl-primary"><AddRegular />새로 만들기</B></span>
-          </header>
-          <div className="tl-cal" style={{ '--days': t.week.days.length } as React.CSSProperties}>
-            <i />{t.week.days.map(d => <b key={d}>{d}</b>)}
-            {HOURS.map(h => [
-              <i key={h}>{h}:00</i>,
-              ...t.week!.days.map((d, di) => {
-                const e = events.find(x => x.day === di && x.hour === h);
-                return <span key={d + h}>{e && <em className={'isNew' in e ? 'is-new' : undefined}>{e.title}</em>}</span>;
-              }),
-            ])}
-          </div>
-          {has('saved') && <p className="tl-toast" role="status"><CheckmarkCircleRegular />일정에 저장하고 참석자 {ev.people.length}명에게 초대를 보냈습니다.</p>}
-        </>
-      );
-  } else if (t.mode === 'files' && tm) {
-    main = !has('created') ? (
+/* ---------- 일정: 새 모임 만들기 ---------- */
+function CalendarView({ c, week, ev }: { c: Ctx; week: NonNullable<TeamsLab['week']>; ev: NonNullable<TeamsLab['event']> }) {
+  const { has, mark } = c;
+  if (!has('calendar')) return <Empty>왼쪽 앱 바에서 <b>일정</b>을 열면 이번 주 일정이 보입니다.</Empty>;
+  if (has('new') && !has('saved')) {
+    return (
+      <>
+        <header className={`tl-head sc-zone ${mark('header')}`}>
+          <b>새 이벤트</b>
+          <span className="tl-head-end"><i className="tl-ghost">스케줄러</i><B c={c} act="save" className="tl-primary">저장</B></span>
+        </header>
+        <div className="tl-form">
+          <label><span>제목</span><Field c={c} act="title" filled={has('titled')} hint="제목 추가">{ev.title}</Field></label>
+          <label><span>필수 참석자</span><Field c={c} act="people" filled={has('people')} hint="필수 참석자 추가"><Chips names={ev.people} /></Field></label>
+          <label><span>날짜·시간</span><span className="tl-inp is-filled">{ev.when}</span></label>
+          <label><span>Teams 모임</span>
+            <B c={c} act="online" className={`tl-toggle${has('online') ? ' is-on' : ''}`} label="Teams 모임"><i /></B>
+            <small>{has('online') ? '켜짐 — 초대에 온라인 참가 링크가 들어갑니다' : '꺼짐'}</small>
+          </label>
+          <label><span>설명</span><span className="tl-inp is-area">이 모임에 대한 설명 입력</span></label>
+        </div>
+      </>
+    );
+  }
+  const events = [...(week.events ?? []), ...(has('saved') ? [{ day: ev.day, hour: ev.hour, title: ev.title, isNew: true }] : [])];
+  return (
+    <>
+      <header className={`tl-head sc-zone ${mark('header')}`}>
+        <b>일정</b><small>{week.label}</small>
+        <span className="tl-head-end"><i className="tl-ghost">지금 모임 시작</i><B c={c} act="new" className="tl-primary"><AddRegular />새로 만들기</B></span>
+      </header>
+      <div className="tl-cal" style={{ '--days': week.days.length } as React.CSSProperties}>
+        <i />{week.days.map(d => <b key={d}>{d}</b>)}
+        {HOURS.map(h => [
+          <i key={h}>{h}:00</i>,
+          ...week.days.map((d, di) => {
+            const e = events.find(x => x.day === di && x.hour === h);
+            return <span key={d + h}>{e && <em className={'isNew' in e ? 'is-new' : undefined}>{e.title}</em>}</span>;
+          }),
+        ])}
+      </div>
+      {has('saved') && <p className="tl-toast" role="status"><CheckmarkCircleRegular />일정에 저장하고 참석자 {ev.people.length}명에게 초대를 보냈습니다.</p>}
+    </>
+  );
+}
+
+/* ---------- 팀·채널: 새 팀 만들고 채널 파일에 폴더 만들기 ---------- */
+function FilesView({ c, tm, me }: { c: Ctx; tm: NonNullable<TeamsLab['team']>; me: string }) {
+  const { has, mark } = c;
+  if (!has('created')) {
+    return (
       <>
         <Empty>목록 위의 <b>새 항목</b>에서 팀과 채널을 만들 수 있습니다.</Empty>
         {has('dialog') && (
@@ -194,57 +158,110 @@ export function TeamsApp({ s, shown, mark, target, onAct, ask }: {
           </div>
         )}
       </>
-    ) : (
-      <>
-        <header className={`tl-head sc-zone ${mark('header')}`}>
-          <Av name={tm.name} team /><b>{tm.channel}</b>
-          <span className="tl-tabs">
-            <i className={has('shared') ? undefined : 'on'}>게시물</i>
-            {has('shared') ? <i className="on">공유</i> : <B c={c} act="shared" className="tl-tab">공유</B>}
-            <i>＋</i>
-          </span>
-          <span className="tl-head-end"><i className="tl-ghost"><VideoRegular />지금 모임 시작</i><i><MoreHorizontalRegular /></i></span>
-        </header>
-        {!has('shared') ? (
-          <>
-            <div className="tl-thread">
-              <div className="tl-msg"><Av name={t.me} /><div><small>{t.me} · 방금</small><p>{tm.welcome ?? `${tm.name} 팀을 만들었습니다.`}</p></div></div>
-            </div>
-            <div className={`tl-compose sc-zone ${mark('composer')}`}><span>채널에 게시</span><i><EmojiRegular /></i><i><AttachRegular /></i></div>
-          </>
-        ) : (
-          <div className="tl-files">
-            <div className="tl-bar">
-              <B c={c} act="new" className="tl-primary"><AddRegular />새로 만들기</B>
-              <B c={c} act="upload" className="tl-ghost"><ArrowUploadRegular />업로드</B>
-              <i className="tl-ghost">SharePoint에서 열기</i>
-              {has('newmenu') && !has('folder') && (
-                <div className="tl-menu" role="menu">
-                  <B c={c} act="folder" className="tl-menu-row"><FolderRegular />폴더</B>
-                  <span><DocumentRegular />Word 문서</span>
-                  <span><DocumentRegular />Excel 통합 문서</span>
-                  <span><DocumentRegular />PowerPoint 프레젠테이션</span>
-                </div>
-              )}
-            </div>
-            <p className="tl-crumb">문서 › {tm.channel}{has('infolder') && <> › <b>{tm.folder}</b></>}</p>
-            <div className="tl-table" role="table">
-              <div role="row"><b>이름</b><b>수정한 날짜</b><b>수정한 사람</b></div>
-              {has('infolder')
-                ? has('uploaded')
-                  ? <div role="row" className="is-in"><span><DocumentRegular />{tm.file}</span><span>방금</span><span>{t.me}</span></div>
-                  : <div role="row" className="is-none"><span>이 폴더는 비어 있습니다. 파일을 끌어다 놓거나 업로드를 누르세요.</span></div>
-                : has('folder')
-                  ? <div role="row" className="is-in"><B c={c} act="open" className="tl-link"><FolderRegular />{tm.folder}</B><span>방금</span><span>{t.me}</span></div>
-                  : <div role="row" className="is-none"><span>아직 파일이 없습니다. 새로 만들기로 폴더부터 만들어 보세요.</span></div>}
-            </div>
-            {has('uploaded') && <p className="tl-toast" role="status"><CheckmarkCircleRegular />업로드했습니다. {tm.name} 구성원은 따로 권한을 주지 않아도 바로 열 수 있습니다.</p>}
+    );
+  }
+  return (
+    <>
+      <header className={`tl-head sc-zone ${mark('header')}`}>
+        <Av name={tm.name} team /><b>{tm.channel}</b>
+        <span className="tl-tabs">
+          <i className={has('shared') ? undefined : 'on'}>게시물</i>
+          {has('shared') ? <i className="on">공유</i> : <B c={c} act="shared" className="tl-tab">공유</B>}
+          <i>＋</i>
+        </span>
+        <span className="tl-head-end"><i className="tl-ghost"><VideoRegular />지금 모임 시작</i><i><MoreHorizontalRegular /></i></span>
+      </header>
+      {!has('shared') ? (
+        <>
+          <div className="tl-thread">
+            <div className="tl-msg"><Av name={me} /><div><small>{me} · 방금</small><p>{tm.welcome ?? `${tm.name} 팀을 만들었습니다.`}</p></div></div>
           </div>
-        )}
+          <div className={`tl-compose sc-zone ${mark('composer')}`}><span>채널에 게시</span><i><EmojiRegular /></i><i><AttachRegular /></i></div>
+        </>
+      ) : (
+        <div className="tl-files">
+          <div className="tl-bar">
+            <B c={c} act="new" className="tl-primary"><AddRegular />새로 만들기</B>
+            <B c={c} act="upload" className="tl-ghost"><ArrowUploadRegular />업로드</B>
+            <i className="tl-ghost">SharePoint에서 열기</i>
+            {has('newmenu') && !has('folder') && (
+              <div className="tl-menu">
+                <B c={c} act="folder" className="tl-menu-row"><FolderRegular />폴더</B>
+                <span><DocumentRegular />Word 문서</span>
+                <span><DocumentRegular />Excel 통합 문서</span>
+                <span><DocumentRegular />PowerPoint 프레젠테이션</span>
+              </div>
+            )}
+          </div>
+          <p className="tl-crumb">문서 › {tm.channel}{has('infolder') && <> › <b>{tm.folder}</b></>}</p>
+          <div className="tl-table">
+            <div className="tl-tr"><b>이름</b><b>수정한 날짜</b><b>수정한 사람</b></div>
+            {has('infolder')
+              ? has('uploaded')
+                ? <div className="tl-tr is-in"><span><DocumentRegular />{tm.file}</span><span>방금</span><span>{me}</span></div>
+                : <div className="tl-tr is-none"><span>이 폴더는 비어 있습니다. 파일을 끌어다 놓거나 업로드를 누르세요.</span></div>
+              : has('folder')
+                ? <div className="tl-tr is-in"><B c={c} act="open" className="tl-link"><FolderRegular />{tm.folder}</B><span>방금</span><span>{me}</span></div>
+                : <div className="tl-tr is-none"><span>아직 파일이 없습니다. 새로 만들기로 폴더부터 만들어 보세요.</span></div>}
+          </div>
+          {has('uploaded') && <p className="tl-toast" role="status"><CheckmarkCircleRegular />업로드했습니다. {tm.name} 구성원은 따로 권한을 주지 않아도 바로 열 수 있습니다.</p>}
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ---------- 가운데 목록: 활동 또는 채팅(+ 팀 및 채널) ---------- */
+function ListPane({ c, t, app, sent }: { c: Ctx; t: TeamsLab; app: string; sent?: string }) {
+  const { has } = c;
+  if (app === 'activity') {
+    return (
+      <>
+        <div className="tl-list-head"><b>활동</b><span><i><FilterRegular /></i><i><MoreHorizontalRegular /></i></span></div>
+        <p className="tl-list-note">새 알림이 없습니다.</p>
       </>
     );
   }
+  const g = t.group, tm = t.team;
+  return (
+    <>
+      <div className="tl-list-head">
+        <b>채팅</b>
+        <span>
+          <i><FilterRegular /></i>
+          <B c={c} act={t.mode === 'chat' ? 'new' : undefined} className="tl-ico" label="새 채팅"><ComposeRegular /></B>
+          <B c={c} act={t.mode === 'files' ? 'menu' : undefined} className="tl-ico is-caret" label="새 항목"><ChevronDownRegular /></B>
+        </span>
+        {t.mode === 'files' && has('menu') && !has('dialog') && (
+          <div className="tl-menu">
+            <span><ComposeRegular />새 채팅</span>
+            <span><AddRegular />새 채널</span>
+            <B c={c} act="team" className="tl-menu-row"><AddRegular />새 팀</B>
+          </div>
+        )}
+      </div>
+      {t.mode === 'files' && has('created') && tm && (
+        <>
+          <u>팀 및 채널</u>
+          <span className="tl-row"><Av name={tm.name} team /><span><b>{tm.name}</b></span></span>
+          <span className="tl-row is-sub is-on"><span><b>{tm.channel}</b></span></span>
+        </>
+      )}
+      <u>채팅</u>
+      {t.mode === 'chat' && has('sent') && g && <span className="tl-row is-on"><Av name={g.name} team /><span><b>{g.name}</b><em>나: {sent?.slice(0, 18)}…</em></span></span>}
+      {(t.chats ?? []).map(x => <span key={x.name} className="tl-row"><Av name={x.name} /><span><b>{x.name}</b><em>{x.sub}</em></span></span>)}
+    </>
+  );
+}
 
+export function TeamsApp({ s, shown, mark, target, onAct, ask }: {
+  s: Scenario; shown: number; mark: Mark; target?: string; onAct: () => void; ask: string | null;
+}) {
+  const t = s.teams as TeamsLab; // check-scenarios 가 teams 시나리오의 teams 항목을 보장한다
+  const flags = s.messages.slice(0, shown).flatMap(m => (m.role === 'tool' && m.sets ? [m.sets] : []));
+  const c: Ctx = { has: f => flags.includes(f), target, onAct, mark };
+  const app = t.mode === 'chat' ? (c.has('chat') ? 'chat' : 'activity') : t.mode === 'calendar' ? (c.has('calendar') ? 'calendar' : 'chat') : 'chat';
+  const sent = s.messages.find(m => m.role === 'user')?.text;
   const wide = app === 'calendar';
   return (
     <div className={`sc-shell is-teams tl${wide ? ' is-wide' : ''}`} data-app="teamsapp" data-mode={t.mode}>
@@ -260,8 +277,12 @@ export function TeamsApp({ s, shown, mark, target, onAct, ask }: {
           </B>
         ))}
       </nav>
-      {!wide && <aside className={`tl-list sc-zone ${mark('list')}`}>{list}</aside>}
-      <section className={`tl-main sc-zone ${mark('main')}`}>{main}</section>
+      {!wide && <aside className={`tl-list sc-zone ${mark('list')}`}><ListPane c={c} t={t} app={app} sent={sent} /></aside>}
+      <section className={`tl-main sc-zone ${mark('main')}`}>
+        {t.mode === 'chat' && t.group && <ChatView c={c} g={t.group} sent={sent} typed={target === 'send' ? ask : null} />}
+        {t.mode === 'calendar' && t.week && t.event && <CalendarView c={c} week={t.week} ev={t.event} />}
+        {t.mode === 'files' && t.team && <FilesView c={c} tm={t.team} me={t.me} />}
+      </section>
     </div>
   );
 }

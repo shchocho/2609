@@ -132,7 +132,7 @@
 .tl-bar { position: relative; display: flex; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--tl-line); }
 .tl-crumb { margin: 0; padding: 10px 16px 4px; color: var(--tl-sub); }
 .tl-table { display: grid; padding: 0 16px; }
-.tl-table [role=row] { display: grid; grid-template-columns: minmax(0, 1fr) 140px 140px; align-items: center; gap: 8px; padding: 9px 4px; border-bottom: 1px solid #eee; }
+.tl-tr { display: grid; grid-template-columns: minmax(0, 1fr) 140px 140px; align-items: center; gap: 8px; padding: 9px 4px; border-bottom: 1px solid #eee; }
 .tl-table b { font-size: 12px; font-weight: 600; color: var(--tl-sub); }
 .tl-table span, .tl .tl-link { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .tl-table svg { font-size: 18px; color: var(--tl); }

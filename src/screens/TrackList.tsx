@@ -6,7 +6,6 @@ import { APP_LOGO, appsOf, madeAppOf, productName, scenariosOf } from '../data';
 import { go, HASH_HOME, hashPlay } from '../router';
 import { COPY } from '../copy';
 import type { Scenario } from '../types';
-import { DRAFT } from '../look';
 import { DraftTrackArt } from './DraftArt';
 
 /** plain: Copilot 로고 없이 이름만 쓰는 열 */
@@ -70,7 +69,7 @@ export function TrackList({ track }: { track: string }) {
         return `::view-transition-group(scenario-${e.id}) { z-index: ${10 - away}; animation-delay: ${expanded ? Math.min(i * 12, 48) : 0}ms; }`;
       }).join('\n')}</style>
       <header className="booth-hero">
-        {DRAFT ? <DraftTrackArt /> : <img className="booth-hero-art" src="brand/signiture/copilot-signature.png" alt="" aria-hidden="true" />}
+        <DraftTrackArt />
         <div className="booth-hero-inner">
           <button type="button" className="booth-back" onClick={() => go(HASH_HOME)}>
             <ArrowLeftRegular aria-hidden="true" />{COPY.backToHome}

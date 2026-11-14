@@ -8,10 +8,8 @@ import { AppIcon } from '../components/ui';
 import { ArtifactView, DocTabs, DocWindow } from '../components/artifacts';
 import { Slides } from '../components/messages';
 import { artifactName, Bold, fill, pickIds } from '../engine/text';
-import { SCENE_ART, fillArt } from './sceneArt';
-import { SCENE_ART_DRAFT } from './sceneArtDraft';
+import { fillArt } from './sceneArt';
 import { SCENE_ART_SARANG } from './sceneArtSarang';
-import { DRAFT } from '../look';
 import { COPY } from '../copy';
 
 const POINT_GAP = 900 + 320;
@@ -26,7 +24,8 @@ export function SceneStage({ scene, onNext, cta = 'Copilot과 해보기' }: { sc
     const t = window.setTimeout(() => setShown(n => n + 1), POINT_GAP);
     return () => window.clearTimeout(t);
   }, [shown, scene.points.length]);
-  const tpl = scene.art ? SCENE_ART_SARANG[scene.art] ?? ((DRAFT && SCENE_ART_DRAFT[scene.art]) || SCENE_ART[scene.art]) : undefined;
+  // 고객사 실습 사이트는 새로 그린 그림만 쓴다 (원본 부스 그림 SCENE_ART 는 번들에 넣지 않는다)
+  const tpl = scene.art ? SCENE_ART_SARANG[scene.art] : undefined;
   const svg = tpl ? fillArt(tpl, scene.artSlots) : undefined;
   // 템플릿의 꽉 찬 배경 도형을 숨겨 페이지 배경이 비치게 한다
   useLayoutEffect(() => {
