@@ -1,6 +1,6 @@
 /** 시나리오 JSON 스키마 (src/scenarios/<track>/<id>.scenario.json) */
 
-export type AgentKind = 'chat' | 'cowork' | 'scout' | 'office' | 'flow' | 'studio' | 'code';
+export type AgentKind = 'chat' | 'cowork' | 'scout' | 'office' | 'flow' | 'studio' | 'code' | 'teams';
 export type AppKind = 'excel' | 'word' | 'powerpoint' | 'outlook' | 'teams' | 'onenote';
 
 /** only: 고른 선택지 id(또는 "hunted") 중 하나라도 있을 때만 / not: 하나라도 있으면 숨김 */
@@ -175,6 +175,27 @@ export interface MsgSpot extends Filterable {
 }
 export type Message = MsgCue | MsgUser | MsgAssistant | MsgTool | MsgNote | MsgApprove | MsgChoice | MsgHunt | MsgSpot;
 
+/**
+ * Teams 기본 실습 화면(agent: 'teams', surface: 'teamsapp')의 내용.
+ * 화면 상태는 tool 메시지의 sets 깃발로 바뀌고, 눌러야 할 곳은 cue 의 target 으로 정한다 (깃발·단추 이름: src/surfaces/TeamsApp.tsx).
+ */
+export interface TeamsLab {
+  mode: 'chat' | 'calendar' | 'files';
+  /** 내 이름(가상) */
+  me: string;
+  /** 왼쪽 채팅 목록 */
+  chats?: { name: string; sub: string }[];
+  /** chat: 새로 만들 그룹 채팅 */
+  group?: { name: string; people: string[]; reply?: { from: string; text: string } };
+  /** calendar: 주간 일정과 새로 만들 모임 (day 0=월 … 4=금, hour 는 시작 시각) */
+  week?: { label: string; days: string[]; events?: { day: number; hour: number; title: string }[] };
+  event?: { title: string; people: string[]; when: string; day: number; hour: number };
+  /** files: 새로 만들 팀 · 첫 채널 · 폴더 · 올릴 파일 */
+  team?: { name: string; desc: string; channel: string; folder: string; file: string; welcome?: string };
+}
+/** 결과 화면의 "실제로 해 보기" 카드: 실제 Teams·Copilot 에서 따라 할 순서 */
+export interface Practice { where?: string; steps: string[]; note?: string }
+
 export interface ChatArtifact { kind: string; title: string; slides?: string[]; src?: string; note?: string }
 
 export interface Scenario {
@@ -201,6 +222,8 @@ export interface Scenario {
   quiz?: QuizItem[];
   finish?: Finish;
   artifact?: ChatArtifact;
+  teams?: TeamsLab;
+  practice?: Practice;
 }
 
 export interface TrackIntro { tone: string; icon?: string; caption: string }

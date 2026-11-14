@@ -37,6 +37,7 @@ export const AGENTS = {
   flow: { name: 'Copilot', full: 'Power Automate' },
   studio: { name: '에이전트', full: 'Copilot Studio' },
   code: { name: 'Copilot', full: 'Copilot Code' },
+  teams: { name: 'Teams', full: 'Microsoft Teams' },
 } as const;
 
 export const APPS = {

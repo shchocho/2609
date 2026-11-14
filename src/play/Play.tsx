@@ -16,6 +16,7 @@ import { CHAT_NAV, ChatComposer, ChatMain, CpApp, History, NavItem, RailTabs, sc
 import { WE } from '../components/ui';
 import { Cowork } from './Cowork';
 import { AppWindow } from '../surfaces/AppWindow';
+import { TeamsApp } from '../surfaces/TeamsApp';
 import { DoneStage, OverviewStage, PainStage, SceneStage } from './Stages';
 
 const LABEL: Record<string, string> = { pain: '상황', overview: '흐름', demo: '실습', done: '결과' };
@@ -189,7 +190,7 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
       </ol>
 
       {step === 'pain' && (s.scene
-        ? <SceneStage scene={s.scene} onNext={next} />
+        ? <SceneStage scene={s.scene} onNext={next} cta={s.agent === 'teams' ? 'Teams에서 해보기' : undefined} />
         : <PainStage title={s.title} caption={s.before ?? s.summary} onNext={next} />)}
       {step === 'overview' && <OverviewStage product={productName(s)} steps={s.overview ?? []} hook={s.hook} onNext={next} />}
       {step === 'done' && <DoneStage s={s} st={st} vars={vars} completed={p.done} />}
@@ -203,7 +204,9 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
       {step === 'demo' && !cowork && (
         <div className="sc-feed">
           <div className="desk-win is-app">
-            {office ? (
+            {s.agent === 'teams' ? (
+              <TeamsApp s={s} shown={p.shown} mark={mark} target={holdAt === null ? p.pending?.target : undefined} onAct={p.act} ask={ask} />
+            ) : office ? (
               <AppWindow
                 s={s} st={st} vars={vars} ids={ids} streamRef={streamRef} mark={mark}
                 ask={ask} onSend={ask ? onSend : undefined} pick={pick} pickPhase={pickPhase} onPickSelect={selectPick}

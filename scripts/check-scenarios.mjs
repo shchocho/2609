@@ -9,12 +9,12 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('../src/scenarios/', import.meta.url)); // .pathname 은 Windows 에서 경로가 깨짐
 const TRACKS = ['teams-basics', 'copilot-chat', 'm365-apps', 'copilot-agent', 'copilot-code'];
-const AGENTS = ['chat', 'cowork', 'office', 'flow', 'studio', 'code'];
+const AGENTS = ['chat', 'cowork', 'office', 'flow', 'studio', 'code', 'teams'];
 /** 앱 창에서 재생하는 agent 와 그 화면(surface) */
 const WINDOWS = { office: ['word', 'excel', 'powerpoint', 'outlook', 'forms', 'teams'], flow: ['cloudflow', 'deskflow'], studio: ['studio'], code: ['code'] };
 const ROLES = new Set(['user', 'assistant', 'tool', 'note', 'cue', 'spot', 'approve', 'choice', 'hunt']);
 const HUNT_TARGETS = new Set(['model', 'effort', 'attach', 'new', 'mine', 'auto', 'custom']);
-const ZONES = { chat: ['rail', 'top', 'stream', 'actions', 'composer'], cowork: ['rail', 'stream', 'composer'], office: ['ribbon', 'canvas', 'pane', 'composer'] }; // 앱 창 화면(WINDOWS)은 모두 office 와 같은 영역을 쓴다
+const ZONES = { chat: ['rail', 'top', 'stream', 'actions', 'composer'], cowork: ['rail', 'stream', 'composer'], office: ['ribbon', 'canvas', 'pane', 'composer'], teams: ['rail', 'list', 'header', 'main', 'composer'] }; // 앱 창 화면(WINDOWS)은 모두 office 와 같은 영역을 쓴다
 const ICONS = new Set(['box', 'briefcase', 'chart', 'megaphone', 'people', 'code', 'clock', 'calx', 'scales', 'split', 'docsearch', 'calc', 'target', 'mail', 'share', 'checkdoc', 'factory', 'coin', 'network', 'alert', 'bolt', 'sliders', 'link', 'check', 'send', 'truck', 'refresh', 'gauge', 'shield']);
 const BANNED = (process.env.BANNED ?? 'POSTECH,포스텍').split(',').filter(Boolean);
 
@@ -38,6 +38,8 @@ for (const track of readdirSync(ROOT)) {
     if (!AGENTS.includes(s.agent)) err(file, `agent 는 ${AGENTS.join(' · ')} 중 하나여야 합니다`);
     const surfaces = WINDOWS[s.agent];
     if (surfaces && !(surfaces.includes(s.surface) && Object.values(s.workbench?.artifacts ?? {}).some(a => a.app === s.surface))) err(file, `${s.agent} 시나리오는 surface(${surfaces.join(' · ')})와 그 화면의 결과물이 필요합니다`);
+    if (s.agent === 'teams' && !(s.surface === 'teamsapp' && ['chat', 'calendar', 'files'].includes(s.teams?.mode) && s.teams.me)) err(file, 'teams 시나리오는 surface "teamsapp" 과 teams.mode(chat · calendar · files) · teams.me 가 필요합니다');
+    if (s.practice && !(Array.isArray(s.practice.steps) && s.practice.steps.length && s.practice.steps.every(x => typeof x === 'string' && x))) err(file, 'practice.steps 는 글이 든 배열이어야 합니다');
     if (!Array.isArray(s.messages) || !s.messages.length) { err(file, 'messages 가 비어 있습니다'); continue; }
     const arts = s.workbench?.artifacts ?? {};
     const optionIds = new Set(['hunted']);
@@ -46,7 +48,7 @@ for (const track of readdirSync(ROOT)) {
       if (!ROLES.has(m.role)) return err(file, `${at}: 알 수 없는 role`);
       if (m.role === 'cue' && (!m.text || !m.action)) err(file, `${at}: text·action 이 필요합니다`);
       if (m.role === 'tool' && !m.tool) err(file, `${at}: tool 이 필요합니다`);
-      if (m.role === 'tool' && m.sets) { optionIds.add(m.sets); if (!WINDOWS[s.agent]) err(file, `${at}: sets 는 앱 창 화면 시나리오에서만 쓸 수 있습니다`); }
+      if (m.role === 'tool' && m.sets) { optionIds.add(m.sets); if (!WINDOWS[s.agent] && s.agent !== 'teams') err(file, `${at}: sets 는 앱 창 화면 시나리오에서만 쓸 수 있습니다`); }
       if (m.role === 'tool') for (const k of ['opens', 'shows', 'writes']) if (m[k] && !arts[m[k]]) err(file, `${at}: ${k} "${m[k]}" 결과물이 없습니다`);
       if (m.role === 'assistant') for (const id of m.files ?? []) if (!arts[id]) err(file, `${at}: files "${id}" 결과물이 없습니다`);
       if (['user', 'assistant', 'note'].includes(m.role) && typeof m.text !== 'string') err(file, `${at}: text 가 필요합니다`);

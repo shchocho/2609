@@ -22,6 +22,7 @@ const PRODUCTS: Record<string, { label: string; plain?: boolean; description: Re
   deskflow: { label: '데스크톱 흐름 (RPA)', plain: true, description: <>커넥터가 없는 프로그램은 <strong>사람이 하던 화면 조작을 그대로</strong> 따라 합니다.</> },
   code: { label: 'Code', description: <>개발자가 아니어도 <strong>말로 설명해 앱</strong>을 만들고, 미리보기에서 써 본 뒤 게시합니다.</> },
   studio: { label: 'Studio', description: <>지식·토픽 또는 지침·스킬·도구로 <strong>우리 업무에 맞는 에이전트</strong>를 만들고 게시합니다.</> },
+  teamsapp: { label: 'Microsoft Teams', plain: true, description: <>채팅·일정·팀 채널의 <strong>기본 기능을 순서대로 눌러 보며</strong> 익힙니다.</> },
   cloudflow: { label: '클라우드 흐름 (DPA)', plain: true, description: <>커넥터로 <strong>메일·승인·알림 같은 서비스를 이어</strong> 업무 절차를 자동화합니다.</> },
 };
 /** 제품별 보기의 열 id — Office 화면은 앱(surface)별로 나눈다 */

@@ -6,6 +6,7 @@ import './styles/overrides.css';
 import './styles/surfaces.css';
 import './styles/draft.css';
 import './styles/sarang.css';
+import './styles/teams-lab.css';
 import { App } from './App';
 import { applyTrackColors } from './tracks';
 import { DRAFT } from './look';

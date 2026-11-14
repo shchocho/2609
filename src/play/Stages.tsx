@@ -1,15 +1,16 @@
 /** 재생 화면의 단계별 화면: 상황(장면) · 흐름(개요) · 결과 */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowRightRegular, Dismiss20Regular, QrCode24Regular } from '@fluentui/react-icons';
-import type { OverviewStep, PlayState, Scenario, Scene, Vars } from '../types';
+import type { OverviewStep, PlayState, Practice, Scenario, Scene, Vars } from '../types';
 import { productName } from '../data';
 import { SemIcon } from '../components/Icons';
 import { AppIcon } from '../components/ui';
 import { ArtifactView, DocTabs, DocWindow } from '../components/artifacts';
 import { Slides } from '../components/messages';
-import { artifactName, fill, pickIds } from '../engine/text';
+import { artifactName, Bold, fill, pickIds } from '../engine/text';
 import { SCENE_ART, fillArt } from './sceneArt';
 import { SCENE_ART_DRAFT } from './sceneArtDraft';
+import { SCENE_ART_SARANG } from './sceneArtSarang';
 import { DRAFT } from '../look';
 import { COPY } from '../copy';
 
@@ -17,7 +18,7 @@ const POINT_GAP = 900 + 320;
 const BG_SHAPES = new Set(['rect', 'path', 'ellipse', 'circle', 'polygon']);
 
 /** 상황: 그림 + 고민 포인트가 하나씩 나타남. 아무 곳이나 누르면 다음 단계 */
-export function SceneStage({ scene, onNext }: { scene: Scene; onNext: () => void }) {
+export function SceneStage({ scene, onNext, cta = 'Copilot과 해보기' }: { scene: Scene; onNext: () => void; cta?: string }) {
   const [shown, setShown] = useState(0);
   const art = useRef<HTMLSpanElement>(null);
   useEffect(() => {
@@ -25,7 +26,7 @@ export function SceneStage({ scene, onNext }: { scene: Scene; onNext: () => void
     const t = window.setTimeout(() => setShown(n => n + 1), POINT_GAP);
     return () => window.clearTimeout(t);
   }, [shown, scene.points.length]);
-  const tpl = scene.art ? (DRAFT && SCENE_ART_DRAFT[scene.art]) || SCENE_ART[scene.art] : undefined;
+  const tpl = scene.art ? SCENE_ART_SARANG[scene.art] ?? ((DRAFT && SCENE_ART_DRAFT[scene.art]) || SCENE_ART[scene.art]) : undefined;
   const svg = tpl ? fillArt(tpl, scene.artSlots) : undefined;
   // 템플릿의 꽉 찬 배경 도형을 숨겨 페이지 배경이 비치게 한다
   useLayoutEffect(() => {
@@ -55,7 +56,7 @@ export function SceneStage({ scene, onNext }: { scene: Scene; onNext: () => void
       </ul>
       <span className="sc-scene-outro" style={{ '--outro-in': `${scene.points.length * POINT_GAP}ms` } as React.CSSProperties}>
         <span className="sc-brandline" aria-hidden="true">Work <em>lighter</em></span>
-        <button type="button" className="sc-start">Copilot과 해보기<ArrowRightRegular aria-hidden="true" /></button>
+        <button type="button" className="sc-start">{cta}<ArrowRightRegular aria-hidden="true" /></button>
       </span>
     </div>
   );
@@ -155,6 +156,16 @@ function QrButton() {
   );
 }
 
+/** "실제로 해 보기": 실제 Teams·Copilot 에서 따라 할 순서 */
+function PracticeSteps({ p }: { p: Practice }) {
+  return (
+    <div className="sr-steps">
+      <ol>{p.steps.map((x, i) => <li key={i}><Bold text={x} /></li>)}</ol>
+      {p.note && <p>{p.note}</p>}
+    </div>
+  );
+}
+
 /** 결과: 만든 결과물 + 요약 */
 export function DoneStage({ s, st, vars, completed }: { s: Scenario; st: PlayState; vars: Vars; completed: boolean }) {
   const ids = pickIds(st);
@@ -199,6 +210,7 @@ export function DoneStage({ s, st, vars, completed }: { s: Scenario; st: PlaySta
         <section className="sc-done-doc is-talk">
           <u>생성된 결과물</u>
           <ul className="sc-outs">{outs.map((o, i) => <li key={i}><AppIcon app={o.app} /><b>{o.name}</b></li>)}</ul>
+          {completed && s.practice && <><u>실제로 해 보기{s.practice.where && <> · {s.practice.where}</>}</u><PracticeSteps p={s.practice} /></>}
         </section>
       )}
       <div className="sc-done-side">
@@ -230,6 +242,12 @@ export function DoneStage({ s, st, vars, completed }: { s: Scenario; st: PlaySta
             </section>
           )}
         </div>
+        {completed && s.practice && !talk && (
+          <details className="sr-practice">
+            <summary>실제로 해 보기{s.practice.where && <small>{s.practice.where}</small>}</summary>
+            <PracticeSteps p={s.practice} />
+          </details>
+        )}
         {completed && <QrButton />}
       </div>
     </div>

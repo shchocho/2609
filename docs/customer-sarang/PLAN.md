@@ -79,14 +79,22 @@
 
 - **Copilot Code, Copilot Studio 하네스, Copilot in 앱**: `docs/EXPANSION-PLAN.md` 의 "제품 사실 확인" 범위 안에서만 씁니다. Copilot Code는 관리자가 사용량(크레딧) 지출 정책을 만들어야 테넌트에서 동작하므로, 고객사 테넌트에서 바로 실습이 안 될 수 있습니다.
 - **Teams 기본 기능**(그룹 채팅, 일정, 팀·채널, 채널 파일 공유): 2단계를 시작할 때 Microsoft 지원 문서·Microsoft Learn에서 현재 화면 순서와 단추 이름을 확인하고, 확인한 주소를 아래에 적습니다.
-  - (확인한 주소 적기)
+  - 그룹 채팅(새 채팅 → 받는 사람 옆 화살표 → 그룹 이름 → 받는 사람 → 보내기, 참가자 보기 및 추가, 250명): https://support.microsoft.com/ko-kr/office/microsoft-teams%EC%9D%98-%EA%B7%B8%EB%A3%B9-%EC%B1%84%ED%8C%85%EC%97%90-%EB%8C%80%ED%95%B4-%EC%95%8C%EC%95%84%EC%95%BC-%ED%95%A0-%EC%B2%AB-%EB%B2%88%EC%A7%B8-%EC%82%AC%ED%95%AD-d563174d-ca98-440c-ade1-69176512122d
+  - 모임 예약(일정 → 시간대 선택 또는 새로 만들기 → 세부 정보·필수 참석자 → Teams 모임 토글 → 저장, 스케줄러): https://support.microsoft.com/ko-kr/teams/meetings/schedule-a-meeting-in-microsoft-teams
+  - 팀 만들기(채팅 또는 Teams → 새 항목 → 새 팀 → 팀 이름·설명·비공개/공개·첫 번째 채널 이름 → 만들기): https://support.microsoft.com/ko-kr/office/microsoft-teams%EC%97%90%EC%84%9C-%EC%B2%98%EC%9D%8C%EB%B6%80%ED%84%B0-%ED%8C%80-%EB%A7%8C%EB%93%A4%EA%B8%B0-174adf5f-846b-4780-b765-de1a0a737e2b
+  - 채널 만들기(새 항목 → 새 채널, 표준·비공개·공유): https://support.microsoft.com/ko-kr/office/microsoft-teams%EC%97%90%EC%84%9C-%EA%B3%B5%EC%9C%A0-%EC%B1%84%EB%84%90-%EB%A7%8C%EB%93%A4%EA%B8%B0-80712457-579e-42b2-b54f-112329578aaa
+  - 채널 파일(채널의 공유 탭, 채널마다 SharePoint 문서 라이브러리, 파일의 공유 → 링크 복사): https://support.microsoft.com/ko-KR/teams/files/share-files-in-microsoft-teams
+  - 채널에 올리기(채널 → Shared → 끌어다 놓기 또는 Upload): https://support.microsoft.com/en-us/teams/files/collaborate-on-files-in-microsoft-teams
+  - 새로 만들기 → 폴더·Word·Excel·PowerPoint: https://support.microsoft.com/ko-kr/teams/teams-channels/add-content-and-notes-to-a-team-in-microsoft-teams
+  - 저장 위치(SharePoint): https://support.microsoft.com/en-us/teams/files/file-storage-in-microsoft-teams
+  - **문서만으로 확정하지 못한 표기**(실제 테넌트 화면에서 확인 필요, 글자는 시나리오 JSON 과 `src/surfaces/TeamsApp.tsx` 에서 고침): ① 채널·채팅의 파일 탭 이름 — 한국어 문서는 "공유", 영어는 "Shared", 예전 화면은 "파일". ② 새 모임의 마지막 단추 — 문서는 "저장", 참석자가 있으면 "보내기"로 보일 수 있음. ③ 왼쪽 앱 바의 일정 이름("일정"/"캘린더")과 새 팀 창의 제목.
 - **Copilot 에이전트**: 고객사 답에 맞춰 5단계를 시작할 때 확인하고 주소를 적습니다.
   - (확인한 주소 적기)
 
 ## 작업 순서 (단계 하나 = 세션 하나, 끝날 때마다 커밋)
 
 - [x] 1. **기반 정리**: `customer/sarang` 브랜치 만들기. 영역 5개로 바꾸기(`src/tracks.ts`, `scripts/check-scenarios.mjs` 의 `TRACKS`, 홈 카드 아이콘). Chat 시나리오 3편과 에이전트용 Cowork 1편을 새 영역 폴더로 옮기고, 쓰지 않는 시나리오·영역 삭제. 문구·푸터·안내문 교체. 이미지 시안을 기본값으로(`?look=draft` 없이도 새 이미지). 이 단계에서는 시나리오 내용은 아직 그대로 둠.
-- [ ] 2. **Teams 기본 실습 화면 + 3편**: Teams 앱 모양의 화면(채팅 목록, 일정, 팀·채널, 파일 탭)을 `src/surfaces/` 에 추가. 화면 찾기(spot)와 단추 안내(cue)로 순서대로 눌러 보게 함. 결과 화면 "실제로 해 보기" 카드(`practice`) 추가.
+- [x] 2. **Teams 기본 실습 화면 + 3편**: Teams 앱 모양의 화면(채팅 목록, 일정, 팀·채널, 파일 탭)을 `src/surfaces/` 에 추가. 화면 찾기(spot)와 단추 안내(cue)로 순서대로 눌러 보게 함. 결과 화면 "실제로 해 보기" 카드(`practice`) 추가.
 - [ ] 3. **Copilot Chat 3편**: 교회 업무로 다시 쓰기. 포스터 이미지는 새로 그림.
 - [ ] 4. **Copilot in 앱 6편**: 교회 업무로 다시 쓰기.
 - [ ] 5. **Copilot 에이전트 2~3편**: 고객사 답에 맞춰 다시 쓰기.
