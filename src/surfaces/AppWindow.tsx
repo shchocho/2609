@@ -11,6 +11,7 @@ import { ArtifactView } from '../components/artifacts';
 import { PickText, SlashPopup, type Mark, type PickPhase } from '../components/chrome';
 import { MicRegular, NavigationRegular, ShieldCheckmarkRegular } from '@fluentui/react-icons';
 import { OfficeRibbon, OfficeStatus, OfficeTitle, REAL } from './OfficeChrome';
+import { isWeb, WebTop } from './WebChrome';
 
 interface Ui {
   app: string;
@@ -19,16 +20,20 @@ interface Ui {
   groups: [string, string, string?][];
   /** 왼쪽 탐색 (둘째 항목이 현재 위치) */
   nav?: string[];
+  /** Copilot 창에 처음 보이는 제안 단추 글 */
+  tips?: string[];
   /** 만들기 전에 메인 화면에 뜨는 시작 화면의 [제목, 안내] */
   create?: [string, string];
   /** 오른쪽 창 제목. 없으면 Office 의 Copilot 창 머리(모델 칩 · 편집 허용)를 쓴다 */
   pane?: string;
-  head: string;
+  head?: string;
   sub?: string;
   /** 입력란 안내 글. 없으면 입력란이 없는 창(Copilot 대화가 없는 화면) */
   input?: string;
   status: string;
 }
+/** Forms 의 "Copilot으로 초안 작성" 상자 안내 글 (2026-11-14 실제 화면) */
+const DRAFT_HINT = '컨텍스트, 목적, 의도된 대상 그룹 및 고려할 특정 요구 사항을 포함하여 만들고 싶은 양식을 설명합니다.';
 const UI: Record<string, Ui> = {
   word: {
     app: 'Word',
@@ -57,30 +62,29 @@ const UI: Record<string, Ui> = {
   },
   outlook: {
     app: 'Outlook',
-    tabs: ['파일', '홈', '보기', '도움말'],
-    groups: [['✉', '새 메일'], ['🗑', '삭제'], ['↩', '회신'], ['⏩', '전달'], ['◈', 'Copilot']],
+    tabs: [], groups: [],
+    nav: ['받은 편지함', '임시 보관함', '보낸 편지함', '지운 편지함'],
     pane: 'Copilot',
-    head: '메일을 요약하거나 답장 초안을 써 드립니다.',
-    input: 'Copilot에게 물어보기',
-    status: '받은 편지함',
+    tips: ['이 이메일 요약', '이 이메일 요약 및 회신'],
+    input: 'Copilot에 메시지 보내기',
+    status: '',
   },
   teams: {
     app: 'Teams',
-    tabs: ['채팅', '요약', '녹취록', '파일'],
-    groups: [['💬', '채팅'], ['👥', '참가자'], ['✋', '손들기'], ['◈', 'Copilot']],
+    tabs: [], groups: [],
+    nav: ['활동', '채팅', 'Teams', '일정', 'OneDrive'],
     pane: 'Copilot',
-    head: '이 회의에 대해 물어보세요.',
-    input: '이 회의에 대해 질문하기',
-    status: '회의 · 녹취 켜짐',
+    head: '안녕하세요, 어떻게 도와드릴까요?',
+    tips: ['이 채팅 요약'],
+    input: 'Copilot에 메시지 보내기',
+    status: '',
   },
   forms: {
     app: 'Forms',
-    tabs: ['내 양식', '질문', '응답', '설정'],
-    groups: [['👁', '미리 보기'], ['🎨', '스타일'], ['📤', '응답 수집'], ['◈', 'Copilot']],
+    tabs: [], groups: [],
     pane: 'Copilot',
-    head: '만들 설문을 말로 설명해 보세요.',
-    input: '묻고 싶은 내용을 설명하세요',
-    status: '내 양식',
+    input: 'Copilot에 메시지 보내기',
+    status: '',
   },
   cloudflow: {
     app: 'Power Automate',
@@ -162,9 +166,25 @@ export function AppWindow({ s, st, vars, ids, shown, streamRef, mark, ask, onSen
   const copilotAt = s.messages.findIndex(m => m.role === 'cue' && m.target === 'copilot');
   const paneOpen = copilotAt < 0 || shown > copilotAt;
   const name = creating ? '새로 만들기' : doc ? artifactName(doc, ids) : s.title;
+  // Outlook · Teams · Forms 는 실제 화면의 위쪽 모양을 쓴다. Outlook · Teams 는 위쪽의 Copilot 단추로 창을 연다
+  const web = isWeb(surface) ? surface : null;
+  // Forms 는 Copilot 창을 열기 전까지 양식 위의 "Copilot으로 초안 작성" 상자에서 요청한다
+  const draft = web === 'forms' && !paneOpen;
+  // Teams 는 모임 채팅 이름(처음 연 것), Forms 는 만들기 전의 이름을 머리에 둔다
+  const webName = web === 'teams' ? Object.values(arts).find(fits)?.name ?? name : web === 'forms' && writing === 0 ? '제목 없는 양식' : name;
+  const navOn = web === 'outlook' && doc?.origin !== 'made' ? 0 : 1;
+  const composer = pane.input && (
+    <div className={`sc-composer is-pane sc-zone ${mark('composer')}`}>
+      <b aria-hidden="true">＋</b>
+      <span className={typed ? 'is-filled' : undefined}>{typed && pick ? <PickText text={typed} pick={pick} phase={pickPhase} /> : typed ?? (draft ? DRAFT_HINT : pane.input)}</span>
+      <i aria-hidden="true">{real || web ? <MicRegular /> : '🎤'}</i>
+      {onSend && !target && <button type="button" className="sc-pane-send is-hunt" aria-label="보내기" onClick={onSend}>↑</button>}
+      {slashOpen && pick && <SlashPopup pick={pick} active={pickPhase === 'pick'} onPick={pickPhase === 'search' ? onPickSelect : undefined} />}
+    </div>
+  );
   return (
-    <div className="sc-shell is-office" data-app={surface} data-real={real ? '' : undefined}>
-      {real ? <OfficeTitle r={real} surface={surface} name={name} me="나" /> : (
+    <div className="sc-shell is-office" data-app={surface} data-real={real || web ? '' : undefined}>
+      {real ? <OfficeTitle r={real} surface={surface} name={name} me="나" /> : web ? null : (
         <div className="sc-win">
           <span className="sc-win-name">
             {!ui.pane && <span className="sc-save">자동 저장 ●</span>}{name} · {ui.app}
@@ -178,7 +198,7 @@ export function AppWindow({ s, st, vars, ids, shown, streamRef, mark, ask, onSen
           r={real} className={`sc-zone ${mark('ribbon')}`}
           extra={surface === 'excel' ? <div className="or-fx" aria-hidden="true"><i>A1</i><b>fx</b><span /></div> : undefined}
         />
-      ) : (
+      ) : web ? <WebTop surface={web} name={webName} zone={`sc-zone ${mark('ribbon')}`} hot={hot('copilot')} onAct={onAct} /> : (
         <div className={`sc-ribbon sc-zone ${mark('ribbon')}`}>
           <span className="sc-ribbon-tabs">{ui.tabs.map((t, i) => <i key={t} className={i === 1 ? 'on' : undefined}>{t}</i>)}</span>
           <span className="sc-ribbon-groups">
@@ -190,13 +210,21 @@ export function AppWindow({ s, st, vars, ids, shown, streamRef, mark, ask, onSen
         </div>
       )}
       <div className={`sc-office-body${paneOpen ? '' : ' is-paneless'}`}>
-        {real && !paneOpen && (
+        {(real || (draft && writing === null)) && !paneOpen && (
           <button type="button" className={`or-fab${hot('copilot') ? ' is-hunt' : ''}`} aria-label="Copilot" {...(hot('copilot') ? { 'data-act': 'copilot', onClick: onAct } : { tabIndex: -1 })}>
             <img src="logo/copilot/copilot.png" alt="" />
           </button>
         )}
-        {ui.nav && <nav className="sc-app-nav" aria-hidden="true">{ui.nav.map((n, i) => <i key={n} className={i === 1 ? 'on' : undefined}>{n}</i>)}</nav>}
+        {ui.nav && <nav className="sc-app-nav" aria-hidden="true">{ui.nav.map((n, i) => <i key={n} className={i === navOn ? 'on' : undefined}>{n}</i>)}</nav>}
         <div className={`sc-canvas sc-zone ${mark('canvas')}`}>
+          {draft && (
+            <div className={`sc-pane ww-draft${writing === null ? ' is-made' : ''} sc-zone ${mark('pane')}`}>
+              <span className="sc-pane-top ww-pane-top"><img src="logo/copilot/copilot.png" alt="" /><b>Copilot으로 초안 작성</b><i>✕</i></span>
+              <div className="sc-stream-in" ref={streamRef}>{children}</div>
+              {composer}
+            </div>
+          )}
+          {web === 'outlook' && doc?.origin === 'read' && <span className="ww-sum"><img src="logo/copilot/copilot.png" alt="" />이 이메일 요약</span>}
           {creating ? (
             <div className="st-create">
               <b>{ui.create?.[0]}</b>
@@ -214,30 +242,23 @@ export function AppWindow({ s, st, vars, ids, shown, streamRef, mark, ask, onSen
         </div>
         {paneOpen && (
         <div className={`sc-pane sc-zone ${mark('pane')}`} data-pane={s.surface}>
-          {real
+          {web ? <span className="sc-pane-top ww-pane-top"><img src="logo/copilot/copilot.png" alt="" /><b>Copilot</b><i>✕</i></span> : real
             ? <span className="sc-pane-top or-pane-top"><i><NavigationRegular /></i><i className="sc-chip">{vars.model} ⌄</i><em /><i className="or-shield"><ShieldCheckmarkRegular /></i><i>⋯</i><i>✕</i></span>
             : pane.pane
               ? <span className="sc-pane-top"><b>{pane.pane}</b><i>✕</i></span>
               : <span className="sc-pane-top"><i>≡</i><i>⛨</i><i className="sc-chip">{vars.model} ⌄</i><i>⋯</i><i>✕</i></span>}
-          <b className="sc-pane-head">{pane.head}</b>
+          {pane.head && <b className="sc-pane-head">{pane.head}</b>}
           {pane.sub && <span className="sc-pane-sub">{pane.sub}</span>}
+          {pane.tips && <span className="sc-pane-sub ww-tips">{pane.tips.map(t => <i key={t}>{t}</i>)}</span>}
           {!pane.pane && !real && <i className="sc-pane-allow">편집 허용 ⌄</i>}
           <div className="sc-stream-in" ref={streamRef}>{children}</div>
           {real && <i className="or-allow">편집 허용 ⌄</i>}
-          {pane.input && (
-            <div className={`sc-composer is-pane sc-zone ${mark('composer')}`}>
-              <b aria-hidden="true">＋</b>
-              <span className={typed ? 'is-filled' : undefined}>{typed && pick ? <PickText text={typed} pick={pick} phase={pickPhase} /> : typed ?? pane.input}</span>
-              <i aria-hidden="true">{real ? <MicRegular /> : '🎤'}</i>
-              {onSend && !target && <button type="button" className="sc-pane-send is-hunt" aria-label="보내기" onClick={onSend}>↑</button>}
-              {slashOpen && pick && <SlashPopup pick={pick} active={pickPhase === 'pick'} onPick={pickPhase === 'search' ? onPickSelect : undefined} />}
-            </div>
-          )}
+          {composer}
           {real && <small className="or-pane-foot">M365 Copilot(프리미엄) ⓘ</small>}
         </div>
         )}
       </div>
-      {real ? <OfficeStatus r={real} lead={surface === 'powerpoint' ? `슬라이드 ${slide}/${slides}` : undefined} /> : (
+      {real ? <OfficeStatus r={real} lead={surface === 'powerpoint' ? `슬라이드 ${slide}/${slides}` : undefined} /> : web ? null : (
         <div className="sc-status">
           <span>{surface === 'powerpoint' ? `슬라이드 ${slide}/${slides}` : ui.status}</span>
           <span>한국어</span>

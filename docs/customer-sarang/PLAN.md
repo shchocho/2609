@@ -98,7 +98,16 @@
   - 제목 표시줄(자동 저장 · 파일 이름 - 앱 · 검색), 탭 이름, 홈 탭의 그룹 이름(Word: 클립보드 · 글꼴 · 단락 · 스타일 · 편집 · 음성 · 편집기 · 추가 기능 / Excel: 클립보드 · 글꼴 · 맞춤 · 표시 형식 · 스타일 · 셀 · 편집 · 추가 기능 / PowerPoint: 클립보드 · 슬라이드 · 글꼴 · 단락 · 그리기 · 편집 · 음성 · 추가 기능 · Copilot), 오른쪽 단추(메모 · 편집 · 공유), 상태 표시줄.
   - **Copilot 은 리본이 아니라 문서 오른쪽 아래의 둥근 Copilot 단추로 엽니다.** Copilot 창은 위쪽에 모델("자동") · 닫기, 아래쪽에 "편집 허용", 입력란("Copilot으로 편집"), "M365 Copilot(프리미엄)" 순서입니다. 빈 Word 문서의 창 제목은 "무엇을 만드시겠습니까?" 였습니다.
   - 리본의 추가 기능(ChatGPT 등)과 민감도 레이블처럼 테넌트마다 다른 것은 넣지 않았습니다.
-  - **확인하지 못한 화면**: Outlook · Forms · Teams 회의의 Copilot 화면, Copilot Studio, Code 탭은 실제 화면과 대조하지 못했습니다(이전 구성 그대로). Excel · PowerPoint 의 Copilot 창 안쪽 문구도 Word 와 같은 틀이라는 것만 확인했습니다.
+  - Excel · PowerPoint 의 Copilot 창 안쪽 문구는 Word 와 같은 틀이라는 것만 확인했습니다.
+- **Outlook · Teams 모임 채팅 · Forms 화면 (2026-11-14, 한국어 새 Outlook · Teams 데스크톱 앱 · Forms 웹에서 확인)**: `src/surfaces/WebChrome.tsx` 와 `src/styles/office-real.css` 에 옮겼습니다. 읽기만 했고 메일·채팅 내용은 옮기지 않았습니다.
+  - Outlook: 검색란 "검색하거나 Copilot에게 질문하기", 탭 파일 · 홈 · 보기 · 도움말, 리본(새 메일 · 삭제 · 보관 · 이동 · 회신 · 전체 회신 · 전달 · 빠른 단계 · 모두 읽은 상태로 표시), **리본 오른쪽 끝의 Copilot 단추**로 Copilot 창을 엽니다. 메일 위에 **"이 이메일 요약"** 줄이 있고, Copilot 창의 입력란은 "Copilot에 메시지 보내기", 제안은 "이 이메일 요약" · "이 이메일 요약 및 회신" 입니다. 왼쪽 앱 바와 메일 목록 열은 그리지 않고 폴더 열만 두었습니다.
+    - 요약(메일 맨 위의 "Copilot별 요약" 또는 "요약"): https://support.microsoft.com/ko-kr/outlook/copilot-pages/summarize-an-email-thread-with-copilot-in-outlook
+    - 답장 초안(메시지 영역의 Copilot 상자 → 생성 → 유지 → 보내기, 또는 채팅에서 요청): https://support.microsoft.com/ko-kr/outlook/copilot-pages/draft-an-email-message-with-copilot-in-outlook
+  - Teams: 모임 채팅의 머리글(탭 채팅 · 공유 · 노트 · **요약**, 오른쪽에 참가 · 사람 · **Copilot 아이콘** · 검색). Copilot 창은 인사말 "안녕하세요, 어떻게 도와드릴까요?", 입력란 "Copilot에 메시지 보내기", 제안 "이 채팅 요약" 입니다. 요약 탭은 회의 중에 기록을 켜 두어야 채워집니다.
+    - 회의 중(모임 컨트롤의 Copilot, 5분 넘게 늦으면 "Copilot 열기" 알림)과 회의 뒤(모임 채팅 오른쪽 위 · 요약 탭), 대화 내용 기록 조건: https://support.microsoft.com/ko-kr/teams/copilot/catch-up-on-meetings-with-microsoft-365-copilot-in-teams
+  - Forms: 위쪽 도구 모음(스타일 · 설정 · 미리 보기 · **응답 수집** · **응답 보기** · 프레젠테이션), 새 양식 위의 **"Copilot으로 초안 작성"** 상자와 그 안내 글. 오른쪽 Copilot 창은 처음에는 없습니다.
+    - 생성 → 유지 → 오른쪽 아래 Copilot 단추로 채팅 열기 → 응답 보기에서 Copilot으로 결과 분석: https://support.microsoft.com/ko-kr/forms/welcome-to-copilot-in-forms
+  - **확인하지 못한 화면**: Teams 의 **회의 중 창**(모임 컨트롤), Forms 의 **생성 뒤 화면 · Copilot 채팅 창 · 응답 보기 화면**, Outlook 의 **작성 창 안 Copilot 상자**는 실제 화면을 보지 못했습니다. 이 부분은 위 지원 문서의 순서만 따랐고, 화면 모양(대화 형식, 입력란 글)은 다른 앱의 Copilot 창과 같은 틀로 그렸습니다. Copilot Studio 와 Code 탭도 실제 화면과 대조하지 못했습니다(이전 구성 그대로).
 - **Copilot 에이전트**: 고객사 답이 없어 기본값(Copilot Studio 안내 에이전트 1편 + Cowork 1편)으로 만들었습니다. 2026-11-14 확인.
   - 지식 원본(공개 웹사이트 · 올린 문서 · SharePoint · Dataverse · 커넥터): https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-copilot-studio
   - 토픽(토픽 추가 → 처음부터. 클래식 오케스트레이션은 트리거 문구 5~10개, 생성형 오케스트레이션은 토픽 설명으로 고름): https://learn.microsoft.com/en-us/microsoft-copilot-studio/authoring-create-edit-topics

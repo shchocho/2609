@@ -187,8 +187,8 @@ function MailView({ a, writing, vars, ids }: ViewProps) {
       <p className="wb-ol-bar">
         {isRead ? (
           <>
-            <span className="wb-ol-act">{FT.reply}답장</span>
-            <span className="wb-ol-act">{FT.reply}모두 답장</span>
+            <span className="wb-ol-act">{FT.reply}회신</span>
+            <span className="wb-ol-act">{FT.reply}전체 회신</span>
             <span className="wb-ol-act">{FT.forward}전달</span>
           </>
         ) : (
