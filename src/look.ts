@@ -10,13 +10,3 @@ export const DRAFT = (() => {
     return true;
   }
 })();
-
-/** 시안 모드에서 바꿔 끼울 이미지 경로 */
-export const DRAFT_ASSETS: Record<string, string> = {
-  'graphic/event-poster/01-hands.jpg': 'draft/poster/01-hands.jpg',
-  'graphic/event-poster/02-bulb.jpg': 'draft/poster/02-bulb.jpg',
-  'graphic/event-poster/03-tools.jpg': 'draft/poster/03-tools.jpg',
-  'graphic/event-poster/04-whiteboard.jpg': 'draft/poster/04-whiteboard.jpg',
-  'graphic/event-poster/05-brand-poster.jpg': 'draft/poster/05-brand-poster.jpg',
-  'graphic/event-poster/06-tshirt.png': 'draft/poster/06-tshirt.png',
-};

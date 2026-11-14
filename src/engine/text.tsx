@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import type { Artifact, Filterable, FlowStep, PlayState, Vars } from '../types';
-import { DRAFT, DRAFT_ASSETS } from '../look';
 
 /** {model} {effort} {pick:KEY} {val:KEY} 치환 */
 export function fill(text: string, v: Vars): string {
@@ -138,7 +137,4 @@ const EXT: Record<string, string> = {
 export const appFromName = (name: string) => EXT[name.split('.').pop()?.toLowerCase() ?? ''] ?? 'word';
 
 /** 공개 폴더 기준 경로 */
-export const asset = (p: string) => {
-  const rel = p.replace(/^\//, '');
-  return (DRAFT && DRAFT_ASSETS[rel]) || rel;
-};
+export const asset = (p: string) => p.replace(/^\//, '');
