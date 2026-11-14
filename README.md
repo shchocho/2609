@@ -125,6 +125,7 @@ npm run check:scenarios
 
 - `docs/EXPANSION-PLAN.md`: Copilot in 앱(Word·PowerPoint·Excel), Copilot Code, Power Automate, Copilot Studio 영역을 추가하는 계획
 - `docs/LOCAL-HANDOFF.md`: 내 PC 의 Claude Code 로 이어서 작업하는 방법과 붙여 넣을 프롬프트
+- `docs/customer-sarang/PLAN.md`: 이 사이트를 바탕으로 고객사(사랑의교회) 교육용 실습 사이트를 별도 브랜치로 만드는 계획과 새 세션용 프롬프트
 - `docs/design-draft/`: 원본 부스 이미지를 새로 그린 이미지로 바꾸는 시안(주소에 `?look=draft` 를 붙이면 보임)과 비교 이미지
 - `docs/reference/`: 원본 부스 화면을 분석한 엔진·렌더링 명세(필요한 절만 찾아 읽기)
 - `scripts/e2e.cjs`: 시나리오 하나를 결과 화면까지 자동 진행하는 테스트(Playwright 필요)
