@@ -55,7 +55,7 @@
     {
       "icon": "target",
       "title": "Copilot 단추 찾기",
-      "desc": "리본의 Copilot 단추로 오른쪽 창을 엽니다."
+      "desc": "슬라이드 오른쪽 아래의 Copilot 단추로 오른쪽 창을 엽니다."
     },
     {
       "icon": "docsearch",
@@ -202,12 +202,12 @@
       "text": "PowerPoint에서 Copilot을 부르는 단추는 화면의 어디에 있을까요?",
       "options": [
         { "at": "ribbon", "label": "위쪽 리본 메뉴" },
-        { "at": "canvas", "label": "가운데 슬라이드" },
-        { "at": "composer", "label": "아래 입력란" }
+        { "at": "canvas", "label": "슬라이드 오른쪽 아래" }
       ],
-      "answer": 0,
-      "does": "맞아요. 홈 탭 리본의 Copilot 단추를 누르면 오른쪽에 Copilot 창이 열립니다."
+      "answer": 1,
+      "does": "맞아요. 슬라이드 오른쪽 아래의 둥근 Copilot 단추를 누르면 오른쪽에 Copilot 창이 열립니다."
     },
+    { "role": "cue", "text": "슬라이드 오른쪽 아래의 Copilot 단추를 눌러 Copilot 창을 엽니다.", "action": "Copilot", "target": "copilot" },
     {
       "role": "cue",
       "text": "Copilot 창 입력란에 요청이 준비되어 있습니다. 어제 쓴 제안서를 붙였으면 보내 보세요.",
@@ -292,7 +292,7 @@
   "recap": [
     {
       "icon": "target",
-      "name": "리본의 Copilot 단추",
+      "name": "오른쪽 아래의 Copilot 단추",
       "desc": "PowerPoint 안에서 바로 Copilot 창을 열었습니다."
     },
     {

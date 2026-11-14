@@ -1,0 +1,141 @@
+/*
+ * Word · Excel · PowerPoint 창을 실제 데스크톱 앱(한국어, 2026-11-14 확인)처럼 그리는 스타일.
+ * src/surfaces/OfficeChrome.tsx 와 AppWindow.tsx 의 data-real 창에만 적용된다. reference.css 는 고치지 않는다.
+ */
+.sc-shell[data-real] { --or-app: #185abd; --or-bar: #f3f3f3; --or-line: #e0e0e0; --or-sub: #616161; }
+.sc-shell[data-real][data-app=excel] { --or-app: #107c41; }
+.sc-shell[data-real][data-app=powerpoint] { --or-app: #c43e1c; }
+.sc-shell[data-real] svg { flex: none; }
+
+/* 제목 표시줄 */
+.or-title { gap: 10px; padding-left: 12px; color: #242424; background: var(--or-bar); border-bottom: 0; }
+.or-logo { flex: none; width: 20px; height: 20px; }
+.or-auto { flex: none; display: inline-flex; align-items: center; gap: 6px; }
+.or-auto i { position: relative; padding: 1px 20px 1px 8px; font-style: normal; font-size: 10.5px; color: #fff; background: var(--or-app); border-radius: 10px; }
+.or-auto i::after { content: ""; position: absolute; top: 50%; right: 4px; width: 10px; height: 10px; margin-top: -5px; background: #fff; border-radius: 50%; }
+.or-quick { flex: none; display: inline-flex; gap: 10px; font-size: 17px; color: var(--or-sub); }
+.or-title .sc-win-name { flex: 0 1 auto; font-weight: 400; }
+.or-search { flex: 0 1 380px; display: flex; align-items: center; gap: 10px; height: 28px; margin: 0 auto; padding: 0 12px; color: var(--or-sub); background: #fff; border: 1px solid #d1d1d1; border-radius: 4px; }
+.or-search svg { font-size: 15px; }
+.or-me { flex: none; display: grid; place-items: center; width: 26px; height: 26px; font-size: 11px; color: #fff; background: #6264a7; border-radius: 50%; }
+
+/* 탭 줄과 리본 */
+.or-ribbon { gap: 4px; padding: 0 8px 6px; background: var(--or-bar); border-bottom: 1px solid var(--or-line); }
+.or-tabs { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 2px 6px 0; }
+.or-tabs > span { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.or-tabs i { padding: 5px 9px; font-style: normal; font-size: 12.5px; white-space: nowrap; color: #424242; border-bottom: 2px solid transparent; }
+.or-tabs i.on { font-weight: 600; color: #242424; border-bottom-color: var(--or-app); }
+.or-tabs > .or-tabs-end { flex: none; gap: 6px; }
+.or-tabs-end i { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; background: #fff; border: 1px solid #c8c8c8; border-radius: 4px; }
+.or-tabs-end i.is-share { color: #fff; background: var(--or-app); border-color: var(--or-app); }
+.or-tabs-end svg { font-size: 14px; }
+.or-groups { display: flex; align-items: stretch; min-height: 84px; padding: 4px 6px 2px; overflow: hidden; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px #00000024, 0 0 1px #0000001f; }
+.or-g { flex: none; display: grid; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; gap: 2px; padding: 2px 11px 0; border-right: 1px solid #e5e5e5; }
+.or-g:last-child { border-right: 0; }
+.or-g-body { display: flex; align-items: center; gap: 9px; }
+.or-g-name { font-style: normal; font-size: 10.5px; white-space: nowrap; color: var(--or-sub); }
+.or-big { display: grid; justify-items: center; gap: 2px; max-width: 104px; text-align: center; }
+.or-big svg { font-size: 26px; color: var(--or-app); }
+.or-big em { font-style: normal; font-size: 11px; line-height: 1.25; color: #242424; }
+.or-rows { display: grid; gap: 5px; }
+.or-row, .or-boxes { display: flex; align-items: center; gap: 7px; }
+.or-row i { display: grid; font-style: normal; font-size: 11.5px; color: #424242; }
+.or-row svg { font-size: 16px; }
+.or-boxes i { min-width: 36px; height: 20px; padding: 0 6px; font-style: normal; font-size: 11px; line-height: 18px; white-space: nowrap; color: #242424; background: #fff; border: 1px solid #c8c8c8; border-radius: 3px; }
+.or-boxes i:first-child { min-width: 112px; }
+.or-list { display: grid; gap: 4px; }
+.or-list i { font-style: normal; font-size: 11.5px; white-space: nowrap; color: #242424; }
+/* Excel 수식 입력줄 */
+.or-fx { display: grid; grid-template-columns: 84px auto minmax(0, 1fr); align-items: center; gap: 8px; margin-top: 2px; padding: 0 4px; }
+.or-fx i, .or-fx span { height: 22px; background: #fff; border: 1px solid #d1d1d1; border-radius: 3px; }
+.or-fx i { padding: 0 8px; font-style: normal; font-size: 12px; line-height: 20px; }
+.or-fx b { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: var(--or-sub); }
+
+/* 본문: Copilot 창을 열기 전에는 문서만 보이고 오른쪽 아래에 Copilot 단추가 떠 있다 */
+.sc-shell[data-real] .sc-office-body { position: relative; }
+.sc-office-body.is-paneless { grid-template-columns: minmax(0, 1fr); }
+.sc-shell[data-real] .sc-canvas { background: #e8e8e8; }
+.or-fab { position: absolute; right: 28px; bottom: 26px; z-index: 3; display: grid; place-items: center; width: 46px; height: 46px; padding: 0; background: #fff; border: 1px solid var(--or-line); border-radius: 50%; box-shadow: 0 2px 8px #00000029; cursor: pointer; }
+.or-fab img { width: 26px; height: 26px; }
+
+/* Copilot 창 */
+.sc-shell[data-real] .sc-pane { gap: 10px; padding: 12px 16px 10px; border-left-color: var(--or-line); }
+.or-pane-top { color: #424242; }
+.or-pane-top em { flex: 1; }
+.or-pane-top svg { font-size: 18px; }
+.or-pane-top > i { display: grid; font-style: normal; }
+.sc-shell[data-real] .or-pane-top .sc-chip { padding: 4px 12px; font-weight: 400; letter-spacing: 0; color: #242424; background: #f0f0f0; }
+.or-shield { color: #107c10; }
+.sc-shell[data-real] .sc-pane-head { font-size: 19px; line-height: 1.4; }
+.sc-shell[data-real] .sc-pane-sub { font-size: 13px; }
+.or-allow { margin: 2px 0 -2px 4px; font-style: normal; font-size: 12px; font-weight: 600; color: #242424; }
+.sc-shell[data-real] .sc-pane .sc-composer.is-pane { padding: 8px 12px; border: 1px solid #d1d1d1; border-radius: 22px; box-shadow: none; }
+.sc-shell[data-real] .sc-composer.is-pane > i { display: grid; font-size: 18px; color: var(--or-sub); }
+.or-pane-foot { text-align: center; font-size: 11px; color: var(--or-sub); }
+
+/* 상태 표시줄 */
+.or-status { background: var(--or-bar); border-top-color: var(--or-line); }
+
+/*
+ * Outlook · Teams(모임 채팅) · Forms: 실제 화면(한국어, 2026-11-14 확인)의 위쪽 모양. src/surfaces/WebChrome.tsx
+ */
+.sc-shell[data-real][data-app=outlook] { --or-app: #0f6cbd; --or-bar: #e3ecf7; }
+.sc-shell[data-real][data-app=teams] { --or-app: #5b5fc7; --or-bar: #ebebeb; }
+.sc-shell[data-real][data-app=forms] { --or-app: #038387; --or-bar: #fff; }
+.ww-title { gap: 10px; padding-left: 12px; color: #242424; background: var(--or-bar); border-bottom: 0; }
+.ww-title .sc-win-name { flex: none; font-weight: 600; }
+.ww-title.is-forms { color: #fff; background: var(--or-app); }
+.ww-title.is-forms .sc-win-name { color: #fff; }
+.ww-doc { margin: 0 auto; white-space: nowrap; }
+.ww-title.is-forms .or-me { margin-right: 12px; color: var(--or-app); background: #fff; }
+.ww-ribbon { gap: 4px; padding: 0 8px 6px; background: var(--or-bar); border-bottom: 1px solid var(--or-line); }
+.ww-cmds { display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 4px 6px; overflow: hidden; font-size: 12.5px; white-space: nowrap; color: #424242; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px #00000024, 0 0 1px #0000001f; }
+.ww-cmds svg { font-size: 18px; }
+.ww-new { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; font-weight: 600; color: #fff; background: var(--or-app); border-radius: 4px; }
+.ww-ico { display: inline-flex; align-items: center; gap: 12px; padding-right: 12px; color: #616161; border-right: 1px solid #e5e5e5; }
+.ww-ico:last-child, .ww-ico:has(+ .ww-copilot), .ww-end .ww-ico { padding-right: 0; border-right: 0; }
+.ww-ico i { display: grid; }
+.ww-txt { display: inline-flex; align-items: center; gap: 5px; }
+.ww-copilot { flex: none; display: grid; place-items: center; width: 34px; height: 32px; margin-left: auto; padding: 0; background: #fff; border: 1px solid var(--or-line); border-radius: 8px; }
+.ww-copilot.is-hunt { cursor: pointer; }
+.ww-copilot img { width: 22px; height: 22px; }
+/* Teams: 모임 채팅의 머리글(이름 · 탭 · 참가 · Copilot) */
+.ww-ribbon.is-teams { padding: 0; background: #fff; }
+.ww-chat { display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 0 16px; font-size: 13px; color: #424242; }
+.ww-av { flex: none; display: grid; place-items: center; width: 30px; height: 30px; font-size: 12px; color: #fff; background: var(--or-app); border-radius: 50%; }
+.ww-chat strong { font-size: 15px; white-space: nowrap; color: #242424; }
+.ww-chat .or-tabs { padding: 0; }
+.ww-end { display: inline-flex; align-items: center; gap: 14px; margin-left: auto; }
+.ww-end svg { font-size: 18px; }
+.ww-end .ww-txt { padding: 5px 12px; font-weight: 600; color: #fff; background: var(--or-app); border-radius: 4px; }
+.ww-copilot.is-small { width: 30px; height: 30px; margin: 0; border-color: transparent; }
+/* Forms: 위쪽 도구 모음(스타일 · 설정 · 미리 보기 · 응답 수집 · 응답 보기) */
+.ww-ribbon.is-forms { padding: 6px 16px; background: #fff; }
+.ww-cmds.is-end { justify-content: flex-end; gap: 18px; min-height: 34px; padding: 0; box-shadow: none; }
+.ww-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; font-weight: 600; color: var(--or-app); border: 1px solid var(--or-app); border-radius: 4px; }
+.ww-pill.is-fill { color: #fff; background: var(--or-app); }
+/* 본문 */
+.sc-shell[data-real][data-app=teams] .sc-canvas { background: #f5f5f5; }
+.ww-sum { display: flex; align-items: center; gap: 8px; margin: 12px 16px 0; padding: 8px 12px; font-size: 12.5px; color: #242424; background: #f5f5f5; border: 1px solid var(--or-line); border-radius: 6px; }
+.ww-sum img, .ww-pane-top img { width: 18px; height: 18px; }
+.sc-shell[data-real] .ww-pane-top b { font-size: 14px; }
+.ww-tips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ww-tips i { padding: 6px 12px; font-style: normal; color: #242424; border: 1px solid #d1d1d1; border-radius: 8px; }
+/* Forms: 양식 위의 "Copilot으로 초안 작성" 상자 */
+.sc-shell.is-office .sc-pane.ww-draft { max-width: 600px; max-height: 330px; margin: 18px auto 0; border: 1px solid var(--or-line); border-radius: 12px; box-shadow: 0 2px 8px #0000001a; }
+/* 초안이 만들어지면 상자를 줄여 아래의 양식이 보이게 한다 */
+.sc-shell.is-office .sc-pane.ww-draft.is-made { max-height: 250px; }
+.ww-draft .sc-date, .sc-shell[data-app=forms] .sc-canvas .wb-wd-page:empty { display: none; }
+/* 왼쪽: Outlook 폴더 · Teams 앱 바 */
+.sc-shell[data-app=outlook] .sc-app-nav { padding: 10px 8px; font-size: 12.5px; background: var(--or-bar); }
+.sc-shell[data-app=outlook] .sc-app-nav i { padding: 7px 10px; text-align: left; }
+.sc-shell[data-app=outlook] .sc-app-nav i.on { color: #242424; background: #fff; }
+.sc-shell[data-app=teams] .sc-app-nav { background: var(--or-bar); }
+.sc-shell[data-app=teams] .sc-app-nav i.on { color: var(--or-app); background: none; }
+@media (orientation: landscape) {
+  .sc-shell[data-app=outlook] .sc-office-body { grid-template-columns: 150px minmax(0, 1fr) clamp(300px, 26%, 400px); }
+  .sc-shell[data-app=outlook] .sc-office-body.is-paneless { grid-template-columns: 150px minmax(0, 1fr); }
+  .sc-shell[data-app=teams] .sc-office-body { grid-template-columns: 64px minmax(0, 1fr) clamp(300px, 26%, 400px); }
+  .sc-shell[data-app=teams] .sc-office-body.is-paneless { grid-template-columns: 64px minmax(0, 1fr); }
+}
+@media (orientation: portrait) { .sc-shell:is([data-app=outlook], [data-app=teams]) .sc-app-nav { display: none; } }

@@ -25,6 +25,13 @@
 
 > 화면 표기 결정 필요: 하네스 이름을 "Microsoft Copilot harness (구 GitHub Copilot harness)" 로 쓸지, 요청대로 "GitHub Copilot harness" 로 쓸지. 기본값은 앞의 것.
 
+- **Copilot in 앱의 화면 (2026-11-14, 한국어 데스크톱 앱 · Forms 웹의 실제 화면에서 확인)**: 창 위쪽 모양과 단추 이름을 실제 화면대로 옮겼습니다(`src/surfaces/OfficeChrome.tsx` · `WebChrome.tsx` · `src/styles/office-real.css`). 위 항목의 "리본의 Copilot 단추"는 지금 화면과 다릅니다.
+  - Word · Excel · PowerPoint: Copilot 은 리본이 아니라 **문서 오른쪽 아래의 둥근 Copilot 단추**로 엽니다. Copilot 창은 모델("자동") · 닫기, "편집 허용", 입력란("Copilot으로 편집"), "M365 Copilot(프리미엄)" 순서입니다.
+  - Outlook(새 Outlook): **리본 오른쪽 끝의 Copilot 단추**로 창을 엽니다. 메일 위에 "이 이메일 요약" 줄, 창의 제안은 "이 이메일 요약" · "이 이메일 요약 및 회신", 입력란은 "Copilot에 메시지 보내기". https://support.microsoft.com/ko-kr/outlook/copilot-pages/summarize-an-email-thread-with-copilot-in-outlook
+  - Teams: 모임 채팅 머리글(채팅 · 공유 · 노트 · 요약)의 **오른쪽 위 Copilot 아이콘**. 회의 중에는 모임 컨트롤의 Copilot 이고, 회의 뒤 요약과 질문에는 대화 내용 기록이 필요합니다. https://support.microsoft.com/ko-kr/teams/copilot/catch-up-on-meetings-with-microsoft-365-copilot-in-teams
+  - Forms: 새 양식 위의 **"Copilot으로 초안 작성"** 상자 → 생성 → 유지 → 오른쪽 아래 Copilot 단추로 채팅, 결과는 위쪽 도구 모음의 **응답 보기**. https://support.microsoft.com/ko-kr/forms/welcome-to-copilot-in-forms
+  - 실제 화면을 보지 못한 곳: Teams 회의 중 창, Forms 의 생성 뒤 화면 · 채팅 창 · 응답 보기 화면, Outlook 작성 창 안의 Copilot 상자. 이 부분은 지원 문서의 순서만 따랐습니다.
+
 ## 영역별 시나리오 초안 (각 3편)
 
 ### 1. Copilot in 앱 (`m365-apps`)

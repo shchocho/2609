@@ -63,7 +63,7 @@
     {
       "icon": "checkdoc",
       "title": "문서에서 Copilot 열기",
-      "desc": "Word 문서 오른쪽의 Copilot 창에서 바로 요청합니다."
+      "desc": "문서 오른쪽 아래의 Copilot 단추로 Copilot 창을 엽니다."
     },
     {
       "icon": "docsearch",
@@ -225,6 +225,7 @@
     }
   },
   "messages": [
+    { "role": "cue", "text": "메모를 붙여 둔 Word 문서입니다. 문서 오른쪽 아래의 Copilot 단추로 Copilot 창을 엽니다.", "action": "Copilot", "target": "copilot" },
     {
       "role": "cue",
       "text": "Copilot 창 입력란에 요청이 준비되어 있습니다. 참고할 지난 제안서를 붙였으면 보내 보세요.",

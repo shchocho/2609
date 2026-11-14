@@ -46,6 +46,7 @@
     ]
   },
   "overview": [
+    { "icon": "target", "title": "Copilot 창 열기", "desc": "시트 오른쪽 아래의 Copilot 단추를 누릅니다." },
     {
       "icon": "docsearch",
       "title": "표에 대해 묻기",
@@ -142,6 +143,7 @@
     }
   },
   "messages": [
+    { "role": "cue", "text": "3분기 수주 통합 문서를 열었습니다. 시트 오른쪽 아래의 Copilot 단추로 Copilot 창을 엽니다.", "action": "Copilot", "target": "copilot" },
     {
       "role": "cue",
       "text": "Copilot 창 입력란에 질문이 준비되어 있습니다. 열려 있는 표에 대해 물어보세요.",
