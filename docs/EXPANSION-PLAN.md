@@ -31,6 +31,11 @@
   - Teams: 모임 채팅 머리글(채팅 · 공유 · 노트 · 요약)의 **오른쪽 위 Copilot 아이콘**. 회의 중에는 모임 컨트롤의 Copilot 이고, 회의 뒤 요약과 질문에는 대화 내용 기록이 필요합니다. https://support.microsoft.com/ko-kr/teams/copilot/catch-up-on-meetings-with-microsoft-365-copilot-in-teams
   - Forms: 새 양식 위의 **"Copilot으로 초안 작성"** 상자 → 생성 → 유지 → 오른쪽 아래 Copilot 단추로 채팅, 결과는 위쪽 도구 모음의 **응답 보기**. https://support.microsoft.com/ko-kr/forms/welcome-to-copilot-in-forms
   - 실제 화면을 보지 못한 곳: Teams 회의 중 창, Forms 의 생성 뒤 화면 · 채팅 창 · 응답 보기 화면, Outlook 작성 창 안의 Copilot 상자. 이 부분은 지원 문서의 순서만 따랐습니다.
+- **Teams 기본 (`teams-basics`, 2026-11-14 한국어 Teams 데스크톱 앱의 실제 화면에서 확인)**: Copilot 이 아닌 Teams 기본 기능을 눌러 보는 영역입니다. 화면은 `src/surfaces/TeamsApp.tsx`, 인물·일정은 모두 가상입니다.
+  - 앱 바: 활동 · 채팅 · Teams · 일정 · OneDrive · 통화 · 앱. 채팅 목록 위 연필 아이콘이 **새 메시지**, 받는 사람 줄은 **"대상:"**, 그 오른쪽 끝 화살표로 **"그룹 이름:"** 칸을 엽니다. https://support.microsoft.com/ko-kr/office/microsoft-teams%EC%9D%98-%EA%B7%B8%EB%A3%B9-%EC%B1%84%ED%8C%85%EC%97%90-%EB%8C%80%ED%95%B4-%EC%95%8C%EC%95%84%EC%95%BC-%ED%95%A0-%EC%B2%AB-%EB%B2%88%EC%A7%B8-%EC%82%AC%ED%95%AD-d563174d-ca98-440c-ade1-69176512122d
+  - 일정: **"신규"** → 창 제목 "새 이벤트", "제목 추가" · "필수 참석자 초대" · "스케줄러" · "Microsoft Teams 모임" 토글 · **"저장"**. https://support.microsoft.com/ko-kr/teams/meetings/schedule-a-meeting-in-microsoft-teams
+  - 팀과 파일: Teams 목록의 새 항목 → **새 팀** → 창 제목 "팀 만들기"(팀 이름 · 설명 · 팀 유형 · 첫 번째 채널 이름). 채널의 **공유** 탭 오른쪽 **"만들기 또는 업로드"** 안에 폴더 · 파일 업로드가 있습니다. https://support.microsoft.com/ko-KR/teams/files/share-files-in-microsoft-teams
+  - 테넌트 설정(채팅과 채널을 합쳐 보기 등)에 따라 앱 바와 새 항목 메뉴가 다를 수 있습니다.
 
 ## 영역별 시나리오 초안 (각 3편)
 

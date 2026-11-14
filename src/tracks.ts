@@ -69,6 +69,16 @@ export const TRACKS: Track[] = [
   },
   /* ---------- 제품 기능 체험 (docs/EXPANSION-PLAN.md) ---------- */
   {
+    id: 'teams-basics',
+    group: 'product',
+    products: ['teamsapp'],
+    name: 'Teams 기본',
+    icon: '💬',
+    color: '#5b5fc7',
+    textColor: '#3d3e78',
+    about: '그룹 채팅, 일정, 팀·채널 파일 공유를 순서대로 눌러 보며 익힙니다.',
+  },
+  {
     id: 'm365-apps',
     group: 'product',
     products: ['word', 'powerpoint', 'excel', 'outlook', 'teams', 'forms'],

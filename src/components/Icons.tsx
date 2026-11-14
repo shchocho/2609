@@ -1,7 +1,7 @@
 import { SEMANTIC_ICONS } from './semanticIcons';
 import {
   MegaphoneLoudFilled, PeopleFilled, MoneyFilled, ScalesFilled, HandshakeFilled, BriefcaseFilled,
-  AppsFilled, CodeFilled, FlowFilled, BotFilled,
+  AppsFilled, CodeFilled, FlowFilled, BotFilled, PeopleTeamFilled,
 } from '@fluentui/react-icons';
 import {
   Box24Regular, Briefcase24Regular, DataBarVertical24Regular, Megaphone24Regular, People24Regular, Code24Regular,
@@ -44,6 +44,7 @@ const TRACK_ICONS: Record<string, JSX.Element> = {
   procurement: <ScalesFilled />,
   ops: <HandshakeFilled />,
   dev: <BriefcaseFilled />,
+  'teams-basics': <PeopleTeamFilled />,
   'm365-apps': <AppsFilled />,
   'copilot-code': <CodeFilled />,
   'power-automate': <FlowFilled />,

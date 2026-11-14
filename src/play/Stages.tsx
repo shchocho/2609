@@ -10,6 +10,7 @@ import { Slides } from '../components/messages';
 import { artifactName, fill, pickIds } from '../engine/text';
 import { SCENE_ART, fillArt } from './sceneArt';
 import { SCENE_ART_DRAFT } from './sceneArtDraft';
+import { SCENE_ART_BOARD } from './sceneArtBoard';
 import { DRAFT } from '../look';
 import { COPY } from '../copy';
 
@@ -17,7 +18,7 @@ const POINT_GAP = 900 + 320;
 const BG_SHAPES = new Set(['rect', 'path', 'ellipse', 'circle', 'polygon']);
 
 /** 상황: 그림 + 고민 포인트가 하나씩 나타남. 아무 곳이나 누르면 다음 단계 */
-export function SceneStage({ scene, onNext }: { scene: Scene; onNext: () => void }) {
+export function SceneStage({ scene, onNext, cta = 'Copilot과 해보기' }: { scene: Scene; onNext: () => void; cta?: string }) {
   const [shown, setShown] = useState(0);
   const art = useRef<HTMLSpanElement>(null);
   useEffect(() => {
@@ -25,7 +26,7 @@ export function SceneStage({ scene, onNext }: { scene: Scene; onNext: () => void
     const t = window.setTimeout(() => setShown(n => n + 1), POINT_GAP);
     return () => window.clearTimeout(t);
   }, [shown, scene.points.length]);
-  const tpl = scene.art ? (DRAFT && SCENE_ART_DRAFT[scene.art]) || SCENE_ART[scene.art] : undefined;
+  const tpl = scene.art ? (DRAFT && SCENE_ART_DRAFT[scene.art]) || SCENE_ART[scene.art] || SCENE_ART_BOARD[scene.art] : undefined;
   const svg = tpl ? fillArt(tpl, scene.artSlots) : undefined;
   // 템플릿의 꽉 찬 배경 도형을 숨겨 페이지 배경이 비치게 한다
   useLayoutEffect(() => {
@@ -55,7 +56,7 @@ export function SceneStage({ scene, onNext }: { scene: Scene; onNext: () => void
       </ul>
       <span className="sc-scene-outro" style={{ '--outro-in': `${scene.points.length * POINT_GAP}ms` } as React.CSSProperties}>
         <span className="sc-brandline" aria-hidden="true">Work <em>lighter</em></span>
-        <button type="button" className="sc-start">Copilot과 해보기<ArrowRightRegular aria-hidden="true" /></button>
+        <button type="button" className="sc-start">{cta}<ArrowRightRegular aria-hidden="true" /></button>
       </span>
     </div>
   );
