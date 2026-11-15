@@ -98,6 +98,21 @@ npm run build
 `dist/` 폴더를 정적 호스팅에 올리면 됩니다. 주소는 해시(`#/…`) 방식이고 경로가 모두 상대 경로라, 루트가 아닌 하위 경로에 올려도 서버 설정 없이 동작합니다.
 Azure Static Web Apps를 쓸 때는 함께 들어 있는 `staticwebapp.config.json` 이 그대로 적용됩니다(앱 위치 `/`, 출력 위치 `dist`).
 
+### 웹 배포 (GitHub Pages, 비밀번호 잠금)
+
+주소: https://shchocho.github.io/2609/
+
+- 첫 화면에서 비밀번호를 넣어야 열립니다. 사이트 전체가 비밀번호로 암호화돼 있어 비밀번호 없이는 내용을 읽을 수 없습니다.
+- 맞는 비밀번호를 넣으면 그 창(탭)을 닫기 전까지만 열립니다. 새로고침해도 유지되고, 창을 닫으면 다시 잠깁니다.
+- 이미지·영상·로고 파일은 암호화하지 않습니다. 소스 코드는 공개 저장소에 그대로 있습니다. "아무나 우연히 보지 못하게" 하는 용도입니다.
+- 비밀번호는 저장소에 적지 않습니다. 저장소 Settings → Secrets and variables → Actions 의 `PAGE_PASSWORD` 에 넣어 두면, 이 브랜치에 푸시할 때마다 `.github/workflows/pages.yml` 이 다시 빌드해 `gh-pages` 브랜치에 올립니다.
+- 비밀번호 바꾸기: `PAGE_PASSWORD` 값을 바꾼 뒤 Actions 탭에서 마지막 "GitHub Pages 배포" 실행을 다시 실행(Re-run)하거나, 이 브랜치에 새로 푸시합니다.
+- 직접 만들기: 다음 명령 결과인 `dist-pages/` 폴더 내용을 `gh-pages` 브랜치에 올리면 됩니다.
+
+```bash
+PAGE_PASSWORD='비밀번호' npm run build:pages
+```
+
 ## 고쳐 쓰기
 
 - **문구(제목, 안내, 푸터)**: `src/copy.ts`

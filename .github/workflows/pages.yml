@@ -1,0 +1,58 @@
+# GitHub Pages 자동 배포: 이 브랜치에 푸시하면 비밀번호로 암호화한 사이트를 gh-pages 브랜치에 올립니다.
+# 비밀번호는 저장소 Settings → Secrets and variables → Actions 의 PAGE_PASSWORD 에 넣습니다.
+# PAGE_PASSWORD 가 없으면 배포하지 않고 넘어갑니다(실패로 표시되지 않음).
+name: GitHub Pages 배포
+
+on:
+  push:
+    branches: [claude/busy-wright-7wa9ee]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      HAS_PASSWORD: ${{ secrets.PAGE_PASSWORD != '' }}
+    steps:
+      - name: 비밀번호가 없으면 건너뛰기
+        if: env.HAS_PASSWORD != 'true'
+        run: echo "::notice::PAGE_PASSWORD 비밀 값이 없어 배포를 건너뜁니다."
+
+      - uses: actions/checkout@v4
+        if: env.HAS_PASSWORD == 'true'
+
+      - uses: actions/setup-node@v4
+        if: env.HAS_PASSWORD == 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 설치
+        if: env.HAS_PASSWORD == 'true'
+        run: npm ci
+
+      - name: 암호화한 사이트 만들기
+        if: env.HAS_PASSWORD == 'true'
+        env:
+          PAGE_PASSWORD: ${{ secrets.PAGE_PASSWORD }}
+        run: npm run build:pages
+
+      - name: gh-pages 브랜치에 올리기
+        if: env.HAS_PASSWORD == 'true'
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          cd dist-pages
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Deploy ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages

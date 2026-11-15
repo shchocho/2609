@@ -11,7 +11,8 @@
     "check": "tsc -b",
     "check:scenarios": "node scripts/check-scenarios.mjs",
     "e2e:all": "node scripts/e2e-all.cjs",
-    "build:local": "node scripts/check-scenarios.mjs && tsc -b && vite build --mode offline && node scripts/after-local-build.mjs"
+    "build:local": "node scripts/check-scenarios.mjs && tsc -b && vite build --mode offline && node scripts/after-local-build.mjs",
+    "build:pages": "npm run build:local && node scripts/build-pages.mjs"
   },
   "dependencies": {
     "@fluentui/react-icons": "^2.0.345",
