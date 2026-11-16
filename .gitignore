@@ -4,5 +4,6 @@ dist
 *.local
 *.tsbuildinfo
 dist-local
+dist-pages
 release
 e2e-out
