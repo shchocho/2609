@@ -81,13 +81,15 @@
  */
 .sc-shell[data-real][data-app=outlook] { --or-app: #0f6cbd; --or-bar: #e3ecf7; }
 .sc-shell[data-real][data-app=teams] { --or-app: #5b5fc7; --or-bar: #ebebeb; }
-.sc-shell[data-real][data-app=forms] { --or-app: #038387; --or-bar: #fff; }
+.sc-shell[data-real][data-app=forms] { --or-app: #0f6c7c; --or-bar: transparent; background: linear-gradient(120deg, #cfe5fb 0%, #e8f2f3 45%, #e2f3e8 100%); }
 .ww-title { gap: 10px; padding-left: 12px; color: #242424; background: var(--or-bar); border-bottom: 0; }
 .ww-title .sc-win-name { flex: none; font-weight: 600; }
-.ww-title.is-forms { color: #fff; background: var(--or-app); }
-.ww-title.is-forms .sc-win-name { color: #fff; }
-.ww-doc { margin: 0 auto; white-space: nowrap; }
-.ww-title.is-forms .or-me { margin-right: 12px; color: var(--or-app); background: #fff; }
+.ww-title.is-forms { height: 48px; padding-left: 20px; }
+.ww-title.is-forms .sc-win-name { display: flex; align-items: center; gap: 16px; font-size: 16px; }
+.ww-title.is-forms svg { font-size: 20px; }
+.ww-doc { display: inline-flex; align-items: center; gap: 6px; margin: 0 auto; white-space: nowrap; }
+.ww-title.is-forms .ww-ico { gap: 18px; padding-right: 6px; border: 0; }
+.ww-title.is-forms .or-me { margin-right: 16px; }
 .ww-ribbon { gap: 4px; padding: 0 8px 6px; background: var(--or-bar); border-bottom: 1px solid var(--or-line); }
 .ww-cmds { display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 4px 6px; overflow: hidden; font-size: 12.5px; white-space: nowrap; color: #424242; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px #00000024, 0 0 1px #0000001f; }
 .ww-cmds svg { font-size: 18px; }
@@ -110,10 +112,19 @@
 .ww-end .ww-txt { padding: 5px 12px; font-weight: 600; color: #fff; background: var(--or-app); border-radius: 4px; }
 .ww-copilot.is-small { width: 30px; height: 30px; margin: 0; border-color: transparent; }
 /* Forms: 위쪽 도구 모음(스타일 · 설정 · 미리 보기 · 응답 수집 · 응답 보기) */
-.ww-ribbon.is-forms { padding: 6px 16px; background: #fff; }
-.ww-cmds.is-end { justify-content: flex-end; gap: 18px; min-height: 34px; padding: 0; box-shadow: none; }
-.ww-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; font-weight: 600; color: var(--or-app); border: 1px solid var(--or-app); border-radius: 4px; }
-.ww-pill.is-fill { color: #fff; background: var(--or-app); }
+.ww-ribbon.is-forms { padding: 4px 20px 10px; border-bottom: 0; }
+.ww-cmds.is-end { justify-content: flex-end; gap: 18px; min-height: 34px; padding: 0; font-weight: 600; color: #242424; background: none; box-shadow: none; }
+.ww-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; color: var(--or-app); background: #fff; border: 1px solid var(--or-app); border-radius: 999px; }
+.ww-pill.is-fill { color: #fff; background: linear-gradient(90deg, #12807f, #1f5f9c); border-color: transparent; }
+/* Forms: 연한 배경 위의 흰 양식 카드, 왼쪽의 서식 파일 단추 */
+.sc-shell[data-real][data-app=forms] .sc-canvas { margin: 0 clamp(84px, 8%, 150px); background: #fff; border-radius: 16px 16px 0 0; }
+.sc-shell[data-app=forms] .sc-canvas .wb-wd { background: none; }
+.ww-tpl { position: absolute; top: 96px; left: 14px; display: grid; justify-items: center; gap: 2px; width: 60px; padding: 26px 0; font-size: 10.5px; color: #242424; background: #f1f7f8; border-radius: 999px; }
+.ww-tpl svg { font-size: 20px; }
+@media (orientation: portrait) {
+  .sc-shell[data-app=forms] .sc-canvas { margin: 0 12px; }
+  .ww-tpl { display: none; }
+}
 /* 본문 */
 .sc-shell[data-real][data-app=teams] .sc-canvas { background: #f5f5f5; }
 .ww-sum { display: flex; align-items: center; gap: 8px; margin: 12px 16px 0; padding: 8px 12px; font-size: 12.5px; color: #242424; background: #f5f5f5; border: 1px solid var(--or-line); border-radius: 6px; }
@@ -126,6 +137,12 @@
 /* 초안이 만들어지면 상자를 줄여 아래의 양식이 보이게 한다 */
 .sc-shell.is-office .sc-pane.ww-draft.is-made { max-height: 250px; }
 .ww-draft .sc-date, .sc-shell[data-app=forms] .sc-canvas .wb-wd-page:empty { display: none; }
+/* 상자 안의 입력란: 글 아래에 글자 수 · 붙이기 · 보내기 */
+.sc-shell[data-real] .sc-pane .sc-composer.is-draft { flex-wrap: wrap; gap: 6px 14px; border-radius: 6px; }
+.sc-composer.is-draft > span { flex: 0 0 100%; min-height: 3em; }
+.sc-composer.is-draft > small { margin-right: auto; font-size: 11.5px; }
+.sc-shell[data-real] .sc-composer.is-draft > i { display: flex; gap: 14px; }
+.sc-composer.is-draft .sc-pane-send { font-size: 18px; color: #424242; background: none; }
 /* 왼쪽: Outlook 폴더 · Teams 앱 바 */
 .sc-shell[data-app=outlook] .sc-app-nav { padding: 10px 8px; font-size: 12.5px; background: var(--or-bar); }
 .sc-shell[data-app=outlook] .sc-app-nav i { padding: 7px 10px; text-align: left; }

@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { ArrowLeftRegular, ChevronLeftRegular, ChevronRightRegular, ColumnTripleRegular, SlideMultipleRegular, ChevronRight20Regular } from '@fluentui/react-icons';
 import { trackById } from '../tracks';
-import { APP_LOGO, appsOf, madeAppOf, productName, scenariosOf } from '../data';
+import { cardLogo, madeAppOf, productName, scenariosOf } from '../data';
 import { go, HASH_HOME, hashPlay } from '../router';
 import { COPY } from '../copy';
 import type { Scenario } from '../types';
@@ -156,9 +156,7 @@ export function TrackList({ track }: { track: string }) {
                   style={{ '--o': o, viewTransitionName: s ? `scenario-${s.id}` : undefined } as React.CSSProperties}
                 >
                   <span className="booth-orbit-stack" data-mark="logo" aria-hidden="true">
-                    {(s ? appsOf(s) : []).slice(-3).map(app => (
-                      <span key={app} data-product={app}><img src={APP_LOGO[app]} alt="" /></span>
-                    ))}
+                    {s && <span><img src={cardLogo(s)} alt="" /></span>}
                   </span>
                   <button
                     type="button"

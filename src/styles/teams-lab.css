@@ -169,3 +169,8 @@
 .tl-views i.on { color: #3d3e78; background: var(--tl-soft); border-color: #c5cbfa; }
 .tl-dialog > p { margin: -6px 0 2px; font-size: 12.5px; color: var(--tl-sub); }
 .tl-dialog label > span:last-child { display: flex; }
+/* 채팅 목록 위쪽의 Copilot · 빨리 보기(멘션 · 초안) — 2026-11-17 실제 화면 */
+.tl-row.is-quick { padding-block: 5px; }
+.tl-row.is-quick > :is(img, svg) { flex: none; width: 20px; height: 20px; margin: 0 4px; font-size: 20px; color: #424242; }
+.tl .sc-tm-lead { gap: 14px; margin-left: 8px; font-size: 18px; }
+.tl .sc-tm-title { padding-right: 0; }

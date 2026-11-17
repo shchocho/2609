@@ -79,15 +79,16 @@ export const APP_LOGO: Record<AppId, string> = {
   onenote: 'brand/m365-icon-gradient/onenote.png',
 };
 
-/** 시나리오에 등장하는 앱 목록 (apps 가 없으면 workbench 아티팩트에서 유추) */
-export function appsOf(s: Scenario): AppId[] {
-  if (s.apps) return s.apps.filter(isApp);
-  const list: { app: AppId; made: boolean }[] = [];
-  for (const a of Object.values(s.workbench?.artifacts ?? {})) {
-    if (isApp(a.app) && !list.some(x => x.app === a.app)) list.push({ app: a.app, made: a.origin === 'made' });
-  }
-  return list.sort((a, b) => Number(a.made) - Number(b.made)).map(x => x.app);
-}
+const SURFACE_LOGO: Record<string, string> = {
+  ...APP_LOGO,
+  forms: 'logo/m365/forms.svg',
+  teamsapp: APP_LOGO.teams,
+  studio: 'logo/copilot/copilot-studio.svg',
+  cloudflow: 'logo/copilot/power-automate.svg',
+  deskflow: 'logo/copilot/power-automate.svg',
+};
+/** 목록 카드 왼쪽 위의 제품 로고 한 개. Chat·Cowork·Code 는 전용 공식 아이콘이 없어 Copilot 로고를 쓴다 */
+export const cardLogo = (s: Scenario) => SURFACE_LOGO[s.surface ?? ''] ?? 'logo/copilot/copilot.png';
 export function madeAppOf(s: Scenario): AppId | undefined {
   for (const a of Object.values(s.workbench?.artifacts ?? {})) if (a.origin === 'made' && isApp(a.app)) return a.app;
   return undefined;

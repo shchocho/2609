@@ -9,9 +9,10 @@ import type { Artifact, Pick, PlayState, Scenario, Vars } from '../types';
 import { artifactName, filterBy } from '../engine/text';
 import { ArtifactView } from '../components/artifacts';
 import { PickText, SlashPopup, type Mark, type PickPhase } from '../components/chrome';
-import { MicRegular, NavigationRegular, ShieldCheckmarkRegular } from '@fluentui/react-icons';
+import { AttachRegular, MicRegular, NavigationRegular, NotebookRegular, SendRegular, ShieldCheckmarkRegular, TableSimpleRegular } from '@fluentui/react-icons';
 import { OfficeRibbon, OfficeStatus, OfficeTitle, REAL } from './OfficeChrome';
 import { isWeb, WebTop } from './WebChrome';
+import { CsNav, CsStart, CsTop, isCs } from './CopilotChrome';
 
 interface Ui {
   app: string;
@@ -22,8 +23,6 @@ interface Ui {
   nav?: string[];
   /** Copilot 창에 처음 보이는 제안 단추 글 */
   tips?: string[];
-  /** 만들기 전에 메인 화면에 뜨는 시작 화면의 [제목, 안내] */
-  create?: [string, string];
   /** 오른쪽 창 제목. 없으면 Office 의 Copilot 창 머리(모델 칩 · 편집 허용)를 쓴다 */
   pane?: string;
   head?: string;
@@ -106,10 +105,7 @@ const UI: Record<string, Ui> = {
   },
   studio: {
     app: 'Copilot Studio',
-    tabs: ['에이전트', '개요', '지식', '도구', '채널', '분석'],
-    groups: [['▷', '테스트'], ['', '게시', 'publish']],
-    nav: ['홈', '에이전트', '흐름', '도구', '활동'],
-    create: ['새 에이전트 만들기', '어떤 일을 하는 에이전트인지 설명해 주세요.'],
+    tabs: [], groups: [],
     pane: '에이전트 테스트',
     head: '만든 에이전트와 바로 대화해 볼 수 있습니다.',
     input: '메시지를 입력하세요',
@@ -118,9 +114,7 @@ const UI: Record<string, Ui> = {
   code: {
     app: 'Microsoft Copilot',
     tabs: ['앱', '미리보기', '데이터', '권한'],
-    groups: [['', '공유'], ['', '게시', 'publish']],
-    nav: ['Home', 'Code', 'Autopilot'],
-    create: ['무엇을 만들까요?', '만들고 싶은 앱이나 자동화를 말로 설명해 주세요.'],
+    groups: [],
     pane: 'Copilot',
     head: '만들고 싶은 앱을 말로 설명해 보세요.',
     sub: '화면·데이터·권한 계획을 먼저 보여 드린 뒤 샌드박스에서 만듭니다.',
@@ -155,8 +149,9 @@ export function AppWindow({ s, st, vars, ids, shown, streamRef, mark, ask, onSen
   const view = doc?.deck && building ? { ...doc, deck: { slides: building.length ? building : [{ n: 1, head: '제목을 추가하려면 클릭' }] } } : doc;
   const slide = building ? Math.max(1, filterBy(building, ids).length) : st.slide;
   const slides = view?.deck ? view.deck.total ?? filterBy(view.deck.slides, ids).length : 1;
-  // Copilot Studio · Code 는 만들기 전에 메인 화면의 시작 화면부터 보인다 (만들기 단추를 누를 차례일 때)
-  const creating = !!ui.create && writing === 0 && !!doc && target === 'create';
+  // Copilot Studio · Code 는 실제 화면의 왼쪽 메뉴 · 위쪽 막대를 쓰고, 만들기 전에는 시작 화면부터 보인다 (target 'create' 를 누를 차례일 때)
+  const cs = isCs(surface) ? surface : null;
+  const creating = !!cs && writing === 0 && !!doc && target === 'create';
   // 화면의 단추를 누를 차례에는 입력란을 비워 둔다
   const typed = target ? null : ask;
   const hot = (act?: string) => !!act && act === target;
@@ -164,7 +159,7 @@ export function AppWindow({ s, st, vars, ids, shown, streamRef, mark, ask, onSen
   // Word · Excel · PowerPoint 는 실제 데스크톱 앱의 제목 표시줄 · 리본을 쓴다. Copilot 창은 문서 오른쪽 아래의 Copilot 단추로 연다
   const real = REAL[surface];
   const copilotAt = s.messages.findIndex(m => m.role === 'cue' && m.target === 'copilot');
-  const paneOpen = copilotAt < 0 || shown > copilotAt;
+  const paneOpen = (copilotAt < 0 || shown > copilotAt) && !creating; // 시작 화면에는 오른쪽 창이 없다
   const name = creating ? '새로 만들기' : doc ? artifactName(doc, ids) : s.title;
   // Outlook · Teams · Forms 는 실제 화면의 위쪽 모양을 쓴다. Outlook · Teams 는 위쪽의 Copilot 단추로 창을 연다
   const web = isWeb(surface) ? surface : null;
@@ -174,17 +169,19 @@ export function AppWindow({ s, st, vars, ids, shown, streamRef, mark, ask, onSen
   const webName = web === 'teams' ? Object.values(arts).find(fits)?.name ?? name : web === 'forms' && writing === 0 ? '제목 없는 양식' : name;
   const navOn = web === 'outlook' && doc?.origin !== 'made' ? 0 : 1;
   const composer = pane.input && (
-    <div className={`sc-composer is-pane sc-zone ${mark('composer')}`}>
-      <b aria-hidden="true">＋</b>
+    <div className={`sc-composer is-pane sc-zone ${mark('composer')}${draft ? ' is-draft' : ''}`}>
+      {!draft && <b aria-hidden="true">＋</b>}
       <span className={typed ? 'is-filled' : undefined}>{typed && pick ? <PickText text={typed} pick={pick} phase={pickPhase} /> : typed ?? (draft ? DRAFT_HINT : pane.input)}</span>
-      <i aria-hidden="true">{real || web ? <MicRegular /> : '🎤'}</i>
-      {onSend && !target && <button type="button" className="sc-pane-send is-hunt" aria-label="보내기" onClick={onSend}>↑</button>}
+      {draft && <small aria-hidden="true">{typed?.length ?? 0} / 2000</small>}
+      <i aria-hidden="true">{draft ? <><NotebookRegular /><AttachRegular /></> : real || web ? <MicRegular /> : '🎤'}</i>
+      {onSend && !target && <button type="button" className="sc-pane-send is-hunt" aria-label="보내기" onClick={onSend}>{draft ? <SendRegular /> : '↑'}</button>}
       {slashOpen && pick && <SlashPopup pick={pick} active={pickPhase === 'pick'} onPick={pickPhase === 'search' ? onPickSelect : undefined} />}
     </div>
   );
   return (
-    <div className="sc-shell is-office" data-app={surface} data-real={real || web ? '' : undefined}>
-      {real ? <OfficeTitle r={real} surface={surface} name={name} me="나" /> : web ? null : (
+    <div className="sc-shell is-office" data-app={surface} data-real={real || web ? '' : undefined} data-cs={cs ? '' : undefined}>
+      {cs && <CsNav surface={cs} session={creating ? undefined : name} />}
+      {real ? <OfficeTitle r={real} surface={surface} name={name} me="나" /> : web || cs ? null : (
         <div className="sc-win">
           <span className="sc-win-name">
             {!ui.pane && <span className="sc-save">자동 저장 ●</span>}{name} · {ui.app}
@@ -198,7 +195,8 @@ export function AppWindow({ s, st, vars, ids, shown, streamRef, mark, ask, onSen
           r={real} className={`sc-zone ${mark('ribbon')}`}
           extra={surface === 'excel' ? <div className="or-fx" aria-hidden="true"><i>A1</i><b>fx</b><span /></div> : undefined}
         />
-      ) : web ? <WebTop surface={web} name={webName} zone={`sc-zone ${mark('ribbon')}`} hot={hot('copilot')} onAct={onAct} /> : (
+      ) : web ? <WebTop surface={web} name={webName} zone={`sc-zone ${mark('ribbon')}`} hot={hot('copilot')} onAct={onAct} />
+        : cs ? <CsTop surface={cs} name={creating ? '제목 없는 에이전트' : name} live={ids.includes('live') || doc?.origin === 'read'} creating={creating} tabs={ui.tabs} zone={`sc-zone ${mark('ribbon')}`} hot={hot('publish')} onAct={onAct} /> : (
         <div className={`sc-ribbon sc-zone ${mark('ribbon')}`}>
           <span className="sc-ribbon-tabs">{ui.tabs.map((t, i) => <i key={t} className={i === 1 ? 'on' : undefined}>{t}</i>)}</span>
           <span className="sc-ribbon-groups">
@@ -225,15 +223,8 @@ export function AppWindow({ s, st, vars, ids, shown, streamRef, mark, ask, onSen
             </div>
           )}
           {web === 'outlook' && doc?.origin === 'read' && <span className="ww-sum"><img src="logo/copilot/copilot.png" alt="" />이 이메일 요약</span>}
-          {creating ? (
-            <div className="st-create">
-              <b>{ui.create?.[0]}</b>
-              <span>{ui.create?.[1]}</span>
-              <p>{ask ?? s.workbench?.ask}</p>
-              {surface === 'studio' && <i>{doc?.blocks?.[0]?.meta?.[0]}</i>}
-              <button type="button" className="is-hunt" data-act="create" onClick={onAct}>만들기</button>
-            </div>
-          ) : view && (
+          {web === 'forms' && <span className="ww-tpl" aria-hidden="true"><TableSimpleRegular />서식 파일</span>}
+          {creating && cs ? <CsStart surface={cs} ask={ask ?? s.workbench?.ask ?? ''} model={vars.model} onAct={onAct} /> : view && (
             <ArtifactView
               a={view} writing={writing} vars={vars} ids={ids} slide={slide} moved={st.moved} over={st.over} onSlide={onSlide}
               act={{ target, go: onAct }}
@@ -258,7 +249,7 @@ export function AppWindow({ s, st, vars, ids, shown, streamRef, mark, ask, onSen
         </div>
         )}
       </div>
-      {real ? <OfficeStatus r={real} lead={surface === 'powerpoint' ? `슬라이드 ${slide}/${slides}` : undefined} /> : web ? null : (
+      {real ? <OfficeStatus r={real} lead={surface === 'powerpoint' ? `슬라이드 ${slide}/${slides}` : undefined} /> : web || cs ? null : (
         <div className="sc-status">
           <span>{surface === 'powerpoint' ? `슬라이드 ${slide}/${slides}` : ui.status}</span>
           <span>한국어</span>

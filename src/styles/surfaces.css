@@ -261,32 +261,115 @@
 .booth-product-board:has(> article:nth-child(4)) li button { font-size: min(3cqh, 1.3cqw); padding: min(2.4cqh, 1.1cqw); }
 .booth-product-board:has(> article:nth-child(6)) header > h2 { font-size: min(3cqh, 1.42cqw); }
 
-/* ---------- Copilot Studio: 왼쪽 탐색 · 위쪽 한 줄(탭 + 테스트·게시) · 메인 화면에서 직접 만들기 ---------- */
+/* ---------- 왼쪽 탐색(Outlook 폴더 · Teams 앱 바) ---------- */
 .sc-app-nav { display: grid; align-content: start; gap: 2px; padding: 10px 6px; font-size: 10.5px; color: #605e5c; background: #f5f4f2; border-right: 1px solid var(--sc-line, #e6e3df); }
 .sc-app-nav i { padding: 9px 2px; font-style: normal; text-align: center; border-radius: 6px; }
 .sc-app-nav i.on { font-weight: 600; color: var(--track-ink); background: color-mix(in srgb, var(--track) 12%, #fff); }
-.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-office-body { grid-template-columns: 64px minmax(0, 1fr) clamp(300px, 26%, 400px); }
-.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 16px; }
-.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups { flex-wrap: nowrap; gap: 8px; }
-.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups > :is(span, button) { display: inline-flex; align-items: center; gap: 6px; min-width: 0; padding: 6px 16px; font: inherit; color: #1b1a19; background: #fff; border: 1px solid #c8c6c4; border-radius: 6px; }
-.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups > :last-child { color: #fff; background: var(--track); border-color: var(--track); }
-.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups > :last-child i { color: #fff; }
-.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups :is(b, i) { font-size: 12.5px; font-style: normal; color: inherit; }
-.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups b:empty { display: none; }
-.sc-shell.is-office:is([data-app=studio], [data-app=code]) .sc-ribbon-groups button { cursor: pointer; }
 /* 아직 채우지 않은 설정 카드와 "+ 추가" 단추 */
 .wb-wd-sec.is-empty { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-style: dashed !important; background: #fdfdfc !important; box-shadow: none !important; }
 .wb-wd-sec.is-empty h4 { margin: 0; }
 .wb-add { flex: none; padding: 6px 14px; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--track-ink, #5c3d8a); background: #fff; border: 1px solid currentColor; border-radius: 999px; }
 button.wb-add { cursor: pointer; }
-/* 에이전트를 만들기 전의 메인 화면 */
-.st-create { width: min(560px, calc(100% - 48px)); margin: 48px auto; padding: 26px 28px; display: grid; gap: 10px; justify-items: start; font-family: var(--desk-font); background: #fff; border: 1px solid #e1dfdd; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .08); }
-.st-create > b { font-size: 19px; }
-.st-create > span { font-size: 13px; color: #605e5c; }
-.st-create > p { width: 100%; margin: 4px 0; padding: 12px 14px; font-size: 14px; line-height: 1.7; background: #faf9f8; border: 1px solid #c8c6c4; border-radius: 8px; }
-.st-create > i { padding: 2px 10px; font-size: 12px; font-style: normal; color: var(--track-ink); background: color-mix(in srgb, var(--track) 10%, #fff); border-radius: 999px; }
-.st-create > :is(button, u) { justify-self: end; padding: 8px 24px; font: inherit; font-size: 13.5px; font-weight: 600; text-decoration: none; color: #fff; background: var(--track); border: 0; border-radius: 6px; }
-.st-create > button { cursor: pointer; }
+/*
+ * Copilot Studio(빌드 화면) · Copilot 앱의 코드 탭: 실제 화면(한국어, 2026-11-17 확인)의 왼쪽 메뉴 · 위쪽 막대 · 시작 화면.
+ * src/surfaces/CopilotChrome.tsx
+ */
+.sc-shell.is-office[data-cs] { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); color: #242424; }
+.sc-shell.is-office[data-cs] > :is(.cs-top, .sc-office-body) { grid-column: 2; }
+.cs-nav { grid-row: 1 / -1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; font-size: 13px; border-right: 1px solid #e0e0e0; border-radius: var(--borderRadiusLarge) 0 0 var(--borderRadiusLarge); }
+.cs-nav i { display: grid; place-items: center; font-style: normal; }
+.cs-nav svg { flex: none; font-size: 20px; }
+.cs-nav em { flex: 1; }
+.cs-nav.is-studio { align-items: center; gap: 6px; width: 52px; padding: 12px 0; background: #fafafa; }
+.cs-nav.is-studio img { width: 24px; height: 24px; margin-bottom: 14px; }
+.cs-nav.is-studio i { width: 38px; height: 34px; color: #424242; border-radius: 8px; }
+.cs-nav.is-studio i.on { color: #242424; background: #e6e6e6; }
+.cs-nav.is-studio b { display: grid; place-items: center; width: 26px; height: 26px; font-size: 11px; color: #fff; background: #5b5fc7; border-radius: 50%; }
+.cs-nav.is-code { gap: 2px; width: clamp(170px, 17vw, 230px); padding: 12px 10px; background: #fff; }
+.cs-brand { display: flex; align-items: center; gap: 10px; padding: 0 4px 10px; color: #424242; }
+.cs-brand b { margin-right: auto; font-size: 17px; font-weight: 600; color: #242424; }
+.cs-seg { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 10px; padding: 3px; background: #f0f0f0; border-radius: 10px; }
+.cs-seg i { padding: 5px 0; color: #616161; border-radius: 8px; }
+.cs-seg i.on { font-weight: 600; color: #242424; background: #fff; box-shadow: 0 1px 2px #0000001f; }
+.cs-row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #424242; border-radius: 10px; }
+.cs-row.on { font-weight: 600; color: #242424; background: #ededed; }
+.cs-label { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 4px 6px; font-size: 12px; color: #616161; }
+.cs-label i:first-of-type { margin-left: auto; }
+.cs-label svg { font-size: 16px; }
+.cs-nav.is-code > small { padding: 6px 6px 4px; font-size: 12px; color: #616161; }
+.cs-me { display: flex; align-items: center; gap: 8px; padding: 4px; color: #424242; }
+.cs-me > b { flex: none; display: grid; place-items: center; width: 28px; height: 28px; font-size: 11px; color: #fff; background: #5b5fc7; border-radius: 50%; }
+.cs-me > span { flex: 1; display: grid; min-width: 0; }
+.cs-me strong { font-size: 12px; font-weight: 400; }
+.cs-me u { margin-right: 5px; padding: 0 5px; font-size: 10.5px; font-weight: 600; text-decoration: none; color: #fff; background: #242424; border-radius: 4px; }
+.cs-me small { font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #707070; }
+
+.cs-top { display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 0 14px; font-size: 13px; white-space: nowrap; background: #fff; border-bottom: 1px solid #e0e0e0; border-radius: 0 var(--borderRadiusLarge) 0 0; }
+.cs-top.is-code { padding-right: 0; border-bottom-color: transparent; }
+.cs-top.is-code:has(.cs-name) { border-bottom-color: #e0e0e0; }
+.cs-name { flex: 1 1 0; display: flex; align-items: center; gap: 10px; min-width: 0; }
+.cs-name b { font-size: 15px; overflow: hidden; text-overflow: ellipsis; }
+.cs-badge { flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px; font-style: normal; font-size: 11.5px; font-weight: 600; background: #f5f5f5; border: 1px solid #d1d1d1; border-radius: 999px; }
+.cs-badge::before { content: ""; width: 8px; height: 8px; background: #616161; border-radius: 50%; }
+.cs-tabs { flex: none; display: flex; overflow: hidden; border: 1px solid #d1d1d1; border-radius: 6px; }
+.cs-tabs i { padding: 6px 20px; font-style: normal; color: #424242; background: #fff; }
+.cs-tabs i + i { border-left: 1px solid #d1d1d1; }
+.cs-tabs i.on { font-weight: 600; color: var(--track-ink); }
+.cs-tabs i.off { color: #a3a3a3; background: #ebebeb; }
+.cs-end { flex: 1 1 0; display: flex; align-items: center; justify-content: flex-end; gap: 12px; align-self: stretch; }
+.cs-end > i { display: grid; font-style: normal; color: #424242; }
+.cs-end > i svg { font-size: 19px; }
+.cs-end .cs-shield { color: #107c10; }
+.cs-frontier { padding: 1px 5px; font-size: 10.5px; font-weight: 600; letter-spacing: .02em; border: 1px solid #616161; border-radius: 4px; }
+.cs-btn, .cs-publish { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; font: inherit; font-weight: 600; border-radius: 8px; }
+.cs-btn { background: #fff; border: 1px solid #d1d1d1; }
+.cs-btn svg { font-size: 18px; }
+.cs-publish { padding-inline: 24px; color: #3d3fbf; background: #e8ebfa; border: 0; }
+[data-app=code] .cs-publish { color: #fff; background: #242424; }
+button.cs-publish { cursor: pointer; }
+
+/* Copilot Studio: 에이전트 이름 · 안내(지침) · 오른쪽의 기술/도구/지식 상자 */
+.sc-shell.is-office[data-app=studio] .sc-canvas:has(.cs-build) { background: #fff; }
+.cs-build { display: flex; align-items: flex-start; gap: 24px; padding: 28px 16px 28px clamp(24px, 6%, 90px); font-family: var(--desk-font); }
+.cs-build-main { flex: 1; display: grid; gap: 14px; min-width: 0; }
+.cs-build-head { display: flex; align-items: center; gap: 22px; margin-bottom: 26px; }
+.cs-build-head i { flex: none; display: grid; place-items: center; width: 52px; height: 52px; font-size: 30px; color: #fff; background: linear-gradient(135deg, #4cc2ff, #2b88d8); border-radius: 12px; }
+.cs-build-head span { flex: 1; padding: 6px 2px; font-size: 26px; font-weight: 700; border: 1px solid #c7c7c7; border-bottom: 2px solid #4f52b2; border-radius: 6px; }
+.cs-build-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #616161; }
+.cs-build-bar b { display: inline-flex; align-items: center; gap: 5px; font-size: 14px; color: #242424; }
+.cs-build-bar span { display: flex; align-items: center; gap: 12px; }
+.cs-build-bar i { display: inline-flex; align-items: center; gap: 4px; font-style: normal; font-size: 12.5px; }
+.cs-build-bar svg { font-size: 17px; }
+.cs-build-main p { margin: 0; font-size: 14px; line-height: 1.75; color: #424242; }
+.cs-build-main button { justify-self: start; margin-top: 6px; padding: 8px 26px; font: inherit; font-size: 13.5px; font-weight: 600; color: #fff; background: #4f52b2; border: 0; border-radius: 8px; cursor: pointer; }
+.cs-panel { flex: none; display: grid; width: clamp(240px, 30%, 420px); padding: 8px 16px; font-size: 12px; background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; box-shadow: 0 4px 14px #0000001a; }
+.cs-panel > span { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 12px; padding: 12px 0; }
+.cs-panel b { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.cs-panel u { padding: 0 6px; font-size: 10.5px; font-weight: 400; text-decoration: none; border: 1px solid #d1d1d1; border-radius: 999px; }
+.cs-panel small { grid-column: 1; font-size: 12px; line-height: 1.5; color: #616161; }
+.cs-panel i { grid-area: 1 / 2 / span 2; display: grid; font-size: 20px; color: #424242; }
+.cs-panel .cs-toggle { width: 38px; height: 20px; border: 1px solid #616161; border-radius: 999px; }
+.cs-panel .cs-toggle::before { content: ""; width: 12px; height: 12px; margin: 3px; background: #616161; border-radius: 50%; }
+
+/* Copilot 앱 코드 탭: "함께 만들어 보세요." 와 입력 상자 */
+.sc-shell.is-office[data-app=code] .sc-canvas:has(.cs-start) { background: #fff; }
+.cs-start { display: grid; gap: 16px; width: min(760px, calc(100% - 48px)); margin: clamp(24px, 9vh, 110px) auto 32px; font-family: var(--desk-font); }
+.cs-start h2 { margin: 0 0 14px 22px; font-size: clamp(24px, 2.6vw, 34px); font-weight: 400; }
+.cs-ask { display: grid; gap: 12px; padding: 8px; font-size: 13px; border: 1px solid #e0e0e0; border-radius: 22px; box-shadow: 0 6px 22px #0000001a; }
+.cs-ask i { display: inline-flex; align-items: center; gap: 6px; font-style: normal; color: #424242; }
+.cs-ask svg { font-size: 18px; }
+.cs-ask-top { display: flex; gap: 22px; padding: 9px 16px; background: #f5f5f5; border-radius: 16px; }
+.cs-ask p { margin: 0; padding: 4px 16px; font-size: 14.5px; line-height: 1.7; }
+.cs-ask-end { display: flex; align-items: center; gap: 16px; padding: 2px 10px 6px 14px; }
+.cs-ask-end em { flex: 1; }
+.cs-send { display: grid; place-items: center; width: 32px; height: 32px; color: #fff; background: #242424; border: 0; border-radius: 50%; cursor: pointer; }
+.cs-start > b { margin-top: 26px; font-size: 13px; }
+.cs-tips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.cs-tips span { padding: 16px; font-size: 13.5px; line-height: 1.5; border: 1px solid #e0e0e0; border-radius: 16px; }
+@media (orientation: portrait) {
+  .cs-nav, .cs-panel { display: none; }
+  .cs-tips { grid-template-columns: 1fr; }
+}
 
 /* 앱 미리보기 안의 누를 수 있는 단추, 만들기 직후의 빈 화면 */
 .wb-app-btn button { font-family: inherit; border: 0; cursor: pointer; }

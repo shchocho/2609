@@ -20,6 +20,7 @@ import {
   ComposeRegular, ChevronDownRegular, FilterRegular, VideoRegular, PeopleAddRegular, SendRegular, AddRegular,
   ArrowUploadRegular, FolderRegular, DocumentRegular, MoreHorizontalRegular, SearchRegular, CheckmarkCircleRegular,
   EmojiRegular, AttachRegular, PeopleTeamRegular, PeopleTeamFilled, ShareRegular, LinkRegular, LockClosedRegular, EditRegular,
+  DraftsRegular, MentionRegular, TextEditStyleRegular,
 } from '@fluentui/react-icons';
 import type { Scenario, TeamsLab } from '../types';
 import type { Mark } from '../components/chrome';
@@ -89,7 +90,7 @@ function ChatView({ c, g, sent, typed }: { c: Ctx; g: NonNullable<TeamsLab['grou
       </div>
       <div className={`tl-compose sc-zone ${mark('composer')}`}>
         <span className={typed ? 'is-filled' : undefined}>{typed ?? '메시지를 입력하세요.'}</span>
-        <i><EmojiRegular /></i><i><AttachRegular /></i>
+        <i><TextEditStyleRegular /></i><i><EmojiRegular /></i><i><AttachRegular /></i><i><AddRegular /></i>
         <B c={c} act="send" className="tl-send" label="보내기"><SendRegular /></B>
       </div>
     </>
@@ -273,6 +274,10 @@ function ListPane({ c, t, app, sent }: { c: Ctx; t: TeamsLab; app: string; sent?
   return (
     <>
       {head('채팅', ['읽지 않음', '채팅', '모임 채팅'])}
+      <span className="tl-row is-quick"><img src="logo/copilot/copilot.png" alt="" /><span><b>Copilot</b></span></span>
+      <u>빨리 보기</u>
+      <span className="tl-row is-quick"><MentionRegular /><span><b>멘션</b></span></span>
+      <span className="tl-row is-quick"><DraftsRegular /><span><b>초안</b></span></span>
       <u>채팅</u>
       {t.mode === 'chat' && has('new') && !has('sent') && <span className="tl-row is-on"><Av name="＋" /><span><b>새 메시지</b></span></span>}
       {t.mode === 'chat' && has('sent') && g && <span className="tl-row is-on"><Av name={g.name} team /><span><b>{g.name}</b><em>나: {sent?.slice(0, 18)}…</em></span></span>}
@@ -293,9 +298,9 @@ export function TeamsApp({ s, shown, mark, target, onAct, ask }: {
   return (
     <div className={`sc-shell is-teams tl${wide ? ' is-wide' : ''}`} data-app="teamsapp" data-mode={t.mode}>
       <div className="sc-tm-title">
-        <span className="sc-tm-lead"><b>T</b>Microsoft Teams</span>
+        <span className="sc-tm-lead"><i>‹</i><i>›</i></span>
         <span className="sc-tm-search"><i><SearchRegular /></i>검색하거나 Copilot에게 질문하기(Ctrl+E)</span>
-        <span className="sc-tm-right"><i>⋯</i><b>{t.me.slice(0, 1)}</b></span>
+        <span className="sc-tm-right"><i>⋯</i><b>{t.me.slice(0, 1)}</b><span className="sc-win-btns" aria-hidden="true"><i>─</i><i>▢</i><i>✕</i></span></span>
       </div>
       <nav className={`tl-rail sc-zone ${mark('rail')}`} aria-label="Teams 앱 바">
         {RAIL.map(([id, name, ico, icoOn]) => (

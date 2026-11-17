@@ -6,9 +6,9 @@
  */
 import type { ReactNode } from 'react';
 import {
-  ArchiveRegular, ArrowForwardRegular, ArrowReplyAllRegular, ArrowReplyRegular, ComposeRegular, DataBarVerticalRegular,
-  DeleteRegular, EyeRegular, FlashRegular, FolderArrowRightRegular, MailReadRegular, MoreHorizontalRegular, NavigationRegular,
-  PaintBrushRegular, PeopleRegular, SearchRegular, SendRegular, SettingsRegular, SlideLayoutRegular, VideoRegular,
+  ArchiveRegular, ArrowForwardRegular, ArrowReplyAllRegular, ArrowReplyRegular, ChatRegular, ComposeRegular, DataBarVerticalRegular,
+  DeleteRegular, EyeRegular, FlashRegular, FolderArrowRightRegular, GridDotsRegular, MailReadRegular, MoreHorizontalRegular, NavigationRegular,
+  PaintBrushRegular, PeopleRegular, QuestionRegular, SearchRegular, SendRegular, SettingsRegular, ShieldQuestionRegular, SlideLayoutRegular, VideoRegular,
 } from '@fluentui/react-icons';
 
 export type WebSurface = 'outlook' | 'teams' | 'forms';
@@ -84,8 +84,9 @@ export function WebTop({ surface, name, zone, hot, onAct }: Props) {
   return (
     <>
       <div className="sc-win ww-title is-forms">
-        <span className="sc-win-name"><b>Forms</b></span>
-        <span className="ww-doc">{name} - 저장됨 ⌄</span>
+        <span className="sc-win-name"><GridDotsRegular /><b>Forms</b></span>
+        <span className="ww-doc">{name} <ShieldQuestionRegular /> - 저장됨 ⌄</span>
+        <span className="ww-ico">{icons([<QuestionRegular />, <ChatRegular />])}</span>
         <span className="or-me" aria-hidden="true">나</span>
       </div>
       <div className={`sc-ribbon ww-ribbon is-forms ${zone}`}>
