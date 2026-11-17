@@ -358,7 +358,7 @@ function FlowScreenView({ screen, acts, live, run }: { screen: FlowScreen; acts:
   );
 }
 
-function FlowView({ a, writing, vars, ids }: ViewProps) {
+function FlowView({ a, writing, vars, ids, act }: ViewProps) {
   if (!a.flow) return null;
   const steps = filterBy(a.flow.steps, ids);
   const beats = flowBeats(steps);
@@ -366,9 +366,15 @@ function FlowView({ a, writing, vars, ids }: ViewProps) {
   const at = beat < beats.length ? beats[beat].step : steps.length; // 끝난 단계 수
   const now = writing != null && beat > 0 ? beats[beat - 1].step : -1; // 지금 하고 있는 단계
   const run = !!a.flow.run;
+  const shown = run ? steps : steps.slice(0, Math.max(at, now + 1));
+  // 클라우드 흐름 디자이너(앱 창)의 마지막 카드 아래 추가 단추: 빈 흐름이면 "트리거 추가", 카드가 있으면 "작업 추가".
+  // cue.target 이 'trigger' · 'action' 이면 직접 누를 수 있다
+  const add = act && !run && a.app === 'cloudflow' && now < 0
+    ? (shown.length ? { id: 'action', label: '작업 추가' } : { id: 'trigger', label: '트리거 추가' })
+    : null;
   const list = (
     <ol className={`fl${run ? ' is-run' : ''}`} data-app={a.app}>
-      {(run ? steps : steps.slice(0, Math.max(at, now + 1))).map((x, i) => {
+      {shown.map((x, i) => {
         const ran = run && i < at;
         const cls = [ran ? `is-${x.state ?? 'ok'}` : '', i === now ? 'is-now' : ''].filter(Boolean).join(' ');
         return (
@@ -381,6 +387,13 @@ function FlowView({ a, writing, vars, ids }: ViewProps) {
           </li>
         );
       })}
+      {add && (
+        <li className="fl-add">
+          {act?.target === add.id
+            ? <button type="button" className="wb-add is-hunt" data-act={add.id} onClick={act.go}>＋ {add.label}</button>
+            : <span className="wb-add">＋ {add.label}</span>}
+        </li>
+      )}
     </ol>
   );
   if (!a.flow.screen) return list;

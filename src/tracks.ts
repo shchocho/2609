@@ -96,7 +96,7 @@ export const TRACKS: Track[] = [
     icon: '🧩',
     color: '#0f7b6c',
     textColor: '#0b5a4f',
-    about: '개발자가 아니어도 말로 설명해 업무용 앱과 자동화를 만듭니다.',
+    about: '개발자가 아니어도 말로 설명해 업무용 앱과 자동화를 만듭니다. (Frontier 미리 보기)',
   },
   {
     id: 'power-automate',

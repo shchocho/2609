@@ -145,6 +145,9 @@
 .fl li.is-fail > em { color: #a4262c; }
 .fl li.is-skip > u { background: #8a8886; }
 .fl li.is-skip > em { color: #605e5c; }
+/* 클라우드 흐름 디자이너의 "트리거 추가" · "작업 추가" (마지막 카드 아래) */
+.fl li.fl-add { display: block; width: auto; padding: 0; background: none; border: 0; box-shadow: none; counter-increment: none; }
+.fl li.fl-add .wb-add { display: inline-block; --track-ink: var(--fl); }
 /* 데스크톱 흐름: 번호가 붙은 작업 목록 */
 .fl[data-app=deskflow] { justify-items: stretch; gap: 0; padding: 12px 16px 20px; }
 .fl[data-app=deskflow] li { width: auto; grid-template-columns: 26px 30px minmax(0, 1fr) auto; padding: 8px 12px; border-radius: 0; border-width: 0 0 1px; box-shadow: none; }

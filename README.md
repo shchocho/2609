@@ -11,7 +11,7 @@ Microsoft **Copilot Chat**과 **Copilot Cowork**가 실제 업무를 어떻게 �
 | 화면 | 주소 | 내용 |
 |---|---|---|
 | 대기 | `#/` | 배경 영상과 "체험해보기". 아무 곳이나 누르면 홈으로 |
-| 홈 | `#/start` | 업무 영역 5개 · 제품 기능 체험 4개 선택 |
+| 홈 | `#/start` | 업무 영역 5개 · 제품 기능 체험 5개 선택 |
 | 시나리오 목록 | `#/t/<영역>` | 카드 회전 보기 / 제품별(Chat·Cowork) 보기 |
 | 재생 | `#/t/<영역>/<시나리오>` | 상황 → 흐름 → 체험 → 결과 |
 
@@ -41,10 +41,13 @@ Microsoft **Copilot Chat**과 **Copilot Cowork**가 실제 업무를 어떻게 �
 | | 설비 모니터링 SaaS 기술 문의 답변과 고객 안내 자료 준비 | Cowork |
 | | 차세대 진동 센서·예지보전 출시 보도자료 초안 | Chat |
 
-### 제품 기능 체험 (15편 · `docs/EXPANSION-PLAN.md`)
+### 제품 기능 체험 (18편 · `docs/EXPANSION-PLAN.md`)
 
 | 영역 | 시나리오 | 제품 |
 |---|---|---|
+| Teams 기본 | 설치 준비 TF 그룹 채팅방 만들고 첫 공지 보내기 | Teams 채팅 |
+| | 설치 준비 회의를 Teams 일정으로 만들고 참석자 초대하기 | Teams 일정 |
+| | 프로젝트 팀을 만들고 채널 파일에 폴더를 만들어 공유하기 | Teams 팀·채널 |
 | Copilot in 앱 | 회의 메모와 지난 제안서로 고객 제안서 초안 쓰기 | Copilot in Word |
 | | 회사 템플릿에서 Word 제안서로 10장 발표자료 만들기 | Copilot in PowerPoint |
 | | 분기 영업 실적 시트에서 원인 분석·수식 열·차트 만들기 | Copilot in Excel |
@@ -60,6 +63,9 @@ Microsoft **Copilot Chat**과 **Copilot Cowork**가 실제 업무를 어떻게 �
 | Copilot Code | 부서 장비 대여 신청 앱을 말로 만들기 | Code 탭 |
 | | 설비 점검 체크리스트 앱 만들고 이상은 Teams로 알리기 | Code 탭 |
 | | 영업 주간 실적 대시보드 앱 만들기 | Code 탭 |
+
+- Power Automate 클라우드 흐름 2편은 디자이너의 "트리거 추가" · "작업 추가"로 카드를 직접 넣습니다. 디자이너 안의 Copilot 은 2026-11-30 지원 종료(MC1540258)라 쓰지 않습니다.
+- 출시 상태(2026-11-17 확인): Copilot Code 는 Frontier 미리 보기, Copilot Managed Runtime 은 공개 미리 보기입니다. 제품 상태가 자주 바뀌므로 날짜와 근거 문서는 `docs/EXPANSION-PLAN.md` 의 "제품 사실 확인"에 함께 적습니다.
 
 ## 로컬에서 확인하기
 
@@ -130,7 +136,7 @@ npm run check:scenarios
 - `overview`: 흐름 화면의 단계 카드.
 - `workbench`: Cowork 시나리오의 작업 이름(`task`)과 결과물(`artifacts`: 엑셀 `sheet`, 워드 `doc`, 메일 `mail`, PPT `deck`, Teams `teams`).
 - `messages`: 체험 화면에서 순서대로 재생되는 대화.
-  - `cue` 입력창 안내 → 다음 `user` 메시지가 입력창에 미리 채워짐. 앱 창 시나리오에서 `target` 을 주면 말풍선 버튼 대신 화면 안의 그 단추(`create` 시작 화면의 만들기 · `publish` 위쪽 게시 · 설정 카드의 깃발 이름 · 앱 미리보기 `button` 블록의 `label`)를 직접 누르게 합니다. 뒤에 `user` 메시지가 오면 그 글이 시작 화면에 보이고, 단추를 누르면 대화에 올라갑니다
+  - `cue` 입력창 안내 → 다음 `user` 메시지가 입력창에 미리 채워짐. 앱 창 시나리오에서 `target` 을 주면 말풍선 버튼 대신 화면 안의 그 단추(`create` 시작 화면의 만들기 · `publish` 위쪽 게시 · 설정 카드의 깃발 이름 · 앱 미리보기 `button` 블록의 `label` · 클라우드 흐름 캔버스의 `trigger`(트리거 추가) · `action`(작업 추가) · 위쪽 명령 막대의 `save`(저장) · `test`(테스트))를 직접 누르게 합니다. 클라우드 흐름은 카드마다 `only` 깃발을 달고 도구 메시지의 `sets` 로 하나씩 나타나게 합니다. 뒤에 `user` 메시지가 오면 그 글이 시작 화면에 보이고, 단추를 누르면 대화에 올라갑니다
   - `assistant` 답변(`files` 로 결과물 카드, `sources` 로 출처, `images` 로 생성 이미지)
   - `tool` 작업 단계(`opens`·`shows` 열기, `writes` 한 줄씩 작성, 앱 창 시나리오에서는 `sets` 로 깃발을 켜 `only`/`not` 이 걸린 블록을 단계마다 나타나게 함)
   - `approve` 실행 전 권한 확인, `choice` 기준 고르기(`only`/`not` 으로 선택별 내용 분기), `hunt` 기능 찾기 퀴즈, `spot` 화면 영역 찾기 퀴즈

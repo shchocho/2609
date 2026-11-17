@@ -16,11 +16,21 @@
 
 - **Copilot Code**: 2026-09-25 발표된 새 Microsoft Copilot 앱의 Code 탭. 개발자가 아닌 사람이 자연어로 앱·자동화를 만들고, 테넌트 안의 샌드박스에서 실행하며 Copilot Managed Runtime 에 게시합니다. GitHub Copilot 과 같은 기술 기반이고, 사용량(크레딧) 과금이라 관리자가 지출 정책을 만들어야 테넌트에서 동작합니다. Frontier 프로그램으로 먼저 배포됐습니다.
   - https://blogs.microsoft.com/blog/2026/09/25/introducing-the-new-copilot-with-home-code-and-autopilot/
-- **Copilot Studio 하네스**: 에이전트를 실행하는 오케스트레이션 방식. GitHub Copilot harness 는 2026-08-03 GA 되었고, 2026-10-28 부터 **Microsoft Copilot harness** 로 이름이 바뀌었습니다(Foundry 에도 같은 하네스). 대화 경로를 직접 그리는 대신 자연어 지침으로 에이전트를 설명하고, 스킬·메모리·MCP 서버/워크플로 도구·훅을 붙입니다. Standard 하네스 에이전트는 코딩 에이전트용 Copilot Studio 플러그인의 `/migrate` 로 옮길 수 있습니다.
+  - 2026-11-17 다시 확인: 아직 **Frontier 미리 보기**입니다(관리 문서 제목이 "(Frontier)", 2026-10-28 갱신). Copilot Managed Runtime 은 2026-09-25 **공개 미리 보기**로 나왔고, GA 발표는 찾지 못했습니다. 홈의 Copilot Code 카드 설명에 "(Frontier 미리 보기)"를 붙였습니다.
+  - https://learn.microsoft.com/en-us/copilot/code/code-admin
+  - https://www.microsoft.com/en-us/copilot/blog/copilot-studio/build-where-you-want-run-with-confidence-now-microsoft-hosts-and-manages-the-code-created-by-copilot/
+- **Copilot Studio 하네스**: 에이전트를 실행하는 오케스트레이션 방식. GitHub Copilot harness 는 2026-08-03 GA 되었고, 2026-10-28 에 **Microsoft Copilot harness** 로 이름을 바꾼다고 발표했습니다(Foundry 에도 같은 하네스). 제품 화면의 표기는 발표 뒤 몇 주에 걸쳐 바뀌므로, 테넌트에 따라 아직 옛 이름이 보일 수 있습니다. 대화 경로를 직접 그리는 대신 자연어 지침으로 에이전트를 설명하고, 스킬·메모리·MCP 서버/워크플로 도구·훅을 붙입니다. Standard 하네스 에이전트는 코딩 에이전트용 Copilot Studio 플러그인의 `/migrate` 로 옮길 수 있습니다.
   - https://learn.microsoft.com/en-us/microsoft-copilot-studio/harnesses-overview
   - https://blogs.microsoft.com/blog/2026/10/28/introducing-the-microsoft-copilot-harness-unlocking-the-potential-of-truly-multi-model-agentic-work/
 - **Power Automate**: 데스크톱 흐름은 Windows UI 를 조작하는 RPA(커넥터가 없는 레거시 프로그램), 클라우드 흐름은 커넥터·API 기반 프로세스 자동화(DPA). 클라우드 흐름에서 데스크톱 흐름을 호출할 수 있습니다. Copilot 은 클라우드 흐름 생성·수정을 주로 돕고, 데스크톱 흐름 지원은 상대적으로 제한적입니다.
   - https://learn.microsoft.com/en-us/power-platform/release-plan/2026wave1/power-automate/copilot-power-automate
+  - **2026-11-30 지원 종료 (2026-11-17 확인)**: 클라우드 흐름 · 에이전트 흐름 디자이너 안의 Copilot(MC1540258, 2026-11-05 공지)과 설명으로 새 흐름을 만드는 "Describe it to design it"(MC1537406, 2026-11-03 공지). 이미 만든 흐름은 그대로이고, 디자이너에서 직접 만들기 · 템플릿 · 흐름 검사기 · 실행 기록은 계속 씁니다. 말로 만드는 길로는 AI 도우미(GitHub Copilot CLI · Claude Code)의 Power Automate 플러그인, Copilot Studio 의 MCP 연결이 안내돼 있습니다. 두 공지 모두 데스크톱 흐름(Power Automate for desktop)의 Copilot 은 언급하지 않습니다.
+    - https://mc.merill.net/message/MC1540258
+    - https://mc.merill.net/message/MC1537406
+  - 그래서 클라우드 흐름 시나리오 2편(`pa-dpa-expense-approval`, `pa-hybrid-inventory`)은 Copilot 창 대신 캔버스의 **"트리거 추가"** · **"작업 추가"**와 위쪽 명령 막대의 **"저장"** · **"테스트"**를 직접 누르게 바꿨습니다(`cue.target`: `trigger` · `action` · `save` · `test`). 단추 이름은 한국어 Learn 문서(새 디자이너: 실행 취소 · 다시 실행 · 흐름 검사기 · 저장 · 테스트, 빈 흐름의 "트리거 추가" 노드, + 를 누르면 열리는 "작업 추가" 창)를 따랐습니다. 실제 한국어 화면은 아직 보지 못했습니다.
+    - https://learn.microsoft.com/ko-kr/power-automate/flows-designer
+    - https://learn.microsoft.com/ko-kr/power-automate/get-started-logic-flow
+  - 데스크톱 흐름 직접 트리거(RM579975): 2027-01 미리 보기, 2027-03 GA 예정. 그전까지는 지금처럼 클라우드 흐름에서 데스크톱 흐름을 부릅니다.
 - **Copilot in Word·PowerPoint·Excel**: 각 앱 리본의 Copilot 단추와 오른쪽 Copilot 창에서 초안 작성·요약·다시 쓰기(Word), 문서로 발표자료 만들기(PowerPoint), 데이터 분석·수식·차트(Excel). Excel·Word 의 에이전트 모드 이름과 범위는 화면 문구 확정 전에 최신 문서로 확인합니다.
 
 > 화면 표기 결정 필요: 하네스 이름을 "Microsoft Copilot harness (구 GitHub Copilot harness)" 로 쓸지, 요청대로 "GitHub Copilot harness" 로 쓸지. 기본값은 앞의 것.
@@ -36,6 +46,12 @@
   - 일정: **"신규"** → 창 제목 "새 이벤트", "제목 추가" · "필수 참석자 초대" · "스케줄러" · "Microsoft Teams 모임" 토글 · **"저장"**. https://support.microsoft.com/ko-kr/teams/meetings/schedule-a-meeting-in-microsoft-teams
   - 팀과 파일: Teams 목록의 새 항목 → **새 팀** → 창 제목 "팀 만들기"(팀 이름 · 설명 · 팀 유형 · 첫 번째 채널 이름). 채널의 **공유** 탭 오른쪽 **"만들기 또는 업로드"** 안에 폴더 · 파일 업로드가 있습니다. https://support.microsoft.com/ko-KR/teams/files/share-files-in-microsoft-teams
   - 테넌트 설정(채팅과 채널을 합쳐 보기 등)에 따라 앱 바와 새 항목 메뉴가 다를 수 있습니다.
+- **실제 화면에서 다시 확인할 것 (2026-11-17, 외부 정리 글 · Learn "What's new" 기준이라 아직 고치지 않음)**:
+  - Copilot 앱 왼쪽 메뉴(`src/components/chrome.tsx`): "에이전트 및 기술" 단추가 **"플러그인"**으로 바뀌는 중(2026-10 말 ~ 11 말 배포). "전자 필기장"(Notebooks)은 **Copilot Workspaces**로 바뀌는 중(Frontier 먼저, 일반 배포 2027-01 예정).
+  - Cowork 모델 목록(`src/data.ts` 의 GPT 5.5 · Opus 5 · Sonnet 5 · Fable 5.1): Learn "What's new in Copilot Cowork"(2026-11-16 갱신)에 GPT 6 Astra(9월), GPT 6.1 Sol(10월, GPT 6 Sol 대체), Grok 4.7(10월)이 추가돼 있습니다. 실제 모델 선택 목록과 설명 문구를 보고 맞춥니다. https://learn.microsoft.com/en-us/copilot/cowork/whats-new
+  - Cowork 새 기능(아직 시나리오에 없음): Planner 플러그인 · OneNote 지원(11월), Projects · 홈의 Chat/Cowork 전환(10월, Frontier).
+  - Scout 는 **Autopilot** 으로 이름이 바뀌었습니다. `src/data.ts` 의 `scout`(Microsoft Scout)는 원본 부스에서 남은 값이고 쓰는 시나리오는 없습니다.
+  - Microsoft Ignite 2026(2026-11-17 ~ 20) 발표 뒤 이름 · 출시 상태를 한 번 더 확인합니다.
 
 ## 영역별 시나리오 초안 (각 3편)
 
@@ -87,6 +103,7 @@
 5. **(완료)** `copilot-code` 화면 + 3편 — `agent: "code"`, `surface: "code"`. 앱 미리보기도 문서 블록(`app: "code"`)으로 그리고 `button`·`chart` 블록을 더함. Copilot Studio 와 같이 메인 화면의 시작 화면 · 앱 안의 단추 · 위쪽 게시 단추를 직접 누르게 함
 5-1. **(완료 · 계획에 없던 추가)** `m365-apps` 에 Outlook(`outlook-thread-reply`) · Teams(`teams-meeting-catchup`) · Forms(`forms-training-survey`) 한 편씩 추가
 6. 전체 점검: `npm run check:scenarios`, `npm run build`, `npm run build:local`, e2e 로 새 시나리오 전부 결과 화면까지
+7. **(완료 · 2026-11-17)** Power Automate 클라우드 흐름 2편을 디자이너에서 직접 만들기로 변경(디자이너 Copilot 2026-11-30 지원 종료). 흐름 화면에 "트리거 추가" · "작업 추가" 단추(`src/components/artifacts.tsx` 의 `FlowView`)와 명령 막대의 저장 · 테스트 단추를 더함
 
 ## 완료 기준
 

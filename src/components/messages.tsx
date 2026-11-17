@@ -23,8 +23,10 @@ function toolCategory(t: string) {
 export interface Clip { name: string; app: string; link?: boolean }
 
 /** 대화 메시지 하나 (cue/spot/approve/choice/hunt 는 별도 UI로 처리하므로 그리지 않음) */
-export function MessageView({ m, active, ids, extra, hold = false, clips, pick, acts = '' }: {
+export function MessageView({ m, active, ids, extra, hold = false, clips, pick, acts = '', toolIco = 'logo/copilot/copilot.png' }: {
   m: Message; active?: boolean; ids?: string[]; extra?: ReactNode; hold?: boolean; clips?: Clip[]; pick?: Pick; acts?: string;
+  /** 작업 단계 카드의 아이콘. Copilot 없이 사람이 조작하는 화면(Power Automate 흐름)은 그 제품 로고를 쓴다 */
+  toolIco?: string;
 }) {
   if (m.role === 'cue' || m.role === 'spot' || m.role === 'approve' || m.role === 'choice' || m.role === 'hunt') return null;
   if (ids && m.only && !m.only.some(id => ids.includes(id))) return null;
@@ -32,7 +34,7 @@ export function MessageView({ m, active, ids, extra, hold = false, clips, pick, 
   if (m.role === 'tool') {
     return (
       <div className={`sc-act${active ? ' is-now' : ' is-done'}`}>
-        <p className="sc-act-h"><img className="sc-act-ico" src="logo/copilot/copilot.png" alt="" aria-hidden="true" />{toolCategory(m.tool)}<i aria-hidden="true">›</i></p>
+        <p className="sc-act-h"><img className="sc-act-ico" src={toolIco} alt="" aria-hidden="true" />{toolCategory(m.tool)}<i aria-hidden="true">›</i></p>
         <p className="sc-act-d">{m.tool}</p>
       </div>
     );
@@ -190,10 +192,11 @@ const MARK_A = 'M609.124 435.184L605.261 450.65H568.079C540.534 450.65 516.501 4
 const MARK_B = 'M472.295 646.234L476.157 630.768H513.34C540.884 630.768 564.918 612.018 571.589 585.281L605.242 450.631H672.445C711.506 450.631 740.174 487.339 730.694 525.242L696.952 660.191C688.034 695.828 656.013 720.827 619.287 720.827H530.526C491.465 720.827 462.797 684.119 472.277 646.217L472.295 646.234Z';
 const MARK_MASK = `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='341 341 400 400'><path d='${MARK_A}'/><path d='${MARK_B}'/></svg>`)}")`;
 
-export function Working({ label = '작업 중…' }: { label?: string }) {
+/** plain: Copilot 이 아닌 화면(Power Automate 흐름)이라 Copilot 표시 없이 글만 보인다 */
+export function Working({ label = '작업 중…', plain = false }: { label?: string; plain?: boolean }) {
   return (
     <p className="cpw cpw-copilot" aria-live="polite">
-      <span className="cpw-shimmer-mark" style={{ maskImage: MARK_MASK, WebkitMaskImage: MARK_MASK }} aria-hidden="true" />
+      {!plain && <span className="cpw-shimmer-mark" style={{ maskImage: MARK_MASK, WebkitMaskImage: MARK_MASK }} aria-hidden="true" />}
       <span className="cpw-t">{label}</span>
     </p>
   );

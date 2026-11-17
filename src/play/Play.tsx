@@ -146,6 +146,7 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
           ids={ids}
           hold={i === holdAt}
           acts={actsMark}
+          {...(s.agent === 'flow' ? { toolIco: 'logo/copilot/power-automate.svg' } : {})}
           {...(i === firstUserIdx && pick ? { pick } : {})}
         />
       )))}
@@ -160,7 +161,7 @@ export function Play({ track, scenario }: { track: string; scenario: string }) {
           note={p.approve.warn ? <>⚠ {p.approve.warn}</> : undefined}
         />
       )}
-      {p.busy && <Working />}
+      {p.busy && <Working plain={s.agent === 'flow'} />}
     </>
   );
 
