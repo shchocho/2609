@@ -1,6 +1,6 @@
-# GitHub Pages 자동 배포: 이 브랜치에 푸시하면 비밀번호로 암호화한 사이트를 gh-pages 브랜치에 올립니다.
-# 비밀번호는 저장소 Settings → Secrets and variables → Actions 의 PAGE_PASSWORD 에 넣습니다.
-# PAGE_PASSWORD 가 없으면 배포하지 않고 넘어갑니다(실패로 표시되지 않음).
+# GitHub Pages 자동 배포: 이 브랜치에 푸시하면 사이트를 gh-pages 브랜치에 올립니다.
+# 2026-11-19: 비밀번호 잠금을 없애고 공개 배포로 바꿨습니다(피싱 오판 대응, scripts/build-pages.mjs 머리말 참고).
+# 저장소의 PAGE_PASSWORD 비밀 값은 더 이상 쓰지 않습니다.
 name: GitHub Pages 배포
 
 on:
@@ -18,34 +18,21 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      HAS_PASSWORD: ${{ secrets.PAGE_PASSWORD != '' }}
     steps:
-      - name: 비밀번호가 없으면 건너뛰기
-        if: env.HAS_PASSWORD != 'true'
-        run: echo "::notice::PAGE_PASSWORD 비밀 값이 없어 배포를 건너뜁니다."
-
       - uses: actions/checkout@v4
-        if: env.HAS_PASSWORD == 'true'
 
       - uses: actions/setup-node@v4
-        if: env.HAS_PASSWORD == 'true'
         with:
           node-version: 22
           cache: npm
 
       - name: 설치
-        if: env.HAS_PASSWORD == 'true'
         run: npm ci
 
-      - name: 암호화한 사이트 만들기
-        if: env.HAS_PASSWORD == 'true'
-        env:
-          PAGE_PASSWORD: ${{ secrets.PAGE_PASSWORD }}
+      - name: 사이트 만들기
         run: npm run build:pages
 
       - name: gh-pages 브랜치에 올리기
-        if: env.HAS_PASSWORD == 'true'
         env:
           TOKEN: ${{ github.token }}
         run: |
